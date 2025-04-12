@@ -4,8 +4,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "backend":"cd backend && nodemon server.js",
-    "frontend":"cd frontend && npm start"
+    "backend": "cd backend && nodemon server.js",
+    "frontend": "cd frontend && npm start"
   },
   "keywords": [],
   "author": "",
