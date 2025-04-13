@@ -23,7 +23,6 @@ const Login = () => {
               />
             </div>
 
-
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -39,7 +38,6 @@ const Login = () => {
               </button>
             </div>
 
-
             <div className="flex items-center justify-between text-sm text-gray-600">
               <label className="flex items-center gap-2">
                 <input type="checkbox" className="accent-purple-600" />
@@ -50,14 +48,12 @@ const Login = () => {
               </button>
             </div>
 
-
             <button
               type="submit"
               className="w-full bg-black text-white text-lg font-bold rounded-full py-3 transition-transform duration-300 hover:scale-105"
             >
               LOGIN
             </button>
-
 
             <p className="text-center text-gray-700 text-sm mt-4">
               Don’t have an account?{" "}
@@ -67,7 +63,6 @@ const Login = () => {
             </p>
           </form>
         </div>
-
 
         <div className="hidden md:flex w-1/2 items-center justify-center bg-gradient-to-br from-purple-500 to-indigo-600 p-8 relative">
           <div className="absolute inset-0 bg-[url('/src/assets/images/login.png')] mt-10 mb-30 bg-contain bg-no-repeat bg-center opacity-90 rounded-3xl"></div>
