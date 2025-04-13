@@ -1,4 +1,29 @@
 @import "tailwindcss";
 
 @theme {
+  --font-logo: "Orbitron", sans-serif;
+
+  --color-primary-100: #f2ebfd;
+  --color-primary-200: #e5d7fb;
+  --color-primary-300: #d0b5f8;
+  --color-primary-400: #b98ff4;
+  --color-primary-500: #a269f0;
+  --color-primary-600: #843eee;
+  --color-primary-700: #6a32be;
+  --color-primary-800: #50268f;
+  --color-primary-900: #361a5f;
+  --color-footer-100: #e9eaec;
+  --color-footer-200: #d3d5d9;
+  --color-footer-300: #bdc1c6;
+  --color-footer-400: #a7acb3;
+  --color-footer-500: #8c94a3;
+  --color-footer-600: #6b7280;
+  --color-footer-700: #4b5563;
+  --color-footer-800: #1d2026;
+  --color-footer-900: #111318;
+  --color-footer-text: #8c94a3;
+}
+
+.containertwo {
+  width: 100%;
 }
