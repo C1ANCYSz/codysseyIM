@@ -33,7 +33,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="bg-primary-600 relative h-[75vh] w-full rounded-lg md:rounded-4xl">
+      <div className="bg-primary-600 relative w-full rounded-lg pt-20 pb-30 md:rounded-4xl">
         <div className="absolute inset-0 bg-[url(/src/assets/images/wiggly.png)] bg-cover bg-center opacity-30"></div>
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
           <h2 className="text-center text-3xl font-bold tracking-wide text-white uppercase md:text-5xl lg:text-6xl">
@@ -90,7 +90,7 @@ const Home = () => {
           </div>
         </div>
       </div>
-      <div className="relative h-[85vh] w-full rounded-lg bg-[#D2EEFF] md:rounded-4xl">
+      <div className="relative w-full rounded-lg bg-[#D2EEFF] pt-20 pb-30 md:rounded-4xl">
         <div className="absolute inset-0 bg-[url(/src/assets/images/wiggly.png)] bg-cover bg-center opacity-30"></div>
         <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
           <h2 className="text-center text-3xl font-bold tracking-wide uppercase md:text-5xl lg:text-6xl">
