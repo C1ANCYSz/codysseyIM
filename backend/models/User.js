@@ -9,9 +9,9 @@ const userRoadmapSchema = new mongoose.Schema({
     ref: 'Roadmap',
     required: true,
   },
-  activeStage: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Stage',
+  completedStages: {
+    type: Number,
+    default: 0,
   },
   completed: {
     type: Boolean,
@@ -49,7 +49,9 @@ const userSchema = new mongoose.Schema(
         message: 'Passwords do not match',
       },
     },
+
     roadmaps: [userRoadmapSchema],
+
     role: {
       type: String,
       enum: ['student', 'admin', 'content manager', 'academy'],
@@ -63,7 +65,6 @@ const userSchema = new mongoose.Schema(
 
     verificationToken: String,
     verificationTokenExpiresAt: Date,
-
     resetPasswordToken: String,
     resetPasswordExpiresAt: Date,
     passwordChangedAt: Date,
