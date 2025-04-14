@@ -1,17 +1,21 @@
 import { useForm } from "react-hook-form";
 import { MdOutlineEmail } from "react-icons/md";
+import { useForgotPassword } from "../hooks/useForgotPassword";
+import { useSearchParams } from "react-router-dom";
 
-function AccountRecovery() {
+function EmailForm({ setStep }) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const { forgotPassword, isLoading, error } = useForgotPassword();
 
   function onSubmit(data) {
-    console.log(data);
+    forgotPassword({ email: data.email, setStep });
+    setSearchParams({ email: data.email });
   }
-
   return (
     <div className="via-primary-600 flex min-h-dvh w-full items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 p-4 text-center lg:min-h-[calc(100dvh-80px)]">
       <div className="flex w-full max-w-md flex-col rounded-3xl bg-gradient-to-r from-purple-800 to-purple-600 p-1 md:max-w-2xl">
@@ -58,4 +62,4 @@ function AccountRecovery() {
   );
 }
 
-export default AccountRecovery;
+export default EmailForm;

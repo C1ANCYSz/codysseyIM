@@ -3,24 +3,36 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import AppLayout from "./ui/AppLayout";
-import AccountRecovery from "./pages/AccountRecovery";
-import ConfirmRecovery from "./pages/ConfirmRecovery";
+import ForgotPassword from "./pages/ForgotPassword";
+import ConfirmRecovery from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";
+import { AuthProvider } from "./context/AuthProvider";
+import PrivateRoute from "./ui/PrivateRoute";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<AppLayout />}>
-          <Route index element={<Home />} />
-          <Route path="login" element={<Login />} />
-          <Route path="signup" element={<Signup />} />
-          <Route path="account-recovery" element={<AccountRecovery />} />
-          <Route path="confirm-recovery" element={<ConfirmRecovery />} />
-          <Route path="reset-password" element={<ResetPassword />} />
-        </Route>
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<AppLayout />}>
+            <Route index element={<Home />} />
+            <Route path="login" element={<Login />} />
+            <Route path="signup" element={<Signup />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route
+              path="dashboard"
+              element={
+                <PrivateRoute>
+                  <div>Dashboard</div>
+                </PrivateRoute>
+              }
+            />
+          </Route>
+        </Routes>
+      </Router>
+      <Toaster />
+    </AuthProvider>
   );
 }
 

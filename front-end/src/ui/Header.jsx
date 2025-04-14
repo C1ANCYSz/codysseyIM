@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
+import { useAuth } from "../context/AuthProvider";
+import { useLogout } from "../hooks/useLogout";
+
 function Header() {
+  const { isLoggedIn } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
+  const { logout } = useLogout();
   return (
     <div className="bg-footer-900 border-primary-600 relative border-b-2 py-2 shadow-sm md:py-4">
       <div className="container mx-auto px-4">
@@ -49,18 +54,33 @@ function Header() {
               </ul>
             </nav>
           </div>
-          <div className="hidden items-center gap-4 md:flex">
-            <Link to="/login">
-              <button className="cursor-pointer rounded-md border bg-white px-6 py-2 font-bold text-black duration-200 hover:bg-gray-200">
-                Login
-              </button>
-            </Link>
-            <Link to="/signup">
-              <button className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-md border-2 border-white px-6 py-2 font-bold text-white duration-200">
-                Signup
-              </button>
-            </Link>
-          </div>
+          {!isLoggedIn ? (
+            <div className="hidden items-center gap-4 md:flex">
+              <Link to="/login">
+                <button className="cursor-pointer rounded-md border bg-white px-6 py-2 font-bold text-black duration-200 hover:bg-gray-200">
+                  Login
+                </button>
+              </Link>
+              <Link to="/signup">
+                <button className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-md border-2 border-white px-6 py-2 font-bold text-white duration-200">
+                  Signup
+                </button>
+              </Link>
+            </div>
+          ) : (
+            <div className="hidden items-center gap-4 md:flex">
+              <Link to="/dashboard">
+                <button className="cursor-pointer rounded-md border bg-white px-6 py-2 font-bold text-black duration-200 hover:bg-gray-200">
+                  Dashboard
+                </button>
+              </Link>
+              <Link to="/logout" onClick={logout}>
+                <button className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-md border-2 border-white px-6 py-2 font-bold text-white duration-200">
+                  Logout
+                </button>
+              </Link>
+            </div>
+          )}
         </div>
       </div>
     </div>
