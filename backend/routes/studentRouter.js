@@ -61,7 +61,11 @@ router.get(
     if (user.role === 'student') {
       return res.status(200).json({
         success: true,
-        data: { user },
+        data: {
+          _id: user._id,
+          name: user.name,
+          roadmaps: user.roadmaps,
+        },
       });
     } else {
       return res.status(200).json({
