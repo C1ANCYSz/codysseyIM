@@ -10,6 +10,7 @@ import { AuthProvider } from "./context/AuthProvider";
 import PrivateRoute from "./ui/PrivateRoute";
 import { Toaster } from "react-hot-toast";
 import Dashboard from "./pages/Dashboard";
+import Certificates from "./pages/Certificates";
 
 function App() {
   return (
@@ -26,6 +27,14 @@ function App() {
               element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="certificates"
+              element={
+                <PrivateRoute>
+                  <Certificates />
                 </PrivateRoute>
               }
             />
