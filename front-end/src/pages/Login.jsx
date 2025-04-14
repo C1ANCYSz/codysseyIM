@@ -1,9 +1,30 @@
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useForm } from "react-hook-form";
+import { useAuth } from "../context/AuthProvider";
+import { useLogin } from "../hooks/useLogin";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
+
+  const { register, handleSubmit } = useForm();
+
+  const { isLoggedIn, setIsLoggedIn } = useAuth(); // Access global auth state
+
+  const { login, isLoading, error } = useLogin();
+
+  // Redirect if the user is already logged in
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate("/dashboard");
+    }
+  }, [isLoggedIn]);
+
+  function onSubmit(data) {
+    login(data);
+  }
 
   return (
     <div className="via-primary-600 flex h-dvh w-screen items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 px-2 lg:h-[calc(100dvh-80px)]">
@@ -14,12 +35,13 @@ const Login = () => {
           </h1>
           <p className="mb-8 text-gray-700">Welcome back to our community</p>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
             <div>
               <input
                 type="email"
                 placeholder="Your Email"
                 className="focus:border-primary-600 w-full rounded-md border-2 border-black px-4 py-3 text-lg focus:outline-none"
+                {...register("email", { required: true })}
               />
             </div>
 
@@ -28,6 +50,7 @@ const Login = () => {
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 className="focus:border-primary-600 w-full rounded-md border-2 border-black px-4 py-3 pr-12 text-lg focus:outline-none"
+                {...register("password", { required: true })}
               />
               <button
                 type="button"
@@ -43,12 +66,12 @@ const Login = () => {
                 <input type="checkbox" className="accent-primary-600" />
                 Remember
               </label>
-              <button
-                type="button"
+              <Link
+                to="/forgot-password"
                 className="text-primary-600 font-medium hover:underline"
               >
                 Forgot Password?
-              </button>
+              </Link>
             </div>
 
             <button
