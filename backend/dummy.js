@@ -1,65 +1,88 @@
 const mongoose = require('mongoose');
-const faker = require('faker');
-const { Stage, ContentStage, QuizStage } = require('./models/Stage'); // Adjust path as needed
-const Roadmap = require('./models/Roadmap'); // Adjust path to your Roadmap model
+const { Stage, ContentStage, QuizStage } = require('./models/Stage');
+const Roadmap = require('./models/Roadmap'); // Adjust if needed
+require('dotenv').config();
+const { MONGO_URI } = process.env;
+mongoose.connect(MONGO_URI);
 
-// Connect to your MongoDB database
-mongoose
-  .connect(
-    'mongodb+srv://clancy:ozML2FWQMRTs8PRb@cluster0.jwgbv6q.mongodb.net/codyssey'
-  )
-  .then(async () => {
-    console.log('Connected to MongoDB');
+const getRandomContent = () => ({
+  videos: [
+    'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+    'https://www.youtube.com/watch?v=3fumBcKC6RE',
+  ],
+  docs: ['https://developer.mozilla.org', 'https://w3schools.com'],
+});
 
-    // Get a random roadmap (assuming at least one exists in the database)
-    const roadmaps = await Roadmap.find();
-    if (roadmaps.length === 0) {
-      console.error('No roadmaps found in the database!');
-      mongoose.disconnect();
+const getRandomQuiz = () => ({
+  questions: [
+    {
+      questionText: 'What is React?',
+      options: [
+        { optionText: 'Library', isCorrect: true },
+        { optionText: 'Language', isCorrect: false },
+        { optionText: 'Database', isCorrect: false },
+        { optionText: 'Framework', isCorrect: false },
+      ],
+    },
+    {
+      questionText: 'What does HTML stand for?',
+      options: [
+        { optionText: 'HyperText Markup Language', isCorrect: true },
+        { optionText: 'HighText Machine Language', isCorrect: false },
+        { optionText: 'Hyperlinks Text Markup Language', isCorrect: false },
+        { optionText: 'None of the above', isCorrect: false },
+      ],
+    },
+  ],
+  score: 10,
+});
+
+const seedStages = async () => {
+  try {
+    const roadmaps = await Roadmap.find().limit(10);
+
+    if (roadmaps.length < 10) {
+      console.log('Need at least 10 roadmaps to seed.');
       return;
     }
-    const randomRoadmap = roadmaps[Math.floor(Math.random() * roadmaps.length)];
 
-    // Create 20 dummy stages (Content and Quiz)
-    const stages = [];
-    for (let i = 0; i < 20; i++) {
-      const isQuizStage = Math.random() > 0.5; // 50% chance for a QuizStage
+    for (const roadmap of roadmaps) {
+      console.log(`Seeding stages for roadmap: ${roadmap.title}`);
 
-      const stageData = {
-        title: faker.lorem.sentence(),
-        number: i + 1,
-        description: faker.lorem.paragraph(),
-        roadmap: '67fa720f9163f5666f20238e',
-        type: isQuizStage ? 'quiz' : 'content',
-      };
+      for (let i = 1; i <= 20; i++) {
+        const isQuiz = i % 5 === 0; // every 5th stage is a quiz
 
-      if (isQuizStage) {
-        // Generate dummy QuizStage data
-        stageData.questions = Array.from({ length: 3 }, () => ({
-          questionText: faker.lorem.sentence(),
-          options: Array.from({ length: 4 }, () => ({
-            optionText: faker.lorem.word(),
-            isCorrect: Math.random() > 0.5, // Randomly set one correct option
-          })),
-        }));
-        stages.push(QuizStage.create(stageData)); // Create a QuizStage
-      } else {
-        // Generate dummy ContentStage data
-        stageData.videos = Array.from({ length: 2 }, () =>
-          faker.internet.url()
-        );
-        stageData.docs = Array.from({ length: 3 }, () => faker.internet.url());
-        stages.push(ContentStage.create(stageData)); // Create a ContentStage
+        const baseData = {
+          title: isQuiz ? `Quiz Stage ${i}` : `Content Stage ${i}`,
+          number: i,
+          description: isQuiz
+            ? 'Test your knowledge with this quiz'
+            : 'Learn the topic through videos and docs',
+          roadmap: roadmap._id,
+        };
+
+        if (isQuiz) {
+          await QuizStage.create({
+            ...baseData,
+            ...getRandomQuiz(),
+            type: 'quiz',
+          });
+        } else {
+          await ContentStage.create({
+            ...baseData,
+            ...getRandomContent(),
+            type: 'content',
+          });
+        }
       }
     }
 
-    // Wait for all stages to be created
-    await Promise.all(stages);
+    console.log('✅ Done seeding stages!');
+    mongoose.connection.close();
+  } catch (err) {
+    console.error('❌ Error seeding stages:', err);
+    mongoose.connection.close();
+  }
+};
 
-    console.log('Successfully created 20 dummy stages!');
-    mongoose.disconnect();
-  })
-  .catch((err) => {
-    console.error('Error connecting to MongoDB:', err);
-    mongoose.disconnect();
-  });
+seedStages();
