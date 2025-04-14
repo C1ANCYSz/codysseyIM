@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaEye } from "react-icons/fa";
-import { MdOutlineEmail } from "react-icons/md";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
@@ -34,43 +33,58 @@ function ResetPassword() {
           </p>
         </div>
 
-        {/* Form Section */}
         <form
-          className="flex flex-col items-center justify-between rounded-b-3xl bg-white p-6 md:p-10"
-          onSubmit={handleSubmit(onSubmit)}
-        >
-          <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="New Password"
-              className="focus:border-primary-600 w-full rounded-md border-2 px-3 py-2.5 transition-all duration-300 outline-none md:px-4 md:py-3"
-              {...register("newPassword", { required: true })}
-            />
-            <FaEye
-              className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
-              onClick={() => setShowPassword(!showPassword)}
-            />
-          </div>
-          <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
-            <input
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Confirm New Password"
-              className="focus:border-primary-600 w-full rounded-md border-2 px-3 py-2.5 transition-all duration-300 outline-none md:px-4 md:py-3"
-              {...register("confirmNewPassword", { required: true })}
-            />
-            <FaEye
-              className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
-              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            />
-          </div>
+  className="flex flex-col items-center justify-between rounded-b-3xl bg-white p-6 md:p-10"
+  onSubmit={handleSubmit(onSubmit)}
+>
+  {/* New Password Field */}
+  <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
+    <input
+      type={showPassword ? "text" : "password"}
+      placeholder="New Password"
+      className="focus:border-primary-600 w-full rounded-md border-2 px-3 py-2.5 transition-all duration-300 outline-none md:px-4 md:py-3"
+      {...register("newPassword", { required: true })}
+    />
+    {showPassword ? (
+      <FaEyeSlash
+        className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
+        onClick={() => setShowPassword(!showPassword)}
+      />
+    ) : (
+      <FaEye
+        className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
+        onClick={() => setShowPassword(!showPassword)}
+      />
+    )}
+  </div>
 
-          <button
-            type="submit"
-            className="bg-primary-600 hover:bg-primary-700 w-full cursor-pointer rounded-full px-8 py-2.5 text-sm tracking-wider text-white uppercase transition-all duration-300 md:w-auto md:px-20 md:py-3 md:text-base"
-          >
-            Next
-          </button>
-        </form>
+  <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
+    <input
+      type={showConfirmPassword ? "text" : "password"}
+      placeholder="Confirm New Password"
+      className="focus:border-primary-600 w-full rounded-md border-2 px-3 py-2.5 transition-all duration-300 outline-none md:px-4 md:py-3"
+      {...register("confirmNewPassword", { required: true })}
+    />
+    {showConfirmPassword ? (
+      <FaEyeSlash
+        className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
+        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+      />
+    ) : (
+      <FaEye
+        className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
+        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+      />
+    )}
+  </div>
+
+  <button
+    type="submit"
+    className="bg-primary-600 hover:bg-primary-700 w-full cursor-pointer rounded-full px-8 py-2.5 text-sm tracking-wider text-white uppercase transition-all duration-300 md:w-auto md:px-20 md:py-3 md:text-base"
+  >
+    Next
+  </button>
+</form>
       </div>
     </div>
   );
