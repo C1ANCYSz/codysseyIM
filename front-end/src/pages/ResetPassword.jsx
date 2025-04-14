@@ -1,18 +1,38 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useResetPassword } from "../hooks/useForgotPassword";
+import { useSearchParams } from "react-router-dom";
 
 function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const { reset, isLoading, error } = useResetPassword();
+  const [searchParams] = useSearchParams();
+  const email = searchParams.get("email");
   const {
     register,
     handleSubmit,
     formState: { errors },
+    getValues,
   } = useForm();
 
+  // Handle form errors with useEffect
+  useEffect(() => {
+    if (errors.confirmNewPassword || errors.newPassword) {
+      toast.error(
+        errors.confirmNewPassword?.message || errors.newPassword?.message,
+      );
+    }
+  }, [errors.confirmNewPassword, errors.newPassword]);
+
   function onSubmit(data) {
-    console.log(data);
+    reset({
+      email,
+      password: data.newPassword,
+      confirmPassword: data.confirmNewPassword,
+    });
   }
 
   return (
@@ -34,57 +54,69 @@ function ResetPassword() {
         </div>
 
         <form
-  className="flex flex-col items-center justify-between rounded-b-3xl bg-white p-6 md:p-10"
-  onSubmit={handleSubmit(onSubmit)}
->
-  {/* New Password Field */}
-  <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
-    <input
-      type={showPassword ? "text" : "password"}
-      placeholder="New Password"
-      className="focus:border-primary-600 w-full rounded-md border-2 px-3 py-2.5 transition-all duration-300 outline-none md:px-4 md:py-3"
-      {...register("newPassword", { required: true })}
-    />
-    {showPassword ? (
-      <FaEyeSlash
-        className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
-        onClick={() => setShowPassword(!showPassword)}
-      />
-    ) : (
-      <FaEye
-        className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
-        onClick={() => setShowPassword(!showPassword)}
-      />
-    )}
-  </div>
+          className="flex flex-col items-center justify-between rounded-b-3xl bg-white p-6 md:p-10"
+          onSubmit={handleSubmit(onSubmit)}
+        >
+          {/* New Password Field */}
+          <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="New Password"
+              className="focus:border-primary-600 w-full rounded-md border-2 px-3 py-2.5 transition-all duration-300 outline-none md:px-4 md:py-3"
+              {...register("newPassword", {
+                required: true,
+                minLength: {
+                  value: 8,
+                  message: "Password must be at least 8 characters long",
+                },
+              })}
+            />
+            {showPassword ? (
+              <FaEyeSlash
+                className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            ) : (
+              <FaEye
+                className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            )}
+          </div>
 
-  <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
-    <input
-      type={showConfirmPassword ? "text" : "password"}
-      placeholder="Confirm New Password"
-      className="focus:border-primary-600 w-full rounded-md border-2 px-3 py-2.5 transition-all duration-300 outline-none md:px-4 md:py-3"
-      {...register("confirmNewPassword", { required: true })}
-    />
-    {showConfirmPassword ? (
-      <FaEyeSlash
-        className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
-        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-      />
-    ) : (
-      <FaEye
-        className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
-        onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-      />
-    )}
-  </div>
+          <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
+            <input
+              type={showConfirmPassword ? "text" : "password"}
+              placeholder="Confirm New Password"
+              className="focus:border-primary-600 w-full rounded-md border-2 px-3 py-2.5 transition-all duration-300 outline-none md:px-4 md:py-3"
+              {...register("confirmNewPassword", {
+                required: true,
+                validate: (value) =>
+                  value === getValues("newPassword") ||
+                  "Passwords do not match",
+              })}
+            />
+            {showConfirmPassword ? (
+              <FaEyeSlash
+                className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
+            ) : (
+              <FaEye
+                className="group-focus-within:text-primary-600 absolute right-6 cursor-pointer text-xl text-black transition-colors duration-300 md:right-8 md:text-2xl"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
+            )}
+          </div>
 
-  <button
-    type="submit"
-    className="bg-primary-600 hover:bg-primary-700 w-full cursor-pointer rounded-full px-8 py-2.5 text-sm tracking-wider text-white uppercase transition-all duration-300 md:w-auto md:px-20 md:py-3 md:text-base"
-  >
-    Next
-  </button>
-</form>
+          <button
+            type="submit"
+            className="bg-primary-600 hover:bg-primary-700 mt-5 w-full cursor-pointer rounded-full px-8 py-2.5 text-sm tracking-wider text-white uppercase transition-all duration-300 md:w-auto md:px-20 md:py-3 md:text-base"
+            disabled={isLoading}
+          >
+            {isLoading ? "Resetting..." : "Reset"}
+          </button>
+        </form>
       </div>
     </div>
   );
