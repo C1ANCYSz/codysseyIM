@@ -63,6 +63,11 @@ const userSchema = new mongoose.Schema(
       default: false,
     },
 
+    tookQuestionnaire: {
+      type: Boolean,
+      default: false,
+    },
+
     verificationToken: String,
     verificationTokenExpiresAt: Date,
     resetPasswordToken: String,

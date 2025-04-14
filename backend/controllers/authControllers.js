@@ -316,3 +316,32 @@ exports.checkAuth = (req, res) => {
     return res.json({ success: false });
   }
 };
+
+exports.restrictTo = (...roles) => {
+  return (req, res, next) => {
+    if (!req.user) {
+      return next(new AppError('You are not logged in', 401));
+    }
+
+    if (!roles.includes(req.user.role)) {
+      return next(
+        new AppError('You do not have permission to perform this action', 403)
+      );
+    }
+
+    next();
+  };
+};
+exports.isLoggedIn = (req, res, next) => {
+  if (req.cookies.token) {
+    return res.status(200).json({
+      success: true,
+      message: 'User is logged in',
+    });
+  } else {
+    return res.status(200).json({
+      success: false,
+      message: 'User is not logged in',
+    });
+  }
+};
