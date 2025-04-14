@@ -13,8 +13,7 @@ export function useGetUser() {
           credentials: "include",
         });
         const data = await res.json();
-        console.log(data);
-        return data.data.user;
+        return data.data;
       } catch (error) {
         throw new Error(error.message);
       }
