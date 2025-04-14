@@ -1,4 +1,4 @@
-exports.generateCertificateHTML = (user, roadmap) => {
+exports.generateCertificateHTML = (user, roadmap, date) => {
   return `
     <!DOCTYPE html>
     <html lang="en">
@@ -10,10 +10,14 @@ exports.generateCertificateHTML = (user, roadmap) => {
         @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Libre+Baskerville:wght@400;700&display=swap');
 
         body {
+        scale:0.9;
           margin: 0;
           padding: 0;
           background: #f2f2f2;
           font-family: 'Libre Baskerville', serif;
+          display:flex;
+          justify-content: center;
+          
         }
 
         .certificate {
@@ -110,11 +114,11 @@ exports.generateCertificateHTML = (user, roadmap) => {
           <div class="subtitle">This is to proudly certify that</div>
           <div class="name">${user.name}</div>
           <div class="description">has successfully completed the roadmap</div>
-          <div class="roadmap-title">"${roadmap.title}"</div>
+          <div class="roadmap-title">"${roadmap}"</div>
 
           <div class="footer">
             <div class="date">
-              Issued on: ${new Date().toLocaleDateString()}
+              completed on: ${date}
             </div>
             <div class="signature">
               <div class="signature-line"></div>
