@@ -1,4 +1,5 @@
 import { useForm } from "react-hook-form";
+import { Link } from "react-router-dom";
 
 function Signup() {
   const {
@@ -12,7 +13,7 @@ function Signup() {
     console.log(data);
   }
   return (
-    <div className="via-primary-600 flex h-dvh w-screen items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 lg:h-[calc(100dvh-80px)]">
+    <div className="via-primary-600 flex h-dvh w-screen items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 px-2 lg:h-[calc(100dvh-80px)]">
       <div className="flex w-full max-w-4xl rounded-3xl bg-gradient-to-r from-purple-800 to-purple-600 p-1">
         {/* Left side - Purple gradient section */}
         <div className="hidden w-1/2 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 p-8 lg:flex lg:items-center lg:justify-center">
@@ -149,9 +150,9 @@ function Signup() {
 
             <p className="text-center text-sm text-gray-600">
               Already a member?{" "}
-              <a href="/login" className="text-purple-600 hover:underline">
+              <Link to="/login" className="text-purple-600 hover:underline">
                 Login
-              </a>
+              </Link>
             </p>
           </form>
         </div>
