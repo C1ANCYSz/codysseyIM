@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Certificate</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        text-align: center;
+        padding: 50px;
+        margin: 0;
+        background-color: #f0f0f0;
+      }
+      .container {
+        background-color: white;
+        border: 5px solid #4caf50;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .header {
+        font-size: 36px;
+        font-weight: bold;
+        color: #4caf50;
+        margin-bottom: 20px;
+      }
+      .content {
+        font-size: 24px;
+        margin: 20px 0;
+      }
+      .user-name {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+      }
+      .roadmap-title {
+        font-size: 26px;
+        font-style: italic;
+        color: #555;
+      }
+      .footer {
+        font-size: 16px;
+        margin-top: 30px;
+        color: #777;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">Certificate of Completion</div>
+      <div class="content">
+        <p>Awarded to</p>
+        <div class="user-name">{{userName}}</div>
+        <p>For completing the following roadmap:</p>
+        <div class="roadmap-title">{{roadmapTitle}}</div>
+      </div>
+      <div class="footer">
+        <p>Issued on: {{date}}</p>
+      </div>
+    </div>
+  </body>
+</html>

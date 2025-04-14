@@ -62,7 +62,7 @@ router.get('/:id/stages/:number', protectRoute, async (req, res, next) => {
     return next(new AppError('User roadmap not found', 404));
   }
 
-  console.log(userRoadmap.activeStage);
+  console.log(userRoadmap.completedStages);
 
   if (userRoadmap.activeStage < number) {
     return next(
