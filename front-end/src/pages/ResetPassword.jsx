@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { FaEye } from "react-icons/fa";
-import { MdOutlineEmail } from "react-icons/md";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
