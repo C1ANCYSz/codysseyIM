@@ -23,6 +23,7 @@ export function useLogin() {
         });
         const data = await res.json();
         if (data.success) {
+          // console.log(data);
           setIsLoggedIn(true);
 
           navigate("/dashboard");

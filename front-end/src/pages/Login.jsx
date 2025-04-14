@@ -40,6 +40,7 @@ const Login = () => {
               <input
                 type="email"
                 placeholder="Your Email"
+                value={"a7mdmo2mna7md@gmail.com"}
                 className="focus:border-primary-600 w-full rounded-md border-2 border-black px-4 py-3 text-lg focus:outline-none"
                 {...register("email", { required: true })}
               />
@@ -49,6 +50,7 @@ const Login = () => {
               <input
                 type={showPassword ? "text" : "password"}
                 placeholder="Password"
+                value={"12345678"}
                 className="focus:border-primary-600 w-full rounded-md border-2 border-black px-4 py-3 pr-12 text-lg focus:outline-none"
                 {...register("password", { required: true })}
               />

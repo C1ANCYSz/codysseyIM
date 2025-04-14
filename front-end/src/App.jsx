@@ -9,6 +9,7 @@ import ResetPassword from "./pages/ResetPassword";
 import { AuthProvider } from "./context/AuthProvider";
 import PrivateRoute from "./ui/PrivateRoute";
 import { Toaster } from "react-hot-toast";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
@@ -24,7 +25,7 @@ function App() {
               path="dashboard"
               element={
                 <PrivateRoute>
-                  <div>Dashboard</div>
+                  <Dashboard />
                 </PrivateRoute>
               }
             />
