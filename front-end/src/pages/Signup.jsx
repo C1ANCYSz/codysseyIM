@@ -1,7 +1,12 @@
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 function Signup() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -12,6 +17,7 @@ function Signup() {
   function onSubmit(data) {
     console.log(data);
   }
+
   return (
     <div className="via-primary-600 flex h-dvh w-screen items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 px-2 lg:h-[calc(100dvh-80px)]">
       <div className="flex w-full max-w-4xl rounded-3xl bg-gradient-to-r from-purple-800 to-purple-600 p-1">
@@ -61,9 +67,10 @@ function Signup() {
               )}
             </div>
 
+            {/* Password */}
             <div className="relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 placeholder="Password"
                 className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-purple-600"
                 {...register("password", {
@@ -79,40 +86,24 @@ function Signup() {
               )}
               <button
                 type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2"
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600"
+                onClick={() => setShowPassword(!showPassword)}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="hover:text-primary-700 h-5 w-5 text-gray-500"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
 
+            {/* Confirm Password */}
             <div className="relative">
               <input
-                type="password"
+                type={showConfirm ? "text" : "password"}
                 placeholder="Confirm Password"
                 className="w-full rounded-lg border border-gray-300 p-3 outline-none focus:border-purple-600"
                 {...register("confirmPassword", {
                   required: true,
                   validate: (value) =>
                     value === getValues("password") ||
-                    "password does not match",
+                    "Passwords do not match",
                 })}
               />
               {errors.confirmPassword && (
@@ -120,27 +111,10 @@ function Signup() {
               )}
               <button
                 type="button"
-                className="absolute top-1/2 right-3 -translate-y-1/2"
+                className="absolute top-1/2 right-3 -translate-y-1/2 text-gray-600"
+                onClick={() => setShowConfirm(!showConfirm)}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
-                  className="hover:text-primary-700 h-5 w-5 text-gray-500"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
+                {showConfirm ? <FaEyeSlash /> : <FaEye />}
               </button>
             </div>
 
