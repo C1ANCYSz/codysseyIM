@@ -1,0 +1,427 @@
+const Roadmap = require('../models/Roadmap');
+const { Stage, ContentStage, QuizStage } = require('../models/Stage');
+const User = require('../models/User');
+const AppError = require('../utils/AppError');
+const mongoose = require('mongoose');
+
+exports.getRoadmaps = async (req, res, next) => {
+  const categories = await Roadmap.distinct('category').lean();
+
+  const roadmaps = await Roadmap.find().select('title image category').lean();
+
+  res.json({
+    success: true,
+    data: {
+      categories,
+      roadmaps,
+    },
+  });
+};
+
+exports.getRoadmap = async (req, res, next) => {
+  const { id } = req.params;
+
+  let roadmap = await Roadmap.findById(id).lean();
+
+  if (!roadmap) {
+    return res.status(404).json({ message: 'Roadmap not found' });
+  }
+
+  const stages = await Stage.find({ roadmap: id })
+    .select('title number description')
+    .sort('number')
+    .lean();
+
+  roadmap = { ...roadmap, stages };
+
+  res.json({
+    success: true,
+    data: { roadmap },
+  });
+};
+
+exports.getRoadmapStage = async (req, res, next) => {
+  const { id, number } = req.params;
+  const currentUserId = req.user._id;
+  const stage = await Stage.findOne({ roadmap: id, number })
+    .select('-description -roadmap')
+    .lean();
+
+  const user = await User.findById(currentUserId);
+
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  const userRoadmap = user.roadmaps.find(
+    (roadmap) => roadmap.roadmap.toString() === id
+  );
+
+  if (!userRoadmap) {
+    return next(new AppError('Enroll in the roadmap first', 404));
+  }
+
+  console.log(userRoadmap.completedStages);
+
+  if (userRoadmap.completedStages < number - 1) {
+    return next(
+      new AppError(
+        'complete the previous stage before progressing to the next stage',
+        400
+      )
+    );
+  }
+
+  if (!stage) {
+    return next(new AppError('Stage not found', 404));
+  }
+
+  if (stage.type === 'content') {
+    const contentStage = await ContentStage.findById(stage._id).lean();
+
+    return res.json({
+      success: true,
+      data: { stage: contentStage },
+    });
+  } else if (stage.type === 'quiz') {
+    const quizStage = await QuizStage.findById(stage._id).lean();
+
+    return res.json({
+      success: true,
+      data: { stage: quizStage },
+    });
+  }
+  return res.status(400).json({ message: 'Invalid stage type' });
+};
+
+exports.createRoadmap = async (req, res, next) => {
+  const { title, description, category, image } = req.body;
+  if (!title || !description || !category || !image) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  const existingRoadmap = await Roadmap.findOne({ title });
+  if (existingRoadmap) {
+    return res
+      .status(400)
+      .json({ message: 'Roadmap with this title already exists' });
+  }
+
+  const roadmap = await Roadmap.create({
+    title,
+    description,
+    category,
+    image,
+  });
+
+  if (!roadmap) {
+    return res.status(500).json({ message: 'Failed to create roadmap' });
+  }
+  res.status(201).json({
+    success: true,
+    data: { roadmap },
+  });
+};
+
+exports.addRoadmapStage = async (req, res, next) => {
+  const { id } = req.params;
+  const {
+    title,
+    description,
+    type,
+    number,
+    videos = [],
+    docs = [],
+    questions = [],
+    score,
+  } = req.body;
+
+  if (!title || !description || !type || number === undefined) {
+    return res.status(400).json({ message: 'Missing required fields' });
+  }
+
+  if (type !== 'content' && type !== 'quiz') {
+    return res.status(400).json({ message: 'Invalid stage type' });
+  }
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const roadmap = await Roadmap.findById(id).session(session);
+    if (!roadmap) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: 'Roadmap not found' });
+    }
+
+    if (number !== roadmap.stagesCount + 1) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: 'Invalid stage number' });
+    }
+
+    // Shift stages at and after the desired number
+    await Stage.updateMany(
+      { roadmap: id, number: { $gte: number } },
+      { $inc: { number: 1 } },
+      { session }
+    );
+
+    let stage;
+
+    if (type === 'content') {
+      stage = await ContentStage.create(
+        [
+          {
+            title,
+            description,
+            roadmap: id,
+            number,
+            videos,
+            docs,
+            type,
+          },
+        ],
+        { session }
+      );
+
+      stage = stage[0]; // create() with array returns array
+    } else if (type === 'quiz') {
+      if (!Array.isArray(questions) || typeof score !== 'number') {
+        await session.abortTransaction();
+        return res.status(400).json({ message: 'Invalid quiz data' });
+      }
+
+      stage = await QuizStage.create(
+        [
+          {
+            title,
+            description,
+            roadmap: id,
+            number,
+            questions,
+            score,
+            type,
+          },
+        ],
+        { session }
+      );
+
+      stage = stage[0];
+    }
+
+    roadmap.stagesCount += 1;
+    await roadmap.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(201).json({
+      success: true,
+      data: { stage },
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    next(err);
+  }
+};
+
+exports.deleteRoadmapStage = async (req, res, next) => {
+  const { id, stageId } = req.params;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const roadmap = await Roadmap.findById(id).session(session);
+    if (!roadmap) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: 'Roadmap not found' });
+    }
+
+    const stage = await Stage.findById(stageId).session(session);
+    if (!stage) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: 'Stage not found' });
+    }
+
+    if (stage.roadmap.toString() !== id) {
+      await session.abortTransaction();
+      return res
+        .status(403)
+        .json({ message: 'Stage does not belong to this roadmap' });
+    }
+
+    const allStages = await Stage.find({ roadmap: id })
+      .sort('number')
+      .session(session);
+
+    for (let i = 0; i < allStages.length; i++) {
+      if (allStages[i]._id.toString() === stageId) {
+        for (let j = i + 1; j < allStages.length; j++) {
+          await Stage.findByIdAndUpdate(
+            allStages[j]._id,
+            { $inc: { number: -1 } },
+            { session }
+          );
+        }
+        break;
+      }
+    }
+
+    roadmap.stagesCount -= 1;
+    await roadmap.save({ session });
+
+    // Delete the stage
+    await Stage.findByIdAndDelete(stageId, { session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      success: true,
+      message: 'Stage deleted successfully',
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    next(err);
+  }
+};
+
+exports.updateRoadmapStage = async (req, res, next) => {
+  const { id, stageId } = req.params;
+  const { title, description, number, videos, docs, questions, score } =
+    req.body;
+
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
+  try {
+    const roadmap = await Roadmap.findById(id).session(session);
+    if (!roadmap) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: 'Roadmap not found' });
+    }
+
+    if (number !== undefined && (number < 0 || number > roadmap.stagesCount)) {
+      await session.abortTransaction();
+      return res.status(400).json({ message: 'Invalid stage number' });
+    }
+
+    const stage = await Stage.findById(stageId).session(session);
+    if (!stage) {
+      await session.abortTransaction();
+      return res.status(404).json({ message: 'Stage not found' });
+    }
+
+    if (stage.roadmap.toString() !== id) {
+      await session.abortTransaction();
+      return res
+        .status(403)
+        .json({ message: 'Stage does not belong to this roadmap' });
+    }
+
+    // Handle number change logic if number is provided
+    if (number !== undefined && stage.number !== number) {
+      const oldNumber = stage.number;
+      const newNumber = number;
+
+      if (newNumber > oldNumber) {
+        await Stage.updateMany(
+          {
+            roadmap: id,
+            number: { $gt: oldNumber, $lte: newNumber },
+          },
+          { $inc: { number: -1 } },
+          { session }
+        );
+      } else if (newNumber < oldNumber) {
+        await Stage.updateMany(
+          {
+            roadmap: id,
+            number: { $gte: newNumber, $lt: oldNumber },
+          },
+          { $inc: { number: 1 } },
+          { session }
+        );
+      }
+
+      stage.number = newNumber;
+    }
+
+    // Update fields only if provided
+    if (title !== undefined) stage.title = title;
+    if (description !== undefined) stage.description = description;
+
+    if (stage.type === 'content') {
+      if (videos !== undefined) stage.videos = videos;
+      if (docs !== undefined) stage.docs = docs;
+    } else if (stage.type === 'quiz') {
+      if (questions !== undefined) {
+        if (!Array.isArray(questions)) {
+          await session.abortTransaction();
+          return res.status(400).json({ message: 'Invalid questions format' });
+        }
+        stage.questions = questions;
+      }
+      if (score !== undefined) {
+        if (typeof score !== 'number') {
+          await session.abortTransaction();
+          return res.status(400).json({ message: 'Score must be a number' });
+        }
+        stage.score = score;
+      }
+    }
+
+    await stage.save({ session });
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(200).json({
+      success: true,
+      message: 'Stage updated successfully',
+      data: stage,
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    next(err);
+  }
+};
+
+exports.deleteRoadmap = async (req, res, next) => {
+  const session = await User.startSession();
+  session.startTransaction();
+
+  try {
+    const users = await User.find({ 'roadmaps.roadmap': req.params.id });
+
+    for (const user of users) {
+      user.roadmaps.pull({ roadmap: req.params.id });
+      await user.save({ session, validateBeforeSave: false });
+    }
+
+    const roadmap = await Roadmap.findByIdAndDelete(req.params.id, { session });
+
+    if (!roadmap) {
+      await session.abortTransaction();
+      session.endSession();
+      return next(new AppError('No roadmap found with that ID.', 404));
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    res.status(204).json({
+      success: true,
+      message: 'Roadmap deleted successfully',
+      data: null,
+    });
+  } catch (err) {
+    await session.abortTransaction();
+    session.endSession();
+    next(new AppError(err.message || 'Something went wrong.', 500));
+  }
+};

@@ -8,13 +8,14 @@ const globalErrorHandler = require('./middlewares/globalErrorHandler');
 const authRouter = require('./routes/authRouter');
 const roadmapsRouter = require('./routes/roadmapsRouter');
 const studentRouter = require('./routes/studentRouter');
-
+const adminRouter = require('./routes/adminRouter');
+const contentManagerRouter = require('./routes/contentManagerRouter');
 const app = express();
 
 app.use(
   cors({
-    origin: 'http://localhost:5173', // React app URL (use your actual React app URL in production)
-    credentials: true, // This allows cookies to be sent
+    origin: 'http://localhost:5173', 
+    credentials: true, 
   })
 );
 app.use(morgan('dev'));
@@ -26,6 +27,8 @@ app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/roadmaps', roadmapsRouter);
 app.use('/api/student', studentRouter);
+app.use('/api/admin', adminRouter);
+app.use('/api/content-manager', contentManagerRouter);
 
 app.use('*', (req, res, next) => {
   res.status(404).json({ message: 'Not Found' });

@@ -1,30 +1,35 @@
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
-const validator = require("validator");
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const validator = require('validator');
 
-const User = require("./../models/User");
+const User = require('./../models/User');
 
-const AppError = require("../utils/AppError");
+const AppError = require('../utils/AppError');
 const {
   generateVerificationToken,
-} = require("../utils/generateVerificationToken");
+} = require('../utils/generateVerificationToken');
 
 const {
   sendVerificationEmail,
   sendWelcomeEmail,
   sendPasswordResetEmail,
   sendPasswordResetSuccess,
-} = require("../mailtrap/emails");
+} = require('../mailtrap/emails');
+/* 
 
+
+
+
+*/
 const tokenAndCookie = (id, res) => {
   const token = jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 
-  res.cookie("token", token, {
+  res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
 
     maxAge: 7 * 24 * 60 * 60 * 1000, //7 days
   });
@@ -37,18 +42,18 @@ exports.login = async (req, res, next) => {
 
   if (!email || !password) {
     return next(
-      new AppError("Please provide username or email and password", 400)
+      new AppError('Please provide username or email and password', 400)
     );
   }
   email = validator.escape(email);
 
-  const user = await User.findOne({ email: email }).select("+password");
+  const user = await User.findOne({ email: email }).select('+password');
 
   //to mitigate bruce force attack [TO BE IMPROVED]
 
   if (!user || !(await user.comparePassword(password))) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    return next(new AppError("Incorrect username or password", 401));
+    return next(new AppError('Incorrect username or password', 401));
   }
 
   tokenAndCookie(user._id, res);
@@ -57,7 +62,7 @@ exports.login = async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    message: "logged in successfully",
+    message: 'logged in successfully',
     role: user.role,
   });
 };
@@ -71,28 +76,28 @@ exports.signUp = async (req, res, next) => {
   email = validator.escape(email);
 
   if (!name || !email || !password || !confirmPassword) {
-    return next(new AppError("Please provide all required fields", 400));
+    return next(new AppError('Please provide all required fields', 400));
   }
 
   if (!validator.isEmail(email)) {
-    return next(new AppError("Please provide a valid email", 400));
+    return next(new AppError('Please provide a valid email', 400));
   }
 
   if (password.length < 8) {
     return next(
-      new AppError("Password must be at least 8 characters long", 400)
+      new AppError('Password must be at least 8 characters long', 400)
     );
   }
 
   if (password !== confirmPassword) {
-    return next(new AppError("Passwords do not match", 400));
+    return next(new AppError('Passwords do not match', 400));
   }
 
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
     return next(
-      new AppError("User with this email or username already exists", 400)
+      new AppError('User with this email or username already exists', 400)
     );
   }
   const verificationToken = generateVerificationToken();
@@ -106,7 +111,7 @@ exports.signUp = async (req, res, next) => {
   });
 
   await sendVerificationEmail(newUser.email, verificationToken).catch((err) => {
-    console.error("Error sending verification email:", err);
+    console.error('Error sending verification email:', err);
   });
 
   tokenAndCookie(newUser._id, res);
@@ -125,10 +130,10 @@ exports.signUp = async (req, res, next) => {
 };
 
 exports.logout = async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie('token');
   res.status(200).json({
     success: true,
-    message: "logged out successfully",
+    message: 'logged out successfully',
   });
 };
 
@@ -136,8 +141,8 @@ exports.verifyEmail = async (req, res, next) => {
   const { verificationToken } = req.body;
 
   if (!verificationToken) {
-    return res.render("verifyEmail", {
-      message: "Please provide verification token",
+    return res.render('verifyEmail', {
+      message: 'Please provide verification token',
     });
   }
 
@@ -147,7 +152,7 @@ exports.verifyEmail = async (req, res, next) => {
   });
 
   if (!user) {
-    return res.render("verifyEmail", { message: "Invalid or expired token" });
+    return res.render('verifyEmail', { message: 'Invalid or expired token' });
   }
 
   user.isVerified = true;
@@ -162,7 +167,7 @@ exports.verifyEmail = async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: "Email verified successfully",
+    message: 'Email verified successfully',
   });
 };
 
@@ -171,16 +176,16 @@ exports.forgotPassword = async (req, res, next) => {
 
   if (!email) {
     return res.status(400).json({
-      status: "fail",
-      message: "Please provide email",
+      status: 'fail',
+      message: 'Please provide email',
     });
   }
 
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(400).json({
-      status: "fail",
-      message: "No user found with that email",
+      status: 'fail',
+      message: 'No user found with that email',
     });
   }
 
@@ -195,7 +200,7 @@ exports.forgotPassword = async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    message: "Password reset link sent to email",
+    message: 'Password reset link sent to email',
   });
 };
 
@@ -205,25 +210,25 @@ exports.resetPassword = async (req, res, next) => {
 
   if (!password || !confirmPassword) {
     return res.status(400).json({
-      status: "fail",
-      message: "Please provide password and confirm password",
+      status: 'fail',
+      message: 'Please provide password and confirm password',
     });
   }
 
   if (password.length < 8 || confirmPassword.length < 8) {
     return res.status(400).json({
-      status: "fail",
-      message: "Password must be atleast 8 characters",
+      status: 'fail',
+      message: 'Password must be atleast 8 characters',
     });
   }
   if (password !== confirmPassword) {
     return res.status(400).json({
-      status: "fail",
-      message: "Password and confirm password do not match",
+      status: 'fail',
+      message: 'Password and confirm password do not match',
     });
   }
 
-  const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
   const user = await User.findOne({
     resetPasswordToken: hashedToken,
@@ -232,8 +237,8 @@ exports.resetPassword = async (req, res, next) => {
 
   if (!user) {
     return res.status(400).json({
-      status: "fail",
-      message: "Invalid or expired token",
+      status: 'fail',
+      message: 'Invalid or expired token',
     });
   }
 
@@ -245,61 +250,11 @@ exports.resetPassword = async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
 
   await sendPasswordResetSuccess(user.email, user.name);
-  res.clearCookie("token");
+  res.clearCookie('token');
   return res.status(200).json({
-    status: "success",
-    message: "Password reset successful, please login with your new password",
+    status: 'success',
+    message: 'Password reset successful, please login with your new password',
   });
-};
-
-exports.protectRoute = async (req, res, next) => {
-  let token;
-
-  if (req.cookies.token) {
-    token = req.cookies.token;
-  }
-
-  if (!token) {
-    return next(
-      new AppError("You are not logged in, please log in first", 401)
-    );
-  }
-
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    const user = await User.findById(decoded.id);
-
-    if (!user) {
-      return next(new AppError("User not found", 401));
-    }
-
-    if (user.passwordChangedAt) {
-      const changedTimestamp = parseInt(
-        user.passwordChangedAt.getTime() / 1000,
-        10
-      );
-
-      if (decoded.iat < changedTimestamp) {
-        return next(new AppError("User recently changed password", 401));
-      }
-    }
-
-    req.user = user;
-    next();
-  } catch (err) {
-    console.error("JWT verification failed:", err);
-
-    if (err instanceof jwt.TokenExpiredError) {
-      return res.redirect("/users/login?error=tokenExpired");
-    }
-
-    if (err instanceof jwt.JsonWebTokenError) {
-      return res.redirect("/users/login?error=invalidToken");
-    }
-
-    return res.redirect("/users/login");
-  }
 };
 
 exports.checkAuth = async (req, res) => {
@@ -313,40 +268,25 @@ exports.checkAuth = async (req, res) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) {
-      return next(new AppError("User not found", 401));
+      return next(new AppError('User not found', 401));
     }
     return res.json({ success: true, role: user.role });
   } catch (err) {
-    console.error("JWT verification failed:", err.message);
+    console.error('JWT verification failed:', err.message);
     return res.json({ success: false });
   }
 };
 
-exports.restrictTo = (...roles) => {
-  return (req, res, next) => {
-    if (!req.user) {
-      return next(new AppError("You are not logged in", 401));
-    }
-
-    if (!roles.includes(req.user.role)) {
-      return next(
-        new AppError("You do not have permission to perform this action", 403)
-      );
-    }
-
-    next();
-  };
-};
 exports.isLoggedIn = (req, res, next) => {
   if (req.cookies.token) {
     return res.status(200).json({
       success: true,
-      message: "User is logged in",
+      message: 'User is logged in',
     });
   } else {
     return res.status(200).json({
       success: false,
-      message: "User is not logged in",
+      message: 'User is not logged in',
     });
   }
 };
