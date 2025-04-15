@@ -1,12 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 
-export function useGetUser() {
+export function useGetStudent() {
   const {
     data: userData,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["user"],
+    queryKey: ["student"],
     queryFn: async () => {
       try {
         const res = await fetch("http://localhost:3000/api/student/dashboard", {

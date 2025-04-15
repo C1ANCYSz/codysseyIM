@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthProvider";
 
 export function useLogin() {
   const navigate = useNavigate();
-  const { setIsLoggedIn } = useAuth();
+  const { setIsLoggedIn, setUserRole } = useAuth();
   const {
     mutate: login,
     isLoading,
@@ -25,7 +25,7 @@ export function useLogin() {
         if (data.success) {
           // console.log(data);
           setIsLoggedIn(true);
-
+          setUserRole(data.role);
           navigate("/dashboard");
         } else {
           throw new Error(data.message);

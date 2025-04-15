@@ -14,7 +14,6 @@ export const useGetRoadmap = () => {
       const {
         data: { roadmap },
       } = await response.json();
-      console.log(roadmap);
       return roadmap;
     },
   });

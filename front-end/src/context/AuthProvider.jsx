@@ -1,10 +1,10 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(null); // null = loading
-
+  const [userRole, setUserRole] = useState(null);
   // Check login status from backend on first mount
   useEffect(() => {
     const checkLogin = async () => {
@@ -17,6 +17,7 @@ export function AuthProvider({ children }) {
         const data = await res.json();
         if (data.success) {
           setIsLoggedIn(true);
+          setUserRole(data.role);
         } else {
           setIsLoggedIn(false);
         }
@@ -28,11 +29,12 @@ export function AuthProvider({ children }) {
     checkLogin();
   }, []);
 
-  return (
-    <AuthContext.Provider value={{ isLoggedIn, setIsLoggedIn }}>
-      {children}
-    </AuthContext.Provider>
+  const value = useMemo(
+    () => ({ isLoggedIn, setIsLoggedIn, userRole, setUserRole }),
+    [isLoggedIn, setIsLoggedIn, userRole, setUserRole],
   );
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 // Hook to use auth anywhere

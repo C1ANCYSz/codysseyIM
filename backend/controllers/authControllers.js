@@ -58,6 +58,7 @@ exports.login = async (req, res, next) => {
   return res.status(200).json({
     success: true,
     message: "logged in successfully",
+    role: user.role,
   });
 };
 
@@ -301,7 +302,7 @@ exports.protectRoute = async (req, res, next) => {
   }
 };
 
-exports.checkAuth = (req, res) => {
+exports.checkAuth = async (req, res) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -310,7 +311,11 @@ exports.checkAuth = (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    return res.json({ success: true, user: decoded });
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return next(new AppError("User not found", 401));
+    }
+    return res.json({ success: true, role: user.role });
   } catch (err) {
     console.error("JWT verification failed:", err.message);
     return res.json({ success: false });
