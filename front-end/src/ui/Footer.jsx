@@ -4,8 +4,11 @@ import {
   FaTwitter,
   FaLinkedin,
 } from "react-icons/fa";
+import { useAuth } from "../context/AuthProvider";
 
 function Footer() {
+  const { isLoggedIn } = useAuth();
+  if (isLoggedIn) return null;
   return (
     <footer className="bg-footer-900 text-white">
       <div className="container mx-auto grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-8 px-4 py-10 text-sm md:py-20 md:text-base">

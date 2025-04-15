@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 
 export function useGetStudent() {
   const {
-    data: userData,
+    data: studentData,
     isLoading,
     error,
   } = useQuery({
@@ -20,5 +20,5 @@ export function useGetStudent() {
     },
   });
 
-  return { userData, isLoading, error };
+  return { studentData, isLoading, error };
 }
