@@ -11,6 +11,8 @@ import PrivateRoute from "./ui/PrivateRoute";
 import { Toaster } from "react-hot-toast";
 import Dashboard from "./pages/Dashboard";
 import Certificates from "./pages/Certificates";
+import Roadmaps from "./pages/Roadmaps";
+import Roadmap from "./features/content/Roadmap";
 
 function App() {
   return (
@@ -35,6 +37,22 @@ function App() {
               element={
                 <PrivateRoute>
                   <Certificates />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="roadmaps"
+              element={
+                <PrivateRoute>
+                  <Roadmaps />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="roadmaps/:id"
+              element={
+                <PrivateRoute>
+                  <Roadmap />
                 </PrivateRoute>
               }
             />

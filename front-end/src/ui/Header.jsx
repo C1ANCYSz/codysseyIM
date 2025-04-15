@@ -74,6 +74,11 @@ function Header() {
                   Dashboard
                 </button>
               </Link>
+              <Link to="/roadmaps">
+                <button className="cursor-pointer rounded-md border bg-white px-6 py-2 font-bold text-black duration-200 hover:bg-gray-200">
+                  Roadmaps
+                </button>
+              </Link>
               <Link to="/logout" onClick={logout}>
                 <button className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-md border-2 border-white px-6 py-2 font-bold text-white duration-200">
                   Logout
