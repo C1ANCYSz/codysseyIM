@@ -3,12 +3,12 @@ import StudentDashboard from "../features/user/StudentDashboard";
 import { useAuth } from "../context/AuthProvider";
 
 function Dashboard() {
-  const { userData, isLoading, error } = useGetStudent();
+  const { studentData, isLoading, error } = useGetStudent();
   const { userRole } = useAuth();
   console.log(userRole);
-  const { name, roadmaps } = userData || {};
+  const { name, roadmaps } = studentData || {};
 
-  console.log(userData);
+  console.log(studentData);
 
   if (isLoading) {
     return <div>Loading...</div>;

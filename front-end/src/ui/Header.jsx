@@ -6,8 +6,10 @@ import { useLogout } from "../hooks/useLogout";
 
 function Header() {
   const { isLoggedIn } = useAuth();
+
   const [isOpen, setIsOpen] = useState(false);
   const { logout } = useLogout();
+  if (isLoggedIn) return null;
   return (
     <div className="bg-footer-900 border-primary-600 relative border-b-2 py-2 shadow-sm md:py-4">
       <div className="container mx-auto px-4">
