@@ -18,7 +18,6 @@ function ResetPassword() {
     getValues,
   } = useForm();
 
-  // Handle form errors with useEffect
   useEffect(() => {
     if (errors.confirmNewPassword || errors.newPassword) {
       toast.error(
@@ -57,7 +56,7 @@ function ResetPassword() {
           className="flex flex-col items-center justify-between rounded-b-3xl bg-white p-6 md:p-10"
           onSubmit={handleSubmit(onSubmit)}
         >
-          {/* New Password Field */}
+
           <div className="group relative flex w-full items-center gap-2 px-2 py-2 md:px-4 md:py-3">
             <input
               type={showPassword ? "text" : "password"}

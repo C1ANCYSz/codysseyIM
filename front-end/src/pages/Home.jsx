@@ -5,9 +5,10 @@ import { FaArrowRight, FaRegUser } from "react-icons/fa";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
 const Home = () => {
   return (
+    <div className="bg-gradient-to-br from-primary-900 via-cyan-900 to-blue-900">
     <div className="containertwo mx-auto space-y-12 p-2 lg:p-10">
       <div className="relative min-h-[calc(100vh-80px)] rounded-lg border-4 border-white bg-[url(/src/assets/images/exploreMore.jpg)] bg-cover bg-center md:rounded-4xl">
-        <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-black/70 to-black/20 backdrop-blur-[2px] md:rounded-4xl"></div>
+        <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-black/70 to-black/20 backdrop-blur-[3px] md:rounded-4xl"></div>
 
         <div className="relative flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-8 px-4 text-center md:px-8 lg:px-16">
           <h2 className="text-3xl font-bold tracking-wide text-white uppercase md:text-5xl lg:text-6xl">
@@ -208,6 +209,7 @@ const Home = () => {
           </button>
         </div>
       </div>
+    </div>
     </div>
   );
 };

@@ -1,18 +1,18 @@
-const router = require('express').Router();
-const { protectRoute, restrictTo } = require('../controllers/authControllers');
-const Roadmap = require('../models/Roadmap');
-const AppError = require('../utils/AppError');
-const User = require('../models/User');
-const path = require('path');
-const fs = require('fs');
-const puppeteer = require('puppeteer');
-const { generateCertificateHTML } = require('../utils/generateCertificateHTML');
-const Certificate = require('../models/Certificate');
+const router = require("express").Router();
+const { protectRoute, restrictTo } = require("../controllers/authControllers");
+const Roadmap = require("../models/Roadmap");
+const AppError = require("../utils/AppError");
+const User = require("../models/User");
+const path = require("path");
+const fs = require("fs");
+const puppeteer = require("puppeteer");
+const { generateCertificateHTML } = require("../utils/generateCertificateHTML");
+const Certificate = require("../models/Certificate");
 
 router.post(
-  '/enroll/:id',
+  "/enroll/:id",
   protectRoute,
-  restrictTo('student'),
+  restrictTo("student"),
   async (req, res, next) => {
     const roadmapId = req.params.id;
     const userId = req.user?._id;
@@ -22,15 +22,15 @@ router.post(
       User.findById(userId),
     ]);
 
-    if (!roadmap) return next(new AppError('Roadmap not found', 404));
-    if (!user) return next(new AppError('User not found', 404));
+    if (!roadmap) return next(new AppError("Roadmap not found", 404));
+    if (!user) return next(new AppError("User not found", 404));
 
     const alreadyEnrolled = user.roadmaps.some(
       (entry) => entry.roadmap.toString() === roadmapId
     );
 
     if (alreadyEnrolled)
-      return next(new AppError('you already enrolled in this roadmap', 400));
+      return next(new AppError("you already enrolled in this roadmap", 400));
 
     user.roadmaps.push({ roadmap: roadmapId });
 
@@ -44,25 +44,26 @@ router.post(
 );
 
 router.get(
-  '/dashboard',
+  "/dashboard",
   protectRoute,
-  restrictTo('student'),
+  restrictTo("student"),
   async (req, res, next) => {
     const userId = req.user._id;
     const user = await User.findById(userId)
       .populate({
-        path: 'roadmaps.roadmap',
-        select: 'title image stagesCount',
+        path: "roadmaps.roadmap",
+        select: "title image stagesCount",
       })
       .lean();
 
-    if (!user) return next(new AppError('User not found', 404));
+    if (!user) return next(new AppError("User not found", 404));
 
-    if (user.role === 'student') {
+    if (user.role === "student") {
       return res.status(200).json({
         success: true,
         data: {
           _id: user._id,
+          role: user.role,
           name: user.name,
           roadmaps: user.roadmaps,
         },
@@ -70,22 +71,22 @@ router.get(
     } else {
       return res.status(200).json({
         success: true,
-        message: 'other dashboards to be added',
+        message: "other dashboards to be added",
       });
     }
   }
 );
 
 router.post(
-  '/roadmaps/:id/progress',
+  "/roadmaps/:id/progress",
   protectRoute,
-  restrictTo('student'),
+  restrictTo("student"),
   async (req, res, next) => {
     const { id } = req.params;
     const { completedStages } = req.body;
 
-    if (typeof completedStages !== 'number' || completedStages < 0) {
-      return next(new AppError('Invalid or missing completedStages', 400));
+    if (typeof completedStages !== "number" || completedStages < 0) {
+      return next(new AppError("Invalid or missing completedStages", 400));
     }
 
     const [roadmap, user] = await Promise.all([
@@ -94,11 +95,11 @@ router.post(
     ]);
 
     if (!roadmap) {
-      return next(new AppError('Roadmap not found', 404));
+      return next(new AppError("Roadmap not found", 404));
     }
 
     if (!user) {
-      return next(new AppError('User not found', 404));
+      return next(new AppError("User not found", 404));
     }
 
     const userRoadmap = user.roadmaps.find(
@@ -106,7 +107,7 @@ router.post(
     );
 
     if (!userRoadmap) {
-      return next(new AppError('User is not enrolled in this roadmap', 404));
+      return next(new AppError("User is not enrolled in this roadmap", 404));
     }
 
     if (completedStages > roadmap.stagesCount) {
@@ -141,28 +142,28 @@ router.post(
     res.status(200).json({
       success: true,
       message: userRoadmap.completed
-        ? 'Roadmap completed!'
-        : 'Progress updated.',
+        ? "Roadmap completed!"
+        : "Progress updated.",
     });
   }
 );
 
 router.get(
-  '/certificates',
+  "/certificates",
   protectRoute,
-  restrictTo('student'),
+  restrictTo("student"),
   async (req, res, next) => {
     try {
       const userId = req.user._id;
       const certificates = await Certificate.find({ user: userId }).populate({
-        path: 'roadmap',
-        select: 'title image',
+        path: "roadmap",
+        select: "title image",
       });
 
       if (certificates.length === 0) {
         return res.status(200).json({
           success: true,
-          data: { message: 'No certificates found' },
+          data: { message: "No certificates found" },
         });
       }
 
@@ -177,9 +178,9 @@ router.get(
 );
 
 router.get(
-  '/certificates/:id/',
+  "/certificates/:id/",
   protectRoute,
-  restrictTo('student'),
+  restrictTo("student"),
   async (req, res, next) => {
     try {
       const { id } = req.params;
@@ -190,15 +191,15 @@ router.get(
         user: userId,
         _id: id,
       }).populate({
-        path: 'roadmap',
-        select: 'title ',
+        path: "roadmap",
+        select: "title ",
       });
 
       if (!certificate) {
-        return next(new AppError('Certificate not found', 404));
+        return next(new AppError("Certificate not found", 404));
       }
 
-      if (!user) return next(new AppError('User not found', 404));
+      if (!user) return next(new AppError("User not found", 404));
 
       const certificateHTML = generateCertificateHTML(
         req.user,
@@ -209,12 +210,12 @@ router.get(
       const browser = await puppeteer.launch();
       const page = await browser.newPage();
       await page.setContent(certificateHTML);
-      await page.emulateMediaType('screen');
+      await page.emulateMediaType("screen");
 
-      const filePath = path.join(__dirname, 'certificate.pdf');
+      const filePath = path.join(__dirname, "certificate.pdf");
       await page.pdf({
         path: filePath,
-        format: 'A4',
+        format: "A4",
         landscape: true,
         printBackground: true,
       });
@@ -223,10 +224,10 @@ router.get(
 
       const pdfBuffer = fs.readFileSync(filePath);
 
-      res.setHeader('Content-Type', 'application/pdf');
+      res.setHeader("Content-Type", "application/pdf");
       res.setHeader(
-        'Content-Disposition',
-        'attachment; filename=certificate.pdf'
+        "Content-Disposition",
+        "attachment; filename=certificate.pdf"
       );
 
       res.send(pdfBuffer);
@@ -238,6 +239,6 @@ router.get(
   }
 );
 
-router.get('/exam-appointments', protectRoute, async (req, res, next) => {});
+router.get("/exam-appointments", protectRoute, async (req, res, next) => {});
 
 module.exports = router;

@@ -11,11 +11,10 @@ const Login = () => {
 
   const { register, handleSubmit } = useForm();
 
-  const { isLoggedIn, setIsLoggedIn } = useAuth(); // Access global auth state
+  const { isLoggedIn, setIsLoggedIn } = useAuth();
 
   const { login, isLoading, error } = useLogin();
 
-  // Redirect if the user is already logged in
   useEffect(() => {
     if (isLoggedIn) {
       navigate("/dashboard");
