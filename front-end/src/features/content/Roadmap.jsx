@@ -157,16 +157,18 @@ function Roadmap() {
             {/* Hover Effect */}
             <div
               className={`absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100 ${
-                isEnrolled ? "bg-primary-600/60" : "bg-gray-900/60"
+                currentStage?.number === stage.number && "bg-primary-600/60"
               }`}
             >
-              <button className="bg-primary-600 hover:bg-primary-700 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all">
-                {stage.title.includes("Quiz") && isEnrolled
-                  ? "Start Quiz"
-                  : currentStage?.number > 1
-                    ? "Continue Learning"
-                    : "Start Learning"}
-              </button>
+              {currentStage?.number === stage.number && (
+                <button className="bg-primary-600 hover:bg-primary-700 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all">
+                  {stage.title.includes("Quiz") && isEnrolled
+                    ? "Start Quiz"
+                    : currentStage?.number > 1
+                      ? "Continue Learning"
+                      : "Start Learning"}
+                </button>
+              )}
             </div>
           </div>
         ))}
