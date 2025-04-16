@@ -1,5 +1,11 @@
 import { useGetRoadmap } from "../../hooks/courses/useGetRoadmap";
-import { FaPlay, FaQuestionCircle, FaCertificate } from "react-icons/fa";
+import {
+  FaPlay,
+  FaQuestionCircle,
+  FaCertificate,
+  FaRocket,
+  FaCheck,
+} from "react-icons/fa";
 import { useEnroll } from "../../hooks/user/enroll";
 import { useGetStudent } from "../../hooks/user/useGetStudent";
 import { Link } from "react-router-dom";
@@ -21,13 +27,22 @@ function Roadmap() {
     (currentRoadmap) => currentRoadmap.roadmap._id === roadmap?._id,
   )?.completedStages;
 
-  const currentStage = roadmap?.stages.find(
-    (currentStage) => currentStage.number === completedStages + 1,
-  );
-  console.log("currentStage", currentStage);
-  console.log("completedStages", completedStages);
-  console.log("studentData", studentData);
-  console.log("roadmap", roadmap);
+  let currentStage;
+
+  if (
+    roadmap &&
+    roadmap.stages &&
+    typeof completedStages === "number" &&
+    typeof roadmap.stagesCount === "number"
+  ) {
+    if (completedStages === roadmap.stagesCount) {
+      currentStage = roadmap.stagesCount;
+    } else {
+      currentStage =
+        roadmap.stages.find((stage) => stage.number === completedStages + 1) ??
+        completedStages + 1;
+    }
+  }
 
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error: {error.message}</div>;
@@ -51,9 +66,7 @@ function Roadmap() {
             <span className="text-gray-400">{roadmap.stagesCount} Stages</span>
           </div>
         </div>
-        {!studentData?.roadmaps.some(
-          (currentRoadmap) => currentRoadmap.roadmap._id === roadmap._id,
-        ) ? (
+        {!isEnrolled ? (
           <button
             className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
             onClick={() => enroll(roadmap._id)}
@@ -80,17 +93,21 @@ function Roadmap() {
           </Link>
         )}
       </div>
+
+      {/* Roadmap Progress */}
       <div className="bg-footer-900/70 mb-8 flex flex-col gap-4 rounded-lg p-6">
         <h2 className="text-2xl font-bold text-white">Roadmap Progress</h2>
         <div className="bg-footer-700 relative h-4 w-full rounded-full">
           <div
-            className={`bg-primary-600 h-4 rounded-full ${
-              completedStages === roadmap.stagesCount
-                ? "w-full"
-                : completedStages === 0
-                  ? "w-0"
-                  : `w-[${(completedStages / roadmap.stagesCount) * 100}%]`
-            }`}
+            className="bg-primary-600 h-4 rounded-full transition-all duration-300"
+            style={{
+              width:
+                completedStages === roadmap.stagesCount
+                  ? "100%"
+                  : completedStages === 0
+                    ? "0%"
+                    : `${(completedStages / roadmap.stagesCount) * 100}%`,
+            }}
           ></div>
         </div>
       </div>
@@ -100,24 +117,40 @@ function Roadmap() {
         {roadmap.stages.map((stage) => (
           <div
             key={stage._id}
-            className={`group relative overflow-hidden rounded-xl p-4 transition-all ${currentStage.number === stage.number ? "bg-footer-900/70" : "bg-footer-700/70"}`}
+            className={`group relative overflow-visible rounded-xl transition-all ${
+              completedStages >= stage.number
+                ? "bg-purple-700/70"
+                : currentStage?.number === stage.number
+                  ? "bg-footer-900/70 border-4 border-purple-600"
+                  : "bg-footer-700/70"
+            }`}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex-1">
-                <span className="bg-primary-600/20 text-primary-400 mb-2 inline-block rounded-full px-3 py-1 text-sm">
-                  Stage {stage.number}
-                </span>
-                <h3 className="mb-2 text-xl font-semibold text-white">
-                  {stage.title}
-                </h3>
-                <p className="text-sm text-gray-300">{stage.description}</p>
+            {/* ✅ Checkmark */}
+            {completedStages >= stage.number && (
+              <div className="absolute -top-2 -right-2 z-50 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-xs text-white shadow-md">
+                <FaCheck />
               </div>
-              <div className="ml-4">
-                {stage.title.includes("Quiz") ? (
-                  <FaQuestionCircle className="text-2xl text-yellow-500" />
-                ) : (
-                  <FaPlay className="text-primary-500 text-2xl" />
-                )}
+            )}
+
+            {/* Padding wraps only actual content */}
+            <div className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex-1">
+                  <span className="bg-primary-600/20 text-primary-400 mb-2 inline-block rounded-full px-3 py-1 text-sm">
+                    Stage {stage.number}
+                  </span>
+                  <h3 className="mb-2 text-xl font-semibold text-white">
+                    {stage.title}
+                  </h3>
+                  <p className="text-sm text-gray-300">{stage.description}</p>
+                </div>
+                <div className="ml-4">
+                  {stage.title.includes("Quiz") ? (
+                    <FaQuestionCircle className="text-2xl text-yellow-500" />
+                  ) : (
+                    <FaPlay className="text-primary-500 text-2xl" />
+                  )}
+                </div>
               </div>
             </div>
 
@@ -130,7 +163,7 @@ function Roadmap() {
               <button className="bg-primary-600 hover:bg-primary-700 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all">
                 {stage.title.includes("Quiz") && isEnrolled
                   ? "Start Quiz"
-                  : currentStage.number > 1
+                  : currentStage?.number > 1
                     ? "Continue Learning"
                     : "Start Learning"}
               </button>
