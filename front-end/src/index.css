@@ -28,3 +28,22 @@
 .containertwo {
   width: 100%;
 }
+
+/* Scrollbar Styles / أنماط شريط التمرير */
+*::-webkit-scrollbar {
+  width: 8px; /* عرض شريط التمرير */
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--color-footer-700); /* خلفية مسار شريط التمرير */
+  border-radius: 100vh; /* تدوير الزوايا */
+}
+
+*::-webkit-scrollbar-thumb {
+  background: var(--color-primary-600); /* لون شريط التمرير */
+  border-radius: 100vh; /* تدوير الزوايا */
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-700); /* لون شريط التمرير عند التحويم */
+}

@@ -2,6 +2,7 @@ import { useGetStudent } from "../../hooks/user/useGetStudent";
 import Sidebar from "../../ui/Sidebar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { FaCheck } from "react-icons/fa";
 
 function StudentDashboard() {
   const {
@@ -51,8 +52,17 @@ function StudentDashboard() {
                 <Link
                   to={`/roadmaps/${roadmap.roadmap._id}`}
                   key={roadmap._id}
-                  className="group hover:shadow-primary-600/20 bg-footer-800 relative overflow-hidden rounded-xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl"
+                  className={`group relative overflow-hidden rounded-xl p-6 transition-all duration-300 hover:scale-[1.02] hover:shadow-xl ${
+                    roadmap.completedStages === roadmap.roadmap.stagesCount
+                      ? "hover:shadow-green-600/20"
+                      : "hover:shadow-primary-600/20"
+                  } bg-footer-800`}
                 >
+                  {roadmap.completedStages === roadmap.roadmap.stagesCount && (
+                    <div className="absolute top-4 right-4 z-20 rounded-full bg-green-500 p-1">
+                      <FaCheck className="text-white" />
+                    </div>
+                  )}
                   <div className="bg-footer-900/90 absolute inset-0" />
                   <div className="relative z-10">
                     <div className="mb-4 flex items-center gap-4">
@@ -70,13 +80,25 @@ function StudentDashboard() {
                     <div className="mt-4 flex items-center gap-3">
                       <div className="bg-footer-700 h-2 flex-1 overflow-hidden rounded-full">
                         <div
-                          className="bg-primary-600 h-full rounded-full transition-all duration-500"
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            roadmap.completedStages ===
+                            roadmap.roadmap.stagesCount
+                              ? "bg-green-500"
+                              : "bg-primary-600"
+                          }`}
                           style={{
                             width: `${(roadmap.completedStages / roadmap.roadmap.stagesCount) * 100}%`,
                           }}
                         />
                       </div>
-                      <span className="text-primary-400 font-medium">
+                      <span
+                        className={`font-medium ${
+                          roadmap.completedStages ===
+                          roadmap.roadmap.stagesCount
+                            ? "text-green-400"
+                            : "text-primary-400"
+                        }`}
+                      >
                         {roadmap.completedStages === roadmap.roadmap.stagesCount
                           ? "Completed"
                           : `${roadmap.completedStages}/${roadmap.roadmap.stagesCount}`}
