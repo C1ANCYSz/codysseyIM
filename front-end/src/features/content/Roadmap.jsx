@@ -1,12 +1,9 @@
 import { useGetRoadmap } from "../../hooks/courses/useGetRoadmap";
-import {
-  FaPlay,
-  FaQuestionCircle,
-  FaCertificate,
-  FaRocket,
-} from "react-icons/fa";
+import { FaPlay, FaQuestionCircle, FaCertificate } from "react-icons/fa";
 import { useEnroll } from "../../hooks/user/enroll";
 import { useGetStudent } from "../../hooks/user/useGetStudent";
+import { Link } from "react-router-dom";
+
 function Roadmap() {
   const { roadmap, isLoading, error } = useGetRoadmap();
   const { enroll, isLoading: enrollLoading, error: enrollError } = useEnroll();
@@ -74,10 +71,13 @@ function Roadmap() {
             Get Your Certificate
           </button>
         ) : (
-          <button className="bg-primary-600 hover:bg-primary-700 flex cursor-pointer items-center gap-2 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all">
+          <Link
+            to={`/roadmaps/${roadmap._id}/stage/${currentStage.number}`}
+            className="bg-primary-600 hover:bg-primary-700 flex cursor-pointer items-center gap-2 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
+          >
             <FaPlay className="text-sm" />
-            Continue Learning
-          </button>
+            {currentStage.number > 1 ? "Continue Learning" : "Start Learning"}
+          </Link>
         )}
       </div>
       <div className="bg-footer-900/70 mb-8 flex flex-col gap-4 rounded-lg p-6">

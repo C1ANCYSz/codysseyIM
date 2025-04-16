@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Certificates from "./pages/Certificates";
 import Roadmaps from "./pages/Roadmaps";
 import Roadmap from "./features/content/Roadmap";
+import Stage from "./features/content/Stage";
 
 function App() {
   return (
@@ -49,10 +50,18 @@ function App() {
               }
             />
             <Route
-              path="roadmaps/:id"
+              path="roadmaps/:roadmapId"
               element={
                 <PrivateRoute>
                   <Roadmap />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="roadmaps/:roadmapId/stage/:stageNumber"
+              element={
+                <PrivateRoute>
+                  <Stage />
                 </PrivateRoute>
               }
             />
