@@ -145,8 +145,15 @@ function Roadmap() {
                   <p className="text-sm text-gray-300">{stage.description}</p>
                 </div>
                 <div className="ml-4">
-                  {stage.title.includes("Quiz") ? (
-                    <FaQuestionCircle className="text-2xl text-yellow-500" />
+                  {stage.type === "quiz" ? (
+                    <div className="flex items-center gap-2">
+                      {stage.score !== undefined ? (
+                        <span className="text-sm font-semibold text-gray-300">
+                          {stage.score}/{stage.questionsCount}
+                        </span>
+                      ) : null}
+                      <FaQuestionCircle className="text-2xl text-yellow-500" />
+                    </div>
                   ) : (
                     <FaPlay className="text-primary-500 text-2xl" />
                   )}
@@ -162,7 +169,7 @@ function Roadmap() {
             >
               {currentStage?.number === stage.number && (
                 <button className="bg-primary-600 hover:bg-primary-700 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all">
-                  {stage.title.includes("Quiz") && isEnrolled
+                  {stage.type === "quiz" && isEnrolled
                     ? "Start Quiz"
                     : currentStage?.number > 1
                       ? "Continue Learning"
