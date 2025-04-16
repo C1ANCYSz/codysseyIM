@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthProvider";
@@ -6,6 +6,8 @@ import { useAuth } from "../context/AuthProvider";
 export function useLogout() {
   const navigate = useNavigate();
   const { setIsLoggedIn } = useAuth();
+  const queryClient = useQueryClient(); // Access the React Query client
+
   const {
     mutate: logout,
     isLoading,
@@ -23,8 +25,9 @@ export function useLogout() {
         const data = await res.json();
         if (data.success) {
           setIsLoggedIn(false);
-
           navigate("/");
+          // Clear the React Query cache
+          queryClient.clear();
         } else {
           throw new Error(data.message);
         }

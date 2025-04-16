@@ -1,9 +1,8 @@
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const validator = require('validator');
-
 const User = require('./../models/User');
-
+const mongoose = require('mongoose');
 const AppError = require('../utils/AppError');
 const {
   generateVerificationToken,
@@ -174,89 +173,103 @@ exports.verifyEmail = async (req, res, next) => {
 exports.forgotPassword = async (req, res, next) => {
   const { email } = req.body;
 
-  if (!email) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Please provide email',
-    });
+  if (!email || !validator.isEmail(email)) {
+    return next(new AppError('Please provide a valid email address', 400));
   }
 
   const user = await User.findOne({ email });
   if (!user) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'No user found with that email',
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset link sent to email',
     });
   }
 
-  const resetToken = await user.createPasswordResetToken();
-
+  const resetToken = user.createPasswordResetToken();
   await user.save({ validateBeforeSave: false });
 
-  await sendPasswordResetEmail(
-    user.email,
-    `${process.env.CLIENT_URL}/reset-password/${resetToken}`
-  );
+  try {
+    await sendPasswordResetEmail(
+      user.email,
+      `${process.env.FRONTEND_URL}/reset-password/${resetToken}`
+    );
 
-  return res.status(200).json({
-    success: true,
-    message: 'Password reset link sent to email',
-  });
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset link sent to email',
+    });
+  } catch (emailErr) {
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+    await user.save({ validateBeforeSave: false });
+
+    return next(
+      new AppError(
+        'There was an error sending the email. Please try again later.',
+        500
+      )
+    );
+  }
 };
 
 exports.resetPassword = async (req, res, next) => {
-  const token = req.params.token;
-  const { password, confirmPassword } = req.body;
+  const session = await mongoose.startSession();
+  session.startTransaction();
 
-  if (!password || !confirmPassword) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Please provide password and confirm password',
+  try {
+    const { token } = req.params;
+    const { password, confirmPassword } = req.body;
+
+    if (!password || !confirmPassword) {
+      await session.abortTransaction();
+      return next(
+        new AppError('Please provide both password and confirmation', 400)
+      );
+    }
+
+    if (password !== confirmPassword) {
+      await session.abortTransaction();
+      return next(new AppError('Passwords do not match', 400));
+    }
+
+    if (password.length < 8) {
+      await session.abortTransaction();
+      return next(new AppError('Password must be at least 8 characters', 400));
+    }
+
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+      resetPasswordToken: hashedToken,
+      resetPasswordExpiresAt: { $gt: Date.now() },
+    }).session(session);
+
+    if (!user) {
+      await session.abortTransaction();
+      return next(new AppError('Token is invalid or has expired', 400));
+    }
+
+    user.password = password;
+    user.passwordChangedAt = Date.now();
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpiresAt = undefined;
+
+    await user.save({ validateBeforeSave: false });
+    await session.commitTransaction();
+
+    await sendPasswordResetSuccess(user.email, user.name);
+
+    return res.status(200).json({
+      success: true,
+      message: 'Password reset successfully!',
     });
+  } catch (err) {
+    await session.abortTransaction();
+    return next(err);
+  } finally {
+    session.endSession();
   }
-
-  if (password.length < 8 || confirmPassword.length < 8) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Password must be atleast 8 characters',
-    });
-  }
-  if (password !== confirmPassword) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Password and confirm password do not match',
-    });
-  }
-
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
-
-  const user = await User.findOne({
-    resetPasswordToken: hashedToken,
-    resetPasswordExpiresAt: { $gt: Date.now() },
-  });
-
-  if (!user) {
-    return res.status(400).json({
-      status: 'fail',
-      message: 'Invalid or expired token',
-    });
-  }
-
-  user.password = password;
-  user.confirmPassword = undefined;
-  user.resetPasswordToken = undefined;
-  user.resetPasswordExpiresAt = undefined;
-
-  await user.save({ validateBeforeSave: false });
-
-  await sendPasswordResetSuccess(user.email, user.name);
-  res.clearCookie('token');
-  return res.status(200).json({
-    status: 'success',
-    message: 'Password reset successful, please login with your new password',
-  });
 };
-
 exports.checkAuth = async (req, res) => {
   const token = req.cookies.token;
 

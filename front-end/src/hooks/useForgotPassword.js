@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
 
 export function useForgotPassword() {
   const {
@@ -78,7 +79,16 @@ export function useVerifyEmail() {
 }
 
 export function useResetPassword() {
+  const { token } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!token || token.length !== 64) {
+      toast.error("Invalid reset token format");
+      navigate("/forgot-password");
+    }
+  }, [token, navigate]);
+
   const {
     mutate: reset,
     isLoading,
@@ -87,22 +97,25 @@ export function useResetPassword() {
     mutationFn: async ({ email, password, confirmPassword }) => {
       try {
         const res = await fetch(
-          "http://localhost:3000/api/auth/reset-password",
+          `http://localhost:3000/api/auth/reset-password/${token}`,
           {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, password, confirmPassword }),
+            body: JSON.stringify({ password, confirmPassword }),
           },
         );
+
         const data = await res.json();
+
         if (data.success) {
           return data;
         } else {
-          throw new Error(data.message);
+          throw new Error(data.message || "Password reset failed");
         }
       } catch (error) {
+        console.error(error); // Log to debug
         throw new Error(error.message);
       }
     },
@@ -114,5 +127,6 @@ export function useResetPassword() {
       toast.error(data.message);
     },
   });
+
   return { reset, isLoading, error };
 }

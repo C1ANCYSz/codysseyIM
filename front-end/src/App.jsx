@@ -52,6 +52,10 @@ function App() {
               }
             />
           </Route>
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPassword />}
+          ></Route>
         </Routes>
       </Router>
       <Toaster />
