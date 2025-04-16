@@ -8,11 +8,14 @@ import {
 } from "react-icons/fa";
 import { useEnroll } from "../../hooks/user/enroll";
 import { useGetStudent } from "../../hooks/user/useGetStudent";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthProvider";
 
 function Roadmap() {
   const { roadmap, isLoading, error } = useGetRoadmap();
+  const { isLoggedIn } = useAuth();
   const { enroll, isLoading: enrollLoading, error: enrollError } = useEnroll();
+  const navigate = useNavigate();
   const {
     studentData,
     isLoading: userLoading,
@@ -48,7 +51,7 @@ function Roadmap() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto my-10">
       {/* Header Section */}
       <div className="mb-8 flex flex-col items-center gap-6 border-b border-white pb-4 md:flex-row">
         <img
@@ -69,7 +72,13 @@ function Roadmap() {
         {!isEnrolled ? (
           <button
             className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
-            onClick={() => enroll(roadmap._id)}
+            onClick={() => {
+              if (isLoggedIn) {
+                enroll(roadmap._id);
+              } else {
+                navigate("/login");
+              }
+            }}
             disabled={enrollLoading}
           >
             {enrollLoading ? "Enrolling..." : "Enroll"}
@@ -95,22 +104,24 @@ function Roadmap() {
       </div>
 
       {/* Roadmap Progress */}
-      <div className="bg-footer-900/70 mb-8 flex flex-col gap-4 rounded-lg p-6">
-        <h2 className="text-2xl font-bold text-white">Roadmap Progress</h2>
-        <div className="bg-footer-700 relative h-4 w-full rounded-full">
-          <div
-            className="bg-primary-600 h-4 rounded-full transition-all duration-300"
-            style={{
-              width:
-                completedStages === roadmap.stagesCount
-                  ? "100%"
-                  : completedStages === 0
-                    ? "0%"
-                    : `${(completedStages / roadmap.stagesCount) * 100}%`,
-            }}
-          ></div>
+      {isLoggedIn && (
+        <div className="bg-footer-900/70 mb-8 flex flex-col gap-4 rounded-lg p-6">
+          <h2 className="text-2xl font-bold text-white">Roadmap Progress</h2>
+          <div className="bg-footer-700 relative h-4 w-full rounded-full">
+            <div
+              className="bg-primary-600 h-4 rounded-full transition-all duration-300"
+              style={{
+                width:
+                  completedStages === roadmap.stagesCount
+                    ? "100%"
+                    : completedStages === 0
+                      ? "0%"
+                      : `${(completedStages / roadmap.stagesCount) * 100}%`,
+              }}
+            ></div>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Stages Grid */}
       <div className="grid gap-4 md:grid-cols-2">

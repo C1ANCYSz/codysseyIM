@@ -41,22 +41,8 @@ function App() {
                 </PrivateRoute>
               }
             />
-            <Route
-              path="roadmaps"
-              element={
-                <PrivateRoute>
-                  <Roadmaps />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="roadmaps/:roadmapId"
-              element={
-                <PrivateRoute>
-                  <Roadmap />
-                </PrivateRoute>
-              }
-            />
+            <Route path="roadmaps" element={<Roadmaps />} />
+            <Route path="roadmaps/:roadmapId" element={<Roadmap />} />
             <Route
               path="roadmaps/:roadmapId/stage/:stageNumber"
               element={
