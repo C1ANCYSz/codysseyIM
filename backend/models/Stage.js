@@ -34,8 +34,8 @@ const baseStageSchema = new mongoose.Schema(
 const Stage = mongoose.model('Stage', baseStageSchema);
 
 const contentStageSchema = new mongoose.Schema({
-  videos: [String],
-  docs: [String],
+  videos: [{ url: String, title: String }],
+  docs: [{ url: String, title: String }],
 });
 
 const ContentStage = Stage.discriminator('content', contentStageSchema);
@@ -61,7 +61,7 @@ const quizStageSchema = new mongoose.Schema({
       ],
     },
   ],
-  score: {
+  questionsCount: {
     type: Number,
     required: true,
   },

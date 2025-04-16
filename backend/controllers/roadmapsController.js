@@ -3,7 +3,8 @@ const { Stage, ContentStage, QuizStage } = require('../models/Stage');
 const User = require('../models/User');
 const AppError = require('../utils/AppError');
 const mongoose = require('mongoose');
-
+const Quiz = require('../models/Quiz');
+require('express-async-errors');
 exports.getRoadmaps = async (req, res, next) => {
   const categories = await Roadmap.distinct('category').lean();
 
@@ -20,21 +21,36 @@ exports.getRoadmaps = async (req, res, next) => {
 
 exports.getRoadmap = async (req, res, next) => {
   const { id } = req.params;
+  const userId = req.user?._id;
+  console.log(userId);
 
-  let roadmap = await Roadmap.findById(id).lean();
-
+  const roadmap = await Roadmap.findById(id).lean();
   if (!roadmap) {
     return res.status(404).json({ message: 'Roadmap not found' });
   }
 
   const stages = await Stage.find({ roadmap: id })
-    .select('title number description')
+    .select('title number description type questionsCount')
     .sort('number')
     .lean();
+  if (userId) {
+    for (const stage of stages) {
+      if (stage.type === 'quiz') {
+        const quiz = await Quiz.findOne({
+          roadmap: id,
+          stage: stage._id,
+          user: userId,
+        }).lean();
 
-  roadmap = { ...roadmap, stages };
+        if (quiz) {
+          stage.score = quiz.score;
+        }
+      }
+    }
+  }
+  roadmap.stages = stages;
 
-  res.json({
+  return res.json({
     success: true,
     data: { roadmap },
   });

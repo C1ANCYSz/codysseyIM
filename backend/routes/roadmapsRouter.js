@@ -14,9 +14,11 @@ const {
   deleteRoadmap,
 } = require('../controllers/roadmapsController');
 
+const { isLoggedIn } = require('../middlewares/isLoggedIn');
+
 router.get('/', getRoadmaps);
 
-router.get('/:id', getRoadmap);
+router.get('/:id', isLoggedIn, getRoadmap);
 
 router.get('/:id/stages/:number', protectRoute, getRoadmapStage);
 

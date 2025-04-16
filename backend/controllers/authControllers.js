@@ -276,17 +276,3 @@ exports.checkAuth = async (req, res) => {
     return res.json({ success: false });
   }
 };
-
-exports.isLoggedIn = (req, res, next) => {
-  if (req.cookies.token) {
-    return res.status(200).json({
-      success: true,
-      message: 'User is logged in',
-    });
-  } else {
-    return res.status(200).json({
-      success: false,
-      message: 'User is not logged in',
-    });
-  }
-};
