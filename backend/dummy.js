@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
-const { ContentStage } = require('./models/Stage');
+const { ContentStage, QuizStage } = require('./models/Stage');
 require('dotenv').config();
+const Quiz = require('./models/Quiz');
 
 const { MONGO_URI } = process.env;
 mongoose.connect(MONGO_URI);
@@ -83,4 +84,20 @@ const seedStages = async () => {
   }
 };
 
-seedStages();
+const updateQuizzes = async () => {
+  try {
+    const quizzes = await QuizStage.find();
+    for (const quiz of quizzes) {
+      quiz.questionsCount = quiz.questions.length;
+      score = undefined;
+      await quiz.save();
+    }
+    console.log('✅ Done updating quizzes!');
+  } catch (err) {
+    console.error('❌ Error updating quizzes:', err);
+  }
+};
+
+//seedStages();
+
+updateQuizzes();

@@ -126,6 +126,7 @@ exports.roadmapProgress = async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: userRoadmap.completed ? 'Roadmap completed!' : 'Progress updated.',
+    completed: userRoadmap.completed,
   });
 };
 

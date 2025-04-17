@@ -38,7 +38,7 @@ exports.getRoadmap = async (req, res, next) => {
       if (stage.type === 'quiz') {
         const quiz = await Quiz.findOne({
           roadmap: id,
-          stage: stage._id,
+          stage: stage.number,
           user: userId,
         }).lean();
 
@@ -58,56 +58,64 @@ exports.getRoadmap = async (req, res, next) => {
 
 exports.getRoadmapStage = async (req, res, next) => {
   const { id, number } = req.params;
+  const stageNumber = parseInt(number, 10);
   const currentUserId = req.user._id;
-  const stage = await Stage.findOne({ roadmap: id, number })
-    .select('-description -roadmap')
-    .lean();
 
   const user = await User.findById(currentUserId);
-
-  if (!user) {
-    return next(new AppError('User not found', 404));
-  }
+  if (!user) return next(new AppError('User not found', 404));
 
   const userRoadmap = user.roadmaps.find(
     (roadmap) => roadmap.roadmap.toString() === id
   );
-
   if (!userRoadmap) {
     return next(new AppError('Enroll in the roadmap first', 404));
   }
 
-  console.log(userRoadmap.completedStages);
-
-  if (userRoadmap.completedStages < number - 1) {
+  if (userRoadmap.completedStages < stageNumber - 1) {
     return next(
       new AppError(
-        'complete the previous stage before progressing to the next stage',
+        'Complete the previous stage before progressing to the next stage',
         400
       )
     );
   }
 
-  if (!stage) {
-    return next(new AppError('Stage not found', 404));
-  }
+  const stage = await Stage.findOne({ roadmap: id, number: stageNumber })
+    .select('-description -roadmap')
+    .lean();
+
+  if (!stage) return next(new AppError('Stage not found', 404));
 
   if (stage.type === 'content') {
     const contentStage = await ContentStage.findById(stage._id).lean();
-
     return res.json({
       success: true,
       data: { stage: contentStage },
     });
-  } else if (stage.type === 'quiz') {
+  }
+
+  if (stage.type === 'quiz') {
     const quizStage = await QuizStage.findById(stage._id).lean();
+    const userQuiz = await Quiz.findOne({
+      roadmap: id,
+      stage: stageNumber,
+      user: currentUserId,
+    });
+
+    if (userQuiz && userQuiz.score >= stage.questionsCount) {
+      return res.json({
+        success: true,
+        message: 'You already passed the quiz gracefully!',
+      });
+    }
 
     return res.json({
       success: true,
       data: { stage: quizStage },
     });
   }
-  return res.status(400).json({ message: 'Invalid stage type' });
+
+  return next(new AppError('Invalid stage type', 400));
 };
 
 exports.createRoadmap = async (req, res, next) => {

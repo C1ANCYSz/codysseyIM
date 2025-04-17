@@ -12,8 +12,7 @@ const quizSchema = new mongoose.Schema({
     required: true,
   },
   stage: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Stage',
+    type: Number,
     required: true,
   },
   score: {
