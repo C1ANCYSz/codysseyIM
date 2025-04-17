@@ -92,7 +92,12 @@ function Roadmap() {
                 currentRoadmap.roadmap._id === roadmap._id &&
                 currentRoadmap.completed,
             ) ? (
-            <button className="flex cursor-pointer items-center gap-2 rounded-full bg-green-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-green-700">
+            <button
+              className="flex cursor-pointer items-center gap-2 rounded-full bg-green-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-green-700"
+              onClick={() => {
+                navigate(`/certificates`);
+              }}
+            >
               <FaCertificate className="text-lg" />
               Get Your Certificate
             </button>
