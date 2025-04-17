@@ -10,6 +10,7 @@ import { useEnroll } from "../../hooks/user/enroll";
 import { useGetStudent } from "../../hooks/user/useGetStudent";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
+import Loader from "../../ui/Loader";
 
 function Roadmap() {
   const { roadmap, isLoading, error } = useGetRoadmap();
@@ -47,7 +48,7 @@ function Roadmap() {
     }
   }
 
-  if (isLoading) return <div>Loading...</div>;
+  if (isLoading) return <Loader />;
   if (error) return <div>Error: {error.message}</div>;
 
   return (

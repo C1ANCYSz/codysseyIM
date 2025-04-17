@@ -5,6 +5,7 @@ import { FaArrowLeft, FaPlay } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import YoutubePlayer from "../../ui/YoutubePlayer";
 import { useEffect, useState } from "react";
+import Loader from "../../ui/Loader";
 
 function Stage() {
   const navigate = useNavigate();
@@ -30,7 +31,7 @@ function Stage() {
     setSelectedVideo(videoId);
   };
 
-  if (isLoading || roadmapLoading) return <div>Loading...</div>;
+  if (isLoading || roadmapLoading) return <Loader />;
   if (error || roadmapError) return <div>Error: {error.message}</div>;
 
   return (

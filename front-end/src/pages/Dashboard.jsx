@@ -1,23 +1,16 @@
 import { useGetStudent } from "../hooks/user/useGetStudent";
 import StudentDashboard from "../features/user/StudentDashboard";
 import { useAuth } from "../context/AuthProvider";
-
+import Loader from "../ui/Loader";
 function Dashboard() {
-  const { studentData, isLoading, error } = useGetStudent();
-  const { userRole } = useAuth();
-  console.log(userRole);
-  const { name, roadmaps } = studentData || {};
-
-  console.log(studentData);
+  const { userRole, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div>Loading...</div>;
+    return <Loader />;
   }
-  if (error) {
-    return <div>Error: {error.message}</div>;
-  }
+
   if (userRole === "student") {
-    return <StudentDashboard name={name} roadmaps={roadmaps} />;
+    return <StudentDashboard />;
   }
   // if (role === "admin") {
   //   return <AdminDashboard />;

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useGetRoadmaps } from "../hooks/courses/useGetRoadmaps";
 import { Link } from "react-router-dom";
 import Sidebar from "../ui/Sidebar";
+import Loader from "../ui/Loader";
 
 function Roadmaps() {
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -20,23 +21,8 @@ function Roadmaps() {
       ? roadmaps
       : roadmaps.filter((roadmap) => roadmap.category === selectedCategory);
 
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="border-primary-600 h-12 w-12 animate-spin rounded-full border-4 border-t-transparent"></div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="rounded-lg bg-red-500/10 p-4 text-red-500">
-          Error: {error.message}
-        </div>
-      </div>
-    );
-  }
+  if (isLoading) return <Loader />;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="from-footer-900 to-footer-800 flex min-h-screen bg-gradient-to-br">
