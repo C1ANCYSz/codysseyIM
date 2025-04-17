@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useGetRoadmaps } from "../hooks/courses/useGetRoadmaps";
 import { Link } from "react-router-dom";
-import Sidebar from "../ui/Sidebar";
 import Loader from "../ui/Loader";
 
 function Roadmaps() {
@@ -70,7 +69,7 @@ function Roadmaps() {
                       <img
                         src={roadmap.image}
                         alt={roadmap.name}
-                        className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110"
+                        className="h-full w-full object-contain"
                       />
                     </div>
                     <h3 className="mt-6 text-center text-xl font-bold text-white">
