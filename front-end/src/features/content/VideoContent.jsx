@@ -105,13 +105,13 @@ function VideoContent() {
               <h3 className="border-b border-gray-700 pb-4 text-center text-4xl font-semibold tracking-wider">
                 Playlist
               </h3>
-              <ul className="mt-4 space-y-2 divide-y divide-gray-700">
+              <ul className="mt-4 max-h-[500px] space-y-2 divide-y divide-gray-700 overflow-y-auto">
                 {videos?.map((video) => {
                   const videoId = video.url.slice(video.url.indexOf("v=") + 2);
                   return (
                     <li
                       key={videoId}
-                      className={`group hover:bg-footer-800/50 relative flex cursor-pointer items-center gap-4 rounded-lg p-2 transition-all duration-300 ${
+                      className={`group hover:bg-footer-800/50 relative mr-5 flex cursor-pointer items-center gap-4 rounded-lg p-2 transition-all duration-300 ${
                         selectedVideo === videoId ? "bg-primary-700" : ""
                       }`}
                       onClick={() => handleVideoSelect(videoId)}

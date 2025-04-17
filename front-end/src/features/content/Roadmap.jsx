@@ -182,7 +182,7 @@ function Roadmap() {
                   currentStage?.number === stage.number && "bg-primary-600/60"
                 }`}
               >
-                {currentStage?.number === stage.number && (
+                {currentStage?.number >= stage.number && (
                   <button
                     className="bg-primary-600 hover:bg-primary-700 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
                     onClick={() => {
