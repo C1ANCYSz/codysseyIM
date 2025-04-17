@@ -11,11 +11,14 @@ import {
 import { TbFileCertificate } from "react-icons/tb";
 import { NavLink } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
+import { useGetStudent } from "../hooks/user/useGetStudent";
 
 function Sidebar() {
   const { logout } = useLogout();
   const [isOpen, setIsOpen] = useState(false);
-
+  const { studentData } = useGetStudent();
+  const { name, role } = studentData || {};
+  console.log(studentData);
   const toggleSidebar = () => setIsOpen(!isOpen);
 
   return (
@@ -41,7 +44,9 @@ function Sidebar() {
             <FiUser className="text-4xl text-white" />
             <div>
               <p className="text-sm md:text-base">Welcome back,</p>
-              <p className="text-primary-500 font-bold md:text-lg">MuDai</p>
+              <p className="text-primary-500 font-bold uppercase md:text-lg">
+                {name || "MuDai"}
+              </p>
             </div>
           </div>
         </div>
@@ -60,7 +65,7 @@ function Sidebar() {
               {
                 to: "/appointments",
                 icon: <FaCalendar />,
-                label: "Book an Exam",
+                label: "Book an appointment",
               },
             ].map((item) => (
               <li key={item.to}>

@@ -40,7 +40,6 @@ function Roadmaps() {
 
   return (
     <div className="from-footer-900 to-footer-800 flex min-h-screen bg-gradient-to-br">
-      <Sidebar />
       <div className="container mx-auto p-8">
         <div className="space-y-12">
           {/* Categories Navigation - Fixed */}

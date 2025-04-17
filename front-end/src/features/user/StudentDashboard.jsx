@@ -23,7 +23,6 @@ function StudentDashboard() {
   return (
     <div className="from-footer-900 to-footer-800 min-h-screen bg-gradient-to-br">
       <div className="flex h-screen">
-        <Sidebar name={name} />
         <div className="flex-1 p-8">
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-3xl font-bold tracking-tight text-white">

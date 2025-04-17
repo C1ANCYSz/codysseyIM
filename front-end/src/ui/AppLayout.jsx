@@ -1,8 +1,20 @@
 import { Outlet } from "react-router-dom";
 import Footer from "./Footer";
 import Header from "./Header";
-
+import { useAuth } from "../context/AuthProvider";
+import Sidebar from "./Sidebar";
 function AppLayout() {
+  const { isLoggedIn } = useAuth();
+  if (isLoggedIn) {
+    return (
+      <div className="bg-footer-800 font-body flex h-screen overflow-hidden">
+        <Sidebar />
+        <div className="flex-1 overflow-y-auto">
+          <Outlet />
+        </div>
+      </div>
+    );
+  }
   return (
     <div className="bg-footer-800 font-body grid min-h-screen grid-rows-[auto_1fr_auto] overflow-x-hidden">
       <Header />

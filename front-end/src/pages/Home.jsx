@@ -3,212 +3,156 @@ import { TbMapRoute } from "react-icons/tb";
 import { MdOndemandVideo } from "react-icons/md";
 import { FaArrowRight, FaRegUser } from "react-icons/fa";
 import { LiaChalkboardTeacherSolid } from "react-icons/lia";
+
 const Home = () => {
   return (
-    <div className="from-primary-900 bg-gradient-to-br via-cyan-900 to-blue-900">
-      <div className="containertwo mx-auto space-y-12 p-2 lg:p-10">
-        <div className="relative min-h-[calc(100vh-80px)] rounded-lg border-4 border-white bg-[url(/src/assets/images/exploreMore.jpg)] bg-cover bg-center md:rounded-4xl">
-          <div className="absolute inset-0 rounded-lg bg-gradient-to-b from-black/70 to-black/20 backdrop-blur-[3px] md:rounded-4xl"></div>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
+      <div className="mx-auto max-w-[1440px] space-y-24 p-4 lg:p-8">
+        {/* Hero Section */}
+        <div className="relative min-h-[90vh] overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-800 to-slate-900">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.2),rgba(0,0,0,0))]"></div>
 
-          <div className="relative flex min-h-[calc(100vh-80px)] flex-col items-center justify-center gap-8 px-4 text-center md:px-8 lg:px-16">
-            <h2 className="text-3xl font-bold tracking-wide text-white uppercase md:text-5xl lg:text-6xl">
-              Your Companion for a
-              <span className="text-primary-400"> Better</span>
-              <br />
-              Academic Journey
-            </h2>
+          <div className="relative flex min-h-[90vh] flex-col items-center justify-center gap-10 px-6 text-center lg:px-20">
+            <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl lg:text-7xl">
+              Master Programming
+              <span className="bg-gradient-to-r from-indigo-300 to-slate-300 bg-clip-text text-transparent">
+                {" "}
+                The Right Way
+              </span>
+            </h1>
 
-            <p className="max-w-2xl text-lg text-gray-200 md:text-xl">
-              We help programmers learn to code through structured roadmaps,
-              concise tutorials, and practical tools — all in one place.
+            <p className="max-w-2xl text-xl text-gray-300 md:text-2xl">
+              Learn to code through interactive roadmaps, hands-on projects, and
+              a supportive community. Your journey to becoming a developer
+              starts here.
             </p>
 
-            <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:gap-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
               <Link to="/signup">
-                <button className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-lg px-8 py-3 text-lg font-semibold text-white transition-all duration-300 hover:scale-105">
-                  Get Started
+                <button className="group relative overflow-hidden rounded-xl bg-white px-8 py-4 text-lg font-bold text-slate-800 transition-all hover:scale-105">
+                  <span className="relative z-10">Start Learning Now</span>
+                  <div className="absolute inset-0 -z-0 bg-gradient-to-r from-indigo-200 to-slate-200 opacity-0 transition-opacity group-hover:opacity-100"></div>
                 </button>
               </Link>
               <Link to="/roadmaps">
-                <button className="cursor-pointer rounded-lg border-2 border-white bg-transparent px-8 py-3 text-lg font-semibold text-white transition-all duration-300 hover:bg-white/10">
-                  Explore Roadmaps
+                <button className="rounded-xl border-2 border-white/30 bg-white/10 px-8 py-4 text-lg font-bold text-white backdrop-blur-sm transition-all hover:bg-white/20">
+                  View Learning Paths
                 </button>
               </Link>
             </div>
           </div>
         </div>
-        <div className="bg-primary-600 relative w-full rounded-lg pt-20 pb-30 text-center md:rounded-4xl">
-          <div className="absolute inset-0 bg-[url(/src/assets/images/wiggly.png)] bg-cover bg-center opacity-30"></div>
-          <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
-            <h2 className="text-center text-3xl font-bold tracking-wide text-white uppercase md:text-5xl lg:text-6xl">
-              JOIN OUR COMMUNITY
+
+        {/* Features Section */}
+        <div className="relative rounded-3xl bg-gradient-to-r from-indigo-700 to-slate-700 py-32 text-center">
+          <div className="relative z-10 mx-auto max-w-7xl px-6">
+            <h2 className="text-center text-4xl font-bold text-white md:text-6xl">
+              Why Choose Us?
             </h2>
-            <div className="mt-20 grid w-full grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
-              <div className="flex flex-col items-center gap-4">
-                <div className="rounded-full border-4 bg-white p-8">
-                  <TbMapRoute className="text-[120px]" />
+
+            <div className="mt-20 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                {
+                  icon: <TbMapRoute className="h-16 w-16" />,
+                  title: "Structured Learning",
+                  description:
+                    "Follow clear, progressive paths to master programming skills",
+                },
+                {
+                  icon: <MdOndemandVideo className="h-16 w-16" />,
+                  title: "Interactive Content",
+                  description:
+                    "Learn through engaging videos, quizzes, and coding challenges",
+                },
+                {
+                  icon: <FaRegUser className="h-16 w-16" />,
+                  title: "Personalized Path",
+                  description:
+                    "Learn at your own pace with customized learning tracks",
+                },
+                {
+                  icon: <LiaChalkboardTeacherSolid className="h-16 w-16" />,
+                  title: "Expert Support",
+                  description:
+                    "Get help from experienced developers when stuck",
+                },
+              ].map((feature, index) => (
+                <div
+                  key={index}
+                  className="group flex flex-col items-center gap-6 rounded-2xl bg-white/10 p-8 backdrop-blur-sm transition-all hover:bg-white/20"
+                >
+                  <div className="rounded-2xl bg-white/90 p-6 text-indigo-600 shadow-lg">
+                    {feature.icon}
+                  </div>
+                  <h3 className="text-2xl font-bold text-white">
+                    {feature.title}
+                  </h3>
+                  <p className="text-center text-lg text-gray-200">
+                    {feature.description}
+                  </p>
                 </div>
-                <h3 className="text-4xl font-bold text-white capitalize">
-                  Customized roadmaps
-                </h3>
-                <p className="mx-8 text-center text-xl text-gray-200">
-                  Build your skills strategically with expert-designed learning
-                  paths
-                </p>
-              </div>
-              <div className="flex flex-col items-center gap-4">
-                <div className="rounded-full border-4 bg-white p-8">
-                  <MdOndemandVideo className="text-[120px]" />
-                </div>
-                <h3 className="text-4xl font-bold text-white capitalize">
-                  High-quality Content
-                </h3>
-                <p className="mx-8 text-center text-xl text-gray-200">
-                  Master programming concepts through clear, concise, and
-                  practical lessons
-                </p>
-              </div>
-              <div className="flex flex-col items-center gap-4">
-                <div className="rounded-full border-4 bg-white p-10">
-                  <FaRegUser className="text-[100px]" />
-                </div>
-                <h3 className="text-4xl font-bold text-white capitalize">
-                  Start at any level
-                </h3>
-                <p className="mx-8 text-center text-xl text-gray-200">
-                  Whether you&apos;re a beginner or pro, there&apos;s always
-                  room to grow
-                </p>
-              </div>
-              <div className="flex flex-col items-center gap-4">
-                <div className="rounded-full border-4 bg-white p-8">
-                  <LiaChalkboardTeacherSolid className="text-[120px]" />
-                </div>
-                <h3 className="text-4xl font-bold text-white capitalize">
-                  Flexible Learning
-                </h3>
-                <p className="mx-8 text-center text-xl text-gray-200">
-                  Learn at your own pace, on your own schedule
-                </p>
-              </div>
+              ))}
             </div>
           </div>
         </div>
-        <div className="relative w-full rounded-lg bg-[#D2EEFF] pt-20 pb-30 text-center md:rounded-4xl">
-          <div className="absolute inset-0 bg-[url(/src/assets/images/wiggly.png)] bg-cover bg-center opacity-30"></div>
-          <div className="relative z-10 flex h-full flex-col items-center justify-center px-4">
-            <h2 className="text-center text-3xl font-bold tracking-wide uppercase md:text-5xl lg:text-6xl">
-              FEATURED CATEGORIES
+
+        {/* Learning Tracks */}
+        <div className="relative rounded-3xl bg-slate-800/50 py-32">
+          <div className="relative z-10 mx-auto max-w-7xl px-6">
+            <h2 className="text-center text-4xl font-bold text-white md:text-6xl">
+              Popular Learning Tracks
             </h2>
-            <div className="mt-20 grid w-full grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4">
-              <div className="flex flex-col items-center gap-4">
-                <div className="bg-primary-600 rounded-full p-6">
-                  <img
-                    src="/src/assets/images/frontend.png"
-                    alt="frontend"
-                    className="w-[160px]"
-                  />
+
+            <div className="mt-20 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {[
+                {
+                  title: "Frontend Development",
+                  description:
+                    "Master modern web development with React, Vue & more",
+                  level: "Beginner Friendly",
+                },
+                {
+                  title: "Backend Development",
+                  description: "Build scalable servers & APIs with Node.js",
+                  level: "Intermediate",
+                },
+                {
+                  title: "Full Stack Development",
+                  description: "Become a complete web developer",
+                  level: "Advanced",
+                },
+              ].map((track, index) => (
+                <div
+                  key={index}
+                  className="group cursor-pointer rounded-xl bg-slate-700/50 p-8 transition-all hover:bg-slate-700"
+                >
+                  <h3 className="text-2xl font-bold text-white">
+                    {track.title}
+                  </h3>
+                  <p className="mt-4 text-gray-300">{track.description}</p>
+                  <span className="mt-4 inline-block rounded-full bg-indigo-500/20 px-4 py-1 text-sm text-indigo-200">
+                    {track.level}
+                  </span>
                 </div>
-                <h3 className="text-4xl font-bold capitalize">
-                  Front-end Development
-                </h3>
-              </div>
-              <div className="flex flex-col items-center gap-4">
-                <div className="bg-primary-600 rounded-full p-6">
-                  <img
-                    src="/src/assets/images/backend.png"
-                    alt="backend"
-                    className="w-[160px]"
-                  />
-                </div>
-                <h3 className="text-4xl font-bold capitalize">
-                  Back-end Development
-                </h3>
-              </div>
-              <div className="flex flex-col items-center gap-4">
-                <div className="bg-primary-600 rounded-full p-8">
-                  <img
-                    src="/src/assets/images/uiux.png"
-                    alt="uiux"
-                    className="w-[140px]"
-                  />
-                </div>
-                <h3 className="text-4xl font-bold capitalize">UI/UX Design</h3>
-              </div>
-              <div className="flex flex-col items-center gap-4">
-                <div className="bg-primary-600 rounded-full p-8">
-                  <img
-                    src="/src/assets/images/machinelearning.png"
-                    alt="machinelearning"
-                    className="w-[140px]"
-                  />
-                </div>
-                <h3 className="text-4xl font-bold capitalize">
-                  Machine Learning
-                </h3>
-              </div>
-            </div>
-            <button className="bg-footer-800 hover:bg-footer-900 mt-20 flex cursor-pointer items-center gap-2 rounded-full px-8 py-5 text-4xl font-bold text-white transition-all duration-300 hover:scale-105">
-              <span>Explore More</span>
-              <FaArrowRight className="mt-2.5" />
-            </button>
-          </div>
-        </div>
-        <div className="mx-auto flex max-w-[90%] flex-col gap-14">
-          <div className="flex flex-wrap justify-center gap-14">
-            <div className="flex h-[580px] max-w-[580px] basis-1/2 items-center justify-center rounded-lg bg-[#D2EEFF]">
-              <img
-                src="/src/assets/images/progress.png"
-                alt="progress"
-                className="w-[400px]"
-              />
-            </div>
-            <div className="flex max-w-[580px] basis-1/2 flex-col justify-center gap-4 space-y-4">
-              <h2 className="text-3xl leading-tight font-bold tracking-wide text-white uppercase md:text-5xl lg:text-6xl">
-                KEEP TRACK OF YOUR{" "}
-                <span className="text-primary-600">PROGRESS</span>
-              </h2>
-              <p className="text-2xl text-gray-200">
-                See your progress develop before your eyes and rise to the
-                occasion?
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-wrap justify-center gap-14">
-            <div className="flex max-w-[580px] basis-1/2 flex-col justify-center gap-4 space-y-4">
-              <h2 className="text-3xl leading-tight font-bold tracking-wide text-white uppercase md:text-5xl lg:text-6xl">
-                QUIZZES, TESTS &{" "}
-                <span className="text-primary-600">CERTIFICATES</span>
-              </h2>
-              <p className="text-2xl text-gray-200">
-                Gamify the Learning experience by solving quizzes and undergoing
-                tests to obtain your completion certificate!
-              </p>
-            </div>
-            <div className="relative flex h-[580px] max-w-[580px] basis-1/2 rounded-lg bg-[#D2EEFF] p-10">
-              <img
-                src="/src/assets/images/certificate.png"
-                alt="certificate"
-                className="h-[300px]"
-              />
-              <img
-                src="/src/assets/images/certificate2.png"
-                alt="certificate"
-                className="absolute top-1/2 right-1/2 h-[250px] w-[250px] translate-x-[10rem] -translate-y-[2rem]"
-              />
+              ))}
             </div>
           </div>
         </div>
-        <div className="from-primary-600 relative rounded-lg bg-gradient-to-r to-cyan-500 py-20">
-          <div className="absolute inset-0 bg-[url(/src/assets/images/wiggly.png)] bg-cover bg-center opacity-30"></div>
-          <div className="relative z-10 flex flex-col items-center justify-center gap-16">
-            <h2 className="text-xl font-bold tracking-wide text-white uppercase md:text-3xl lg:text-4xl">
-              NO TIME IS BETTER THAN NOW!
+
+        {/* CTA Section */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-700 to-slate-700 py-20">
+          <div className="relative z-10 flex flex-col items-center gap-12">
+            <h2 className="text-center text-3xl font-bold text-white md:text-5xl">
+              Ready to Begin Your Coding Journey?
             </h2>
-            <button className="flex cursor-pointer items-center gap-2 rounded-full border-2 border-black bg-amber-200/90 px-8 py-5 text-3xl font-bold text-black capitalize transition-all duration-300 hover:bg-amber-200">
-              Start your journey
-              <FaArrowRight className="mt-2" />
-            </button>
+            <Link to="/signup">
+              <button className="group relative overflow-hidden rounded-full bg-white px-8 py-4 text-xl font-bold text-slate-800 transition-all hover:scale-105">
+                <span className="relative z-10 flex items-center gap-2">
+                  Get Started For Free
+                  <FaArrowRight className="transition-transform group-hover:translate-x-2" />
+                </span>
+              </button>
+            </Link>
           </div>
         </div>
       </div>
