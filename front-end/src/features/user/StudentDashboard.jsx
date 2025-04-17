@@ -3,11 +3,10 @@ import Sidebar from "../../ui/Sidebar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
+import Loader from "../../ui/Loader";
 
 function StudentDashboard() {
-  const {
-    studentData: { name, roadmaps },
-  } = useGetStudent();
+  const { studentData: { roadmaps } = {}, isLoading } = useGetStudent();
   const [filter, setFilter] = useState("all");
 
   const filteredRoadmaps =
@@ -20,10 +19,13 @@ function StudentDashboard() {
               roadmap.completedStages !== roadmap.roadmap.stagesCount,
           );
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <div className="from-footer-900 to-footer-800 min-h-screen bg-gradient-to-br">
       <div className="flex h-screen">
-        <Sidebar name={name} />
         <div className="flex-1 p-8">
           <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <h3 className="text-3xl font-bold tracking-tight text-white">
@@ -48,7 +50,7 @@ function StudentDashboard() {
 
           <div className="[&::-webkit-scrollbar-thumb]:bg-primary-600 bg-footer-800/50 [&::-webkit-scrollbar-track]:bg-footer-700 h-[calc(100vh-12rem)] overflow-y-auto rounded-2xl p-6 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-track]:rounded-full">
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {filteredRoadmaps.map((roadmap) => (
+              {filteredRoadmaps?.map((roadmap) => (
                 <Link
                   to={`/roadmaps/${roadmap.roadmap._id}`}
                   key={roadmap._id}

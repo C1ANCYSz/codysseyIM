@@ -14,6 +14,7 @@ import Certificates from "./pages/Certificates";
 import Roadmaps from "./pages/Roadmaps";
 import Roadmap from "./features/content/Roadmap";
 import Stage from "./features/content/Stage";
+import Appointements from "./pages/Appointements";
 
 function App() {
   return (
@@ -41,8 +42,15 @@ function App() {
                 </PrivateRoute>
               }
             />
+            <Route
+              path="appointments"
+              element={
+                <PrivateRoute>
+                  <Appointements />
+                </PrivateRoute>
+              }
+            />
             <Route path="roadmaps" element={<Roadmaps />} />
-            <Route path="roadmaps/:roadmapId" element={<Roadmap />} />
             <Route
               path="roadmaps/:roadmapId/stage/:stageNumber"
               element={
@@ -52,6 +60,8 @@ function App() {
               }
             />
           </Route>
+          <Route path="roadmaps/:roadmapId" element={<Roadmap />} />
+
           <Route
             path="/reset-password/:token"
             element={<ResetPassword />}

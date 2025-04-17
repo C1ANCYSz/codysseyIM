@@ -5,21 +5,13 @@ import { FaArrowLeft, FaPlay } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import YoutubePlayer from "../../ui/YoutubePlayer";
 import { useEffect, useState } from "react";
+import Loader from "../../ui/Loader";
 
 function Stage() {
   const navigate = useNavigate();
   const { stage: { stage } = {}, isLoading, error } = useGetStage();
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const {
-    description,
-    docs,
-    number,
-    title,
-    type,
-    updatedAt,
-    videos,
-    roadmap: roadmapId,
-  } = stage || {};
+  const { docs, number, title, type, videos, roadmap: roadmapId } = stage || {};
   console.log("stage", stage);
 
   useEffect(() => {
@@ -39,12 +31,11 @@ function Stage() {
     setSelectedVideo(videoId);
   };
 
-  if (isLoading || roadmapLoading) return <div>Loading...</div>;
+  if (isLoading || roadmapLoading) return <Loader />;
   if (error || roadmapError) return <div>Error: {error.message}</div>;
 
   return (
     <div className="flex h-screen">
-      <Sidebar />
       <div className="flex-1 overflow-y-auto px-6 py-6 text-white">
         <div className="flex items-center justify-between">
           <button
@@ -132,7 +123,7 @@ function Stage() {
                   <img
                     src={`https://www.google.com/s2/favicons?domain=${doc.url}&sz=128`}
                     alt="Document icon"
-                    className="rounded-md object-contain transition-all duration-300 group-hover:scale-105"
+                    className="h-10 w-10 rounded-md object-contain transition-all duration-300 group-hover:scale-105"
                   />
                   <p className="text-xl text-gray-400">{doc.title}</p>
                 </a>
