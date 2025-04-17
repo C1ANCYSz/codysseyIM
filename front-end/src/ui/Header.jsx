@@ -20,10 +20,10 @@ function Header() {
 
   return (
     <header
-      className={`z-50 w-full transition-all duration-300 ${
+      className={`z-50 w-full bg-slate-900/95 transition-all duration-300 ${
         scrolled
-          ? "fixed top-0 right-0 left-0 z-50 bg-slate-900/95 shadow-lg backdrop-blur-md"
-          : "sticky top-0 bg-transparent"
+          ? "shadow-primary-600/25 fixed top-0 right-0 left-0 z-50 shadow-lg backdrop-blur-md"
+          : "sticky top-0"
       }`}
     >
       <div className="container mx-auto px-4 py-3">

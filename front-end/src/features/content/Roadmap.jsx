@@ -52,7 +52,7 @@ function Roadmap() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="bg-footer-800 font-body flex">
+    <div className="bg-footer-800 font-body flex min-h-screen">
       <div className="container mx-auto my-10">
         {/* Header Section */}
         <div className="mb-8 flex flex-col items-center gap-6 border-b border-white pb-4 md:flex-row">
