@@ -98,6 +98,80 @@ const updateQuizzes = async () => {
   }
 };
 
+const questionPool = [
+  {
+    questionText: 'What does HTML stand for?',
+    options: [
+      { isCorrect: true, answer: 'HyperText Markup Language' },
+      { isCorrect: false, answer: 'HighText Machine Language' },
+      { isCorrect: false, answer: 'Hyperloop Machine Language' },
+      { isCorrect: false, answer: 'HyperText Markdown Language' },
+    ],
+  },
+  {
+    questionText: 'Which tag is used to create a hyperlink in HTML?',
+    options: [
+      { isCorrect: true, answer: '<a>' },
+      { isCorrect: false, answer: '<link>' },
+      { isCorrect: false, answer: '<href>' },
+      { isCorrect: false, answer: '<hyperlink>' },
+    ],
+  },
+  {
+    questionText: 'Which property in CSS is used to change text color?',
+    options: [
+      { isCorrect: true, answer: 'color' },
+      { isCorrect: false, answer: 'text-color' },
+      { isCorrect: false, answer: 'font-color' },
+      { isCorrect: false, answer: 'foreground' },
+    ],
+  },
+  {
+    questionText: 'What is the default display value of a <div> element?',
+    options: [
+      { isCorrect: true, answer: 'block' },
+      { isCorrect: false, answer: 'inline' },
+      { isCorrect: false, answer: 'flex' },
+      { isCorrect: false, answer: 'grid' },
+    ],
+  },
+  {
+    questionText: 'Which HTTP method is used to update a resource?',
+    options: [
+      { isCorrect: true, answer: 'PUT' },
+      { isCorrect: false, answer: 'GET' },
+      { isCorrect: false, answer: 'POST' },
+      { isCorrect: false, answer: 'DELETE' },
+    ],
+  },
+];
+
+const updateQuizzesAnswer = async () => {
+  try {
+    const quizzes = await QuizStage.find();
+
+    for (const quiz of quizzes) {
+      quiz.questions = questionPool.map((q) => ({
+        questionText: q.questionText,
+        options: q.options.map((opt) => ({
+          answer: opt.answer,
+          isCorrect: opt.isCorrect,
+        })),
+      }));
+
+      quiz.questionsCount = questionPool.length;
+
+      await quiz.save();
+    }
+
+    console.log('✅ All quizzes updated with web dev questions!');
+  } catch (err) {
+    console.error('❌ Error updating quizzes:', err);
+  }
+};
+
 //seedStages();
 
-updateQuizzes();
+//updateQuizzes();
+
+updateQuizzesAnswer();

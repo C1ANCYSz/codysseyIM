@@ -253,6 +253,7 @@ exports.resetPassword = async (req, res, next) => {
     user.passwordChangedAt = Date.now();
     user.resetPasswordToken = undefined;
     user.resetPasswordExpiresAt = undefined;
+    user.passwordResetToken = undefined;
 
     await user.save({ validateBeforeSave: false });
     await session.commitTransaction();

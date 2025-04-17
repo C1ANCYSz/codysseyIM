@@ -33,21 +33,7 @@ exports.getRoadmap = async (req, res, next) => {
     .select('title number description type questionsCount')
     .sort('number')
     .lean();
-  if (userId) {
-    for (const stage of stages) {
-      if (stage.type === 'quiz') {
-        const quiz = await Quiz.findOne({
-          roadmap: id,
-          stage: stage.number,
-          user: userId,
-        }).lean();
 
-        if (quiz) {
-          stage.score = quiz.score;
-        }
-      }
-    }
-  }
   roadmap.stages = stages;
 
   return res.json({

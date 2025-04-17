@@ -49,9 +49,8 @@ const quizStageSchema = new mongoose.Schema({
       },
       options: [
         {
-          optionText: {
+          answer: {
             type: String,
-            required: true,
           },
           isCorrect: {
             type: Boolean,
