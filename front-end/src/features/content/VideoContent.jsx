@@ -13,25 +13,32 @@ import { useNavigate } from "react-router-dom";
 import YoutubePlayer from "../../ui/YoutubePlayer";
 import { useEffect, useState } from "react";
 import Loader from "../../ui/Loader";
-import { useUiContext } from "../../context/UiContext";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUpdateStageContent } from "../../hooks/courses/useUpdateStageContent";
 import { useAuth } from "../../context/AuthProvider";
+import toast from "react-hot-toast";
 
 function VideoContent() {
   const navigate = useNavigate();
+  const { register, handleSubmit, getValues, setValue } = useForm();
+
   const [editingVideoId, setEditingVideoId] = useState(null);
+  const [editingDocId, setEditingDocId] = useState(null);
   const [editFormData, setEditFormData] = useState({
     title: "",
     url: "",
   });
-  const { register, handleSubmit, getValues, setValue } = useForm();
+  const [editDocFormData, setEditDocFormData] = useState({
+    title: "",
+    url: "",
+  });
   const [videosArray, setVideosArray] = useState([]);
-  const [docsCount, setDocsCount] = useState(0);
+  const [docsArray, setDocsArray] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+
   const { stage: { stage } = {}, isLoading, error } = useGetStage();
 
-  const [selectedVideo, setSelectedVideo] = useState(null);
   const [isNextStageDisabled, setIsNextStageDisabled] = useState(true);
   const { user: { role } = {} } = useAuth();
   console.log(role);
@@ -44,12 +51,15 @@ function VideoContent() {
     roadmap: roadmapId,
     _id: stageId,
   } = stage || {};
+
   console.log(stage);
+
   const {
     updateStage,
     isLoading: updateStageLoading,
     error: updateStageError,
   } = useUpdateStageContent();
+
   const {
     roadmap: { stagesCount },
     isLoading: roadmapLoading,
@@ -83,11 +93,27 @@ function VideoContent() {
     });
   }
 
+  function handleDeleteDoc(doc) {
+    const newDocs = docs.filter((d) => d.url !== doc.url);
+    updateStage({
+      stageId,
+      data: { ...stage, docs: newDocs },
+    });
+  }
+
   function handleEditVideo(video) {
     setEditingVideoId(video.url);
     setEditFormData({
       title: video.title,
       url: video.url,
+    });
+  }
+
+  function handleEditDoc(doc) {
+    setEditingDocId(doc.url);
+    setEditDocFormData({
+      title: doc.title,
+      url: doc.url,
     });
   }
 
@@ -117,11 +143,32 @@ function VideoContent() {
     setEditFormData({ title: "", url: "" });
   }
 
+  function handleSaveDocEdit() {
+    const newDocs = docs.map((doc) => {
+      if (doc.url === editingDocId) {
+        return {
+          ...doc,
+          title: editDocFormData.title,
+          url: editDocFormData.url,
+        };
+      }
+      return doc;
+    });
+
+    updateStage({
+      stageId,
+      data: { ...stage, docs: newDocs },
+    });
+
+    setEditingDocId(null);
+    setEditDocFormData({ title: "", url: "" });
+  }
+
   const handleVideoSelect = (videoId) => {
     setSelectedVideo(videoId);
   };
+
   const onSubmit = (data) => {
-    console.log(data);
     const newVideos = data.videos.map((video) => ({
       ...video,
       url: video.url.slice(0, video.url.indexOf("&")),
@@ -130,11 +177,49 @@ function VideoContent() {
       ...stage,
       videos: [...stage.videos, ...newVideos],
     };
-    console.log(newStage);
-    updateStage({
-      stageId,
-      data: newStage,
-    });
+    updateStage(
+      {
+        stageId,
+        data: newStage,
+      },
+      {
+        onSuccess: () => {
+          setVideosArray([]);
+        },
+      },
+    );
+  };
+
+  const onDocSubmit = (data) => {
+    console.log(data);
+    // Filter out docs that already exist based on URL
+    const filteredNewDocs = data.docs
+      .filter(
+        (newDoc) =>
+          !stage.docs?.some(
+            (existingDoc) => existingDoc.url === newDoc.url.toString(),
+          ),
+      )
+      .map((doc) => ({
+        ...doc,
+        url: doc.url.toString(),
+      }));
+
+    const newStage = {
+      ...stage,
+      docs: [...(stage.docs || []), ...filteredNewDocs],
+    };
+    updateStage(
+      {
+        stageId,
+        data: newStage,
+      },
+      {
+        onSuccess: () => {
+          setDocsArray([]);
+        },
+      },
+    );
   };
 
   if (isLoading || roadmapLoading) return <Loader />;
@@ -188,22 +273,26 @@ function VideoContent() {
           <div className="mt-10">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Videos</h2>
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                disabled={isNextStageDisabled}
-                className={`group flex items-center gap-2 rounded-full px-4 py-2 text-lg font-bold text-white capitalize select-none ${
-                  number === stagesCount ? "cursor-not-allowed opacity-50" : ""
-                } ${
-                  isNextStageDisabled
-                    ? "cursor-not-allowed bg-gray-600"
-                    : "bg-primary-700 hover:bg-primary-600 cursor-pointer"
-                } `}
-                onClick={() => updateStage()}
-              >
-                next stage
-                <FaArrowRight />
-              </motion.button>
+              {role === "student" && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  disabled={isNextStageDisabled}
+                  className={`group flex items-center gap-2 rounded-full px-4 py-2 text-lg font-bold text-white capitalize select-none ${
+                    number === stagesCount
+                      ? "cursor-not-allowed opacity-50"
+                      : ""
+                  } ${
+                    isNextStageDisabled
+                      ? "cursor-not-allowed bg-gray-600"
+                      : "bg-primary-700 hover:bg-primary-600 cursor-pointer"
+                  } `}
+                  onClick={() => updateStage()}
+                >
+                  next stage
+                  <FaArrowRight />
+                </motion.button>
+              )}
             </div>
 
             <div className="mt-6 flex gap-6">
@@ -428,14 +517,90 @@ function VideoContent() {
             animate={{ opacity: 1, y: 0 }}
             className="mt-10"
           >
-            <h2 className="text-2xl font-semibold">Documents</h2>
-            <ul className="mt-4 flex flex-wrap items-center gap-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold">Documents</h2>
+              {role !== "student" && (
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() =>
+                    setDocsArray([...docsArray, { title: "", url: "" }])
+                  }
+                  className="bg-primary-700 hover:bg-primary-600 cursor-pointer rounded-full px-6 py-2 font-bold text-white transition-colors"
+                >
+                  <FaPlus />
+                </motion.button>
+              )}
+            </div>
+            {role !== "student" && docsArray.length > 0 && (
+              <motion.form
+                onSubmit={handleSubmit(onDocSubmit)}
+                className="mt-4 space-y-4"
+              >
+                <AnimatePresence mode="popLayout">
+                  {docsArray.map((doc, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className="bg-footer-800/50 flex items-center gap-4 rounded-xl p-4 backdrop-blur-sm"
+                    >
+                      <input
+                        type="text"
+                        placeholder="Document Title"
+                        className="bg-footer-800 ring-primary-500 hover:bg-footer-700 flex-1 rounded-lg px-4 py-2 text-white transition-all duration-200 outline-none focus:ring-2"
+                        {...register(`docs.${index}.title`, { required: true })}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Document URL"
+                        className="bg-footer-800 ring-primary-500 hover:bg-footer-700 flex-1 rounded-lg px-4 py-2 text-white transition-all duration-200 outline-none focus:ring-2"
+                        {...register(`docs.${index}.url`, { required: true })}
+                      />
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        type="button"
+                        onClick={() => {
+                          setDocsArray((curr) =>
+                            curr.filter((_, i) => i !== index),
+                          );
+                          const values = getValues();
+                          const newDocs = values.docs.filter(
+                            (_, i) => i !== index,
+                          );
+                          setValue("docs", newDocs);
+                        }}
+                        className="text-xl text-red-400 transition-colors duration-200 hover:text-red-500"
+                      >
+                        <FaTrash />
+                      </motion.button>
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
+                {docsArray.length > 0 && (
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    type="submit"
+                    className="bg-primary-700 hover:bg-primary-600 hover:shadow-primary-500/20 rounded-full px-6 py-2 font-bold text-white shadow-lg transition-all duration-300"
+                  >
+                    Add Documents
+                  </motion.button>
+                )}
+              </motion.form>
+            )}
+            <ul className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {docs?.map((doc) => (
                 <motion.li
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  whileHover={{ scale: 1.05 }}
-                  key={doc.id}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 400 }}
+                  key={doc.url}
+                  className="bg-footer-800/50 relative rounded-2xl p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:shadow-xl"
                 >
                   <a
                     href={doc.url}
@@ -443,17 +608,78 @@ function VideoContent() {
                     rel="noopener noreferrer"
                     className="group flex cursor-pointer flex-col items-center gap-3"
                   >
-                    <div className="group-hover:shadow-primary-500/20 overflow-hidden rounded-xl shadow-lg transition-transform duration-300">
+                    <div className="group-hover:shadow-primary-500/20 overflow-hidden rounded-xl bg-white/5 p-3 shadow-lg transition-all duration-300">
                       <img
                         src={`https://www.google.com/s2/favicons?domain=${doc.url}&sz=128`}
                         alt="Document icon"
-                        className="h-12 w-12 object-contain transition-all duration-300 group-hover:scale-110"
+                        className="h-16 w-16 object-contain transition-all duration-300 group-hover:scale-110"
                       />
                     </div>
-                    <p className="group-hover:text-primary-500 text-lg text-gray-400 transition-colors">
+                  </a>
+                  {editingDocId === doc.url ? (
+                    <div className="mt-4 flex flex-col gap-2">
+                      <input
+                        type="text"
+                        value={editDocFormData.title}
+                        onChange={(e) =>
+                          setEditDocFormData({
+                            ...editDocFormData,
+                            title: e.target.value,
+                          })
+                        }
+                        className="bg-footer-800 ring-primary-500 rounded-lg px-4 py-2 text-white transition-all duration-200 outline-none focus:ring-2"
+                      />
+                      <input
+                        type="text"
+                        value={editDocFormData.url}
+                        onChange={(e) =>
+                          setEditDocFormData({
+                            ...editDocFormData,
+                            url: e.target.value,
+                          })
+                        }
+                        className="bg-footer-800 ring-primary-500 rounded-lg px-4 py-2 text-white transition-all duration-200 outline-none focus:ring-2"
+                      />
+                    </div>
+                  ) : (
+                    <p className="group-hover:text-primary-500 mt-4 text-center text-lg font-medium text-gray-400 transition-colors">
                       {doc.title}
                     </p>
-                  </a>
+                  )}
+                  {role !== "student" && (
+                    <motion.div className="absolute top-2 right-2 flex items-center gap-2">
+                      {editingDocId === doc.url ? (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          type="button"
+                          className="cursor-pointer rounded-full bg-green-500 p-2 text-white shadow-lg transition-colors duration-200 hover:bg-green-600"
+                          onClick={handleSaveDocEdit}
+                        >
+                          <FaSave />
+                        </motion.button>
+                      ) : (
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          type="button"
+                          className="bg-primary-700 hover:bg-primary-600 cursor-pointer rounded-full p-2 text-white shadow-lg transition-colors duration-200"
+                          onClick={() => handleEditDoc(doc)}
+                        >
+                          <FaEdit />
+                        </motion.button>
+                      )}
+                      <motion.button
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        type="button"
+                        className="cursor-pointer rounded-full bg-red-500 p-2 text-white shadow-lg transition-colors duration-200 hover:bg-red-600"
+                        onClick={() => handleDeleteDoc(doc)}
+                      >
+                        <FaTrash />
+                      </motion.button>
+                    </motion.div>
+                  )}
                 </motion.li>
               ))}
             </ul>
