@@ -4,11 +4,11 @@ import Header from "./Header";
 import { useAuth } from "../context/AuthProvider";
 import Sidebar from "./Sidebar";
 function AppLayout() {
-  const { isLoggedIn } = useAuth();
+  const { isLoggedIn, user } = useAuth();
   if (isLoggedIn) {
     return (
       <div className="bg-footer-800 font-body flex h-screen overflow-hidden">
-        <Sidebar />
+        <Sidebar user={user} />
         <div className="flex-1 overflow-y-auto">
           <Outlet />
         </div>

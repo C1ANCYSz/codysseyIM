@@ -9,8 +9,8 @@ const Home = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800">
       <div className="mx-auto max-w-[1440px] space-y-24 p-4 lg:p-8">
         {/* Hero Section */}
-        <div className="relative min-h-[90vh] overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-800 to-slate-900">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_120%,rgba(120,119,198,0.2),rgba(0,0,0,0))]"></div>
+        <div className="from-primary-900 relative min-h-[90vh] overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br to-slate-950">
+          <div className="bg-[radial-gradient(circle_at_50%_120%,rgba(182, 119, 198, 0.2),rgba(0,0,0,0))] absolute inset-0"></div>
 
           <div className="relative flex min-h-[90vh] flex-col items-center justify-center gap-10 px-6 text-center lg:px-20">
             <h1 className="text-4xl font-extrabold tracking-tight text-white md:text-6xl lg:text-7xl">
@@ -44,7 +44,7 @@ const Home = () => {
         </div>
 
         {/* Features Section */}
-        <div className="relative rounded-3xl bg-gradient-to-r from-indigo-700 to-slate-700 py-32 text-center">
+        <div className="from-primary-900 relative rounded-3xl bg-gradient-to-r to-slate-950 py-32 text-center">
           <div className="relative z-10 mx-auto max-w-7xl px-6">
             <h2 className="text-center text-4xl font-bold text-white md:text-6xl">
               Why Choose Us?
@@ -79,7 +79,7 @@ const Home = () => {
               ].map((feature, index) => (
                 <div
                   key={index}
-                  className="group flex flex-col items-center gap-6 rounded-2xl bg-white/10 p-8 backdrop-blur-sm transition-all hover:bg-white/20"
+                  className="group flex flex-col items-center gap-6 rounded-2xl bg-white/10 p-8 backdrop-blur-sm transition-all select-none hover:bg-white/20"
                 >
                   <div className="rounded-2xl bg-white/90 p-6 text-indigo-600 shadow-lg">
                     {feature.icon}
@@ -97,7 +97,7 @@ const Home = () => {
         </div>
 
         {/* Learning Tracks */}
-        <div className="relative rounded-3xl bg-slate-800/50 py-32">
+        <div className="from-primary-900 relative rounded-3xl bg-gradient-to-r to-slate-950 py-32">
           <div className="relative z-10 mx-auto max-w-7xl px-6">
             <h2 className="text-center text-4xl font-bold text-white md:text-6xl">
               Popular Learning Tracks
@@ -140,7 +140,7 @@ const Home = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-indigo-700 to-slate-700 py-20">
+        <div className="from-primary-900 relative overflow-hidden rounded-3xl bg-gradient-to-r to-slate-950 py-20">
           <div className="relative z-10 flex flex-col items-center gap-12">
             <h2 className="text-center text-3xl font-bold text-white md:text-5xl">
               Ready to Begin Your Coding Journey?

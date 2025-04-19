@@ -5,7 +5,7 @@ import { useAuth } from "../context/AuthProvider";
 
 export function useLogin() {
   const navigate = useNavigate();
-  const { setIsLoggedIn, setUserRole } = useAuth();
+  const { setIsLoggedIn, setUser, setIsLoading } = useAuth();
   const {
     mutate: login,
     isLoading,
@@ -13,6 +13,7 @@ export function useLogin() {
   } = useMutation({
     mutationFn: async ({ email, password }) => {
       try {
+        setIsLoading(true);
         const res = await fetch("http://localhost:3000/api/auth/login", {
           method: "POST",
           headers: {
@@ -23,19 +24,20 @@ export function useLogin() {
         });
         const data = await res.json();
         if (data.success) {
-          // console.log(data);
           setIsLoggedIn(true);
-          setUserRole(data.role);
-          navigate("/dashboard");
+          setUser(data.user);
         } else {
           throw new Error(data.message);
         }
       } catch (error) {
         throw new Error(error.message);
+      } finally {
+        setIsLoading(false);
       }
     },
     onSuccess: () => {
       toast.success("Login successful");
+      navigate("/dashboard");
     },
     onError: (data) => {
       toast.error(data.message);

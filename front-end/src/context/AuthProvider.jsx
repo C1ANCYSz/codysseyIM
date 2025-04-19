@@ -4,8 +4,9 @@ const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(null); // null = loading
-  const [userRole, setUserRole] = useState(null);
+  const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+
   // Check login status from backend on first mount
   useEffect(() => {
     const checkLogin = async () => {
@@ -18,8 +19,10 @@ export function AuthProvider({ children }) {
 
         const data = await res.json();
         if (data.success) {
+          console.log(data);
+
           setIsLoggedIn(true);
-          setUserRole(data.role);
+          setUser(data.user);
         } else {
           setIsLoggedIn(false);
         }
@@ -37,12 +40,12 @@ export function AuthProvider({ children }) {
     () => ({
       isLoggedIn,
       setIsLoggedIn,
-      userRole,
-      setUserRole,
+      user,
+      setUser,
       isLoading,
       setIsLoading,
     }),
-    [isLoggedIn, setIsLoggedIn, userRole, setUserRole, isLoading, setIsLoading],
+    [isLoggedIn, setIsLoggedIn, user, setUser, isLoading, setIsLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
