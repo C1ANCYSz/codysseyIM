@@ -26,7 +26,7 @@ const Login = () => {
   }
 
   return (
-    <div className="via-primary-600 flex h-dvh w-screen items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 px-2 lg:h-[calc(100dvh-80px)]">
+    <div className="via-primary-800 from-primary-900 flex h-dvh w-screen items-center justify-center bg-gradient-to-br to-slate-950 px-2 lg:h-[calc(100dvh-80px)]">
       <div className="flex w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-xl">
         <div className="w-full p-8 sm:p-12 md:w-1/2">
           <h1 className="text-primary-600 mb-2 text-5xl font-extrabold">
@@ -94,7 +94,7 @@ const Login = () => {
           </form>
         </div>
 
-        <div className="from-primary-500 relative hidden w-1/2 items-center justify-center bg-gradient-to-br to-indigo-600 p-8 md:flex">
+        <div className="from-primary-600 relative hidden w-1/2 items-center justify-center bg-gradient-to-br to-slate-950 p-8 md:flex">
           <div className="absolute inset-0 mt-10 mb-30 rounded-3xl bg-[url('/src/assets/images/login.png')] bg-contain bg-center bg-no-repeat opacity-90"></div>
           <blockquote className="relative z-10 mt-auto mb-8 px-4 text-center text-xl font-semibold text-white">
             “Imagination is more important than knowledge”

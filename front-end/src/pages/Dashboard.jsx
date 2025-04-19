@@ -1,23 +1,22 @@
-import { useGetStudent } from "../hooks/user/useGetStudent";
 import StudentDashboard from "../features/user/StudentDashboard";
 import { useAuth } from "../context/AuthProvider";
 import Loader from "../ui/Loader";
+import ContentManagerDashboard from "../features/user/ContentManagerDashboard";
 function Dashboard() {
-  const { userRole, isLoading } = useAuth();
+  const { user, isLoading } = useAuth();
 
   if (isLoading) {
     return <Loader />;
   }
-
-  if (userRole === "student") {
+  if (user.role === "student") {
     return <StudentDashboard />;
   }
-  // if (role === "admin") {
+  // if (userRole === "admin") {
   //   return <AdminDashboard />;
   // }
-  // if (role === "content manager") {
-  //   return <ContentManagerDashboard />;
-  // }
+  if (user.role === "content manager") {
+    return <ContentManagerDashboard />;
+  }
 }
 
 export default Dashboard;

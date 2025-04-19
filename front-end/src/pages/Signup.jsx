@@ -19,10 +19,10 @@ function Signup() {
   }
 
   return (
-    <div className="via-primary-600 flex h-dvh w-screen items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 px-2 lg:h-[calc(100dvh-80px)]">
-      <div className="flex w-full max-w-4xl rounded-3xl bg-gradient-to-r from-purple-800 to-purple-600 p-1">
+    <div className="via-primary-800 from-primary-900 flex h-dvh w-screen items-center justify-center bg-gradient-to-br to-slate-950 px-2 lg:h-[calc(100dvh-80px)]">
+      <div className="bg-slate-750 flex w-full max-w-4xl rounded-3xl p-1">
         {/* Left side - Purple gradient section */}
-        <div className="hidden w-1/2 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 p-8 lg:flex lg:items-center lg:justify-center">
+        <div className="hidden w-1/2 rounded-2xl bg-gradient-to-br from-purple-600 via-purple-800 to-slate-800 p-8 lg:flex lg:items-center lg:justify-center">
           <img
             src="/src/assets/images/login2.png"
             alt="signup"
@@ -102,8 +102,7 @@ function Signup() {
                 {...register("confirmPassword", {
                   required: true,
                   validate: (value) =>
-                    value === getValues("password") ||
-                    "Passwords do not match",
+                    value === getValues("password") || "Passwords do not match",
                 })}
               />
               {errors.confirmPassword && (

@@ -1,5 +1,4 @@
 import { useGetStudent } from "../../hooks/user/useGetStudent";
-import Sidebar from "../../ui/Sidebar";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
@@ -8,7 +7,7 @@ import Loader from "../../ui/Loader";
 function StudentDashboard() {
   const { studentData: { roadmaps } = {}, isLoading } = useGetStudent();
   const [filter, setFilter] = useState("all");
-
+  console.log(roadmaps);
   const filteredRoadmaps =
     filter === "all"
       ? roadmaps

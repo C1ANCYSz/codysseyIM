@@ -11,15 +11,49 @@ import {
 import { TbFileCertificate } from "react-icons/tb";
 import { NavLink } from "react-router-dom";
 import { useLogout } from "../hooks/useLogout";
-import { useGetStudent } from "../hooks/user/useGetStudent";
+import { useUiContext } from "../context/UiContext";
 
-function Sidebar() {
+const navItemsStudent = [
+  { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
+  { to: "/roadmaps", icon: <FiBookOpen />, label: "Roadmaps" },
+  {
+    to: "/certificates",
+    icon: <TbFileCertificate />,
+    label: "Certificates",
+  },
+  {
+    to: "/appointments",
+    icon: <FaCalendar />,
+    label: "Book an appointment",
+  },
+];
+
+const navItemsContentManager = [
+  { to: "/roadmaps", icon: <FiBookOpen />, label: "Roadmaps" },
+  { to: "/add-roadmap", icon: <FiBookOpen />, label: "Add Roadmap" },
+];
+
+const navItemsAdmin = [
+  { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
+  { to: "/roadmaps", icon: <FiBookOpen />, label: "Roadmaps" },
+];
+
+const navItems = {
+  student: navItemsStudent,
+  "content manager": navItemsContentManager,
+  admin: navItemsAdmin,
+};
+
+function Sidebar({ user }) {
+  const { name, role } = user || {};
+  const { setOpenModal } = useUiContext();
   const { logout } = useLogout();
   const [isOpen, setIsOpen] = useState(false);
-  const { studentData } = useGetStudent();
-  const { name, role } = studentData || {};
-  console.log(studentData);
   const toggleSidebar = () => setIsOpen(!isOpen);
+
+  const handleOpenModal = () => {
+    setOpenModal(true);
+  };
 
   return (
     <>
@@ -54,34 +88,29 @@ function Sidebar() {
         {/* Navigation */}
         <nav className="mt-8">
           <ul className="space-y-4">
-            {[
-              { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
-              { to: "/roadmaps", icon: <FiBookOpen />, label: "Roadmaps" },
-              {
-                to: "/certificates",
-                icon: <TbFileCertificate />,
-                label: "Certificates",
-              },
-              {
-                to: "/appointments",
-                icon: <FaCalendar />,
-                label: "Book an appointment",
-              },
-            ].map((item) => (
-              <li key={item.to}>
-                <NavLink
-                  to={item.to}
-                  className={({ isActive }) =>
-                    `hover:bg-primary-800/20 flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
-                      isActive ? "bg-primary-800/30" : ""
-                    }`
-                  }
-                >
-                  <span className="text-primary-500 text-2xl">{item.icon}</span>
-                  <span className="text-base font-medium capitalize">
+            {navItems[role].map((item) => (
+              <li key={item.id}>
+                {item.button ? (
+                  <button
+                    className="bg-primary-800/20 hover:bg-primary-800/30 flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium capitalize transition-all duration-200"
+                    onClick={handleOpenModal}
+                  >
+                    {item.icon}
                     {item.label}
-                  </span>
-                </NavLink>
+                  </button>
+                ) : (
+                  <NavLink
+                    to={item.to}
+                    className={({ isActive }) =>
+                      `hover:bg-primary-800/20 flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-200 ${
+                        isActive ? "bg-primary-800/30" : ""
+                      }`
+                    }
+                  >
+                    {item.icon}
+                    {item.label}
+                  </NavLink>
+                )}
               </li>
             ))}
           </ul>
