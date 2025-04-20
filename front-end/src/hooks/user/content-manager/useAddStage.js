@@ -8,11 +8,12 @@ export function useAddStage() {
   const { mutate: addStage, isLoading } = useMutation({
     mutationFn: async (newStage) => {
       try {
+        console.log(newStage);
         const res = await fetch(
           `http://localhost:3000/api/roadmaps/${roadmapId}/add-stage`,
           {
             method: "POST",
-            body: JSON.stringify(newStage), // Remove the data wrapper
+            body: JSON.stringify(newStage),
             headers: {
               "Content-Type": "application/json",
             },

@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const baseStageSchema = new mongoose.Schema(
   {
@@ -16,29 +16,29 @@ const baseStageSchema = new mongoose.Schema(
     },
     roadmap: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Roadmap',
+      ref: "Roadmap",
       required: true,
     },
     type: {
       type: String,
       required: true,
-      enum: ['content', 'quiz'],
+      enum: ["content", "quiz"],
     },
   },
   {
     timestamps: true,
-    discriminatorKey: 'type',
+    discriminatorKey: "type",
   }
 );
 
-const Stage = mongoose.model('Stage', baseStageSchema);
+const Stage = mongoose.model("Stage", baseStageSchema);
 
 const contentStageSchema = new mongoose.Schema({
   videos: [{ url: String, title: String }],
   docs: [{ url: String, title: String }],
 });
 
-const ContentStage = Stage.discriminator('content', contentStageSchema);
+const ContentStage = Stage.discriminator("content", contentStageSchema);
 
 const quizStageSchema = new mongoose.Schema({
   questions: [
@@ -62,11 +62,11 @@ const quizStageSchema = new mongoose.Schema({
   ],
   questionsCount: {
     type: Number,
-    required: true,
+    required: false,
   },
 });
 
-const QuizStage = Stage.discriminator('quiz', quizStageSchema);
+const QuizStage = Stage.discriminator("quiz", quizStageSchema);
 
 module.exports = {
   Stage,

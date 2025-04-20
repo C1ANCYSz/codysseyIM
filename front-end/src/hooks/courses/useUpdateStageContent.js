@@ -1,11 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 import { useParams } from "react-router-dom";
 
 export function useUpdateStageContent() {
   const { roadmapId } = useParams();
   const queryClient = useQueryClient();
   const {
-    mutate: updateStage,
+    mutate: updateStageContent,
     isLoading,
     error,
   } = useMutation({
@@ -35,11 +36,12 @@ export function useUpdateStageContent() {
       queryClient.invalidateQueries({
         refetchType: "active",
       });
+      toast.success("Stage content updated successfully");
     },
     onError: (err) => {
-      throw new Error(err);
+      toast.error(err.message);
     },
   });
 
-  return { updateStage, isLoading, error };
+  return { updateStageContent, isLoading, error };
 }

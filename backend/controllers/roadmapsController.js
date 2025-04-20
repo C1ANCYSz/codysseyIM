@@ -59,7 +59,10 @@ exports.getRoadmapStage = async (req, res, next) => {
     return next(new AppError("Enroll in the roadmap first", 404));
   }
 
-  if (userRoadmap?.completedStages < stageNumber - 1) {
+  if (
+    userRoadmap?.completedStages < stageNumber - 1 &&
+    user.role === "student"
+  ) {
     return next(
       new AppError(
         "Complete the previous stage before progressing to the next stage",
@@ -198,7 +201,7 @@ exports.addRoadmapStage = async (req, res, next) => {
 
       stage = stage[0]; // create() with array returns array
     } else if (type === "quiz") {
-      if (!Array.isArray(questions) || typeof score !== "number") {
+      if (!Array.isArray(questions)) {
         await session.abortTransaction();
         return res.status(400).json({ message: "Invalid quiz data" });
       }
