@@ -34,7 +34,9 @@ export const useUpdateStage = () => {
     },
     onSuccess: (data) => {
       if (data.success) {
-        queryClient.invalidateQueries({ type: "active" });
+        queryClient.invalidateQueries({
+          refetchType: "active",
+        });
         if (data.completed) navigate(`/roadmaps/${roadmapId}`);
         else
           navigate(`/roadmaps/${roadmapId}/stage/${Number(stageNumber) + 1}`);

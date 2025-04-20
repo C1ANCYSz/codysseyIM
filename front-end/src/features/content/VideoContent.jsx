@@ -18,6 +18,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useUpdateStageContent } from "../../hooks/courses/useUpdateStageContent";
 import { useAuth } from "../../context/AuthProvider";
 import toast from "react-hot-toast";
+import { useUpdateStage as useUpdateStageProgress } from "../../hooks/user/useUpdateStage";
 
 function VideoContent() {
   const navigate = useNavigate();
@@ -36,12 +37,12 @@ function VideoContent() {
   const [videosArray, setVideosArray] = useState([]);
   const [docsArray, setDocsArray] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
-
+  const { updateStage: updateStageProgress } = useUpdateStageProgress();
   const { stage: { stage } = {}, isLoading, error } = useGetStage();
 
   const [isNextStageDisabled, setIsNextStageDisabled] = useState(true);
-  const { user: { role } = {} } = useAuth();
-  console.log(role);
+  const { user = {} } = useAuth();
+
   const {
     docs,
     number,
@@ -61,7 +62,7 @@ function VideoContent() {
   } = useUpdateStageContent();
 
   const {
-    roadmap: { stagesCount },
+    roadmap: { stagesCount } = {},
     isLoading: roadmapLoading,
     error: roadmapError,
   } = useGetRoadmap();
@@ -115,6 +116,19 @@ function VideoContent() {
       title: doc.title,
       url: doc.url,
     });
+  }
+
+  function handleUpdateStageProgress() {
+    console.log("update stage progress");
+    console.log(user);
+    if (
+      user.roadmaps?.find((roadmap) => roadmap._id === roadmapId)
+        ?.completedStages >= number
+    ) {
+      updateStageProgress();
+    } else {
+      navigate(`/roadmaps/${roadmapId}/stage/${number + 1}`);
+    }
   }
 
   function handleSaveEdit() {
@@ -222,8 +236,9 @@ function VideoContent() {
     );
   };
 
-  if (isLoading || roadmapLoading) return <Loader />;
-  if (error || roadmapError) return <div>Error: {error.message}</div>;
+  if (isLoading || roadmapLoading || updateStageLoading) return <Loader />;
+  if (error || roadmapError || updateStageError)
+    return <div>Error: {error.message}</div>;
 
   return (
     <motion.div
@@ -273,7 +288,7 @@ function VideoContent() {
           <div className="mt-10">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Videos</h2>
-              {role === "student" && (
+              {user.role === "student" && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -287,7 +302,7 @@ function VideoContent() {
                       ? "cursor-not-allowed bg-gray-600"
                       : "bg-primary-700 hover:bg-primary-600 cursor-pointer"
                   } `}
-                  onClick={() => updateStage()}
+                  onClick={handleUpdateStageProgress}
                 >
                   next stage
                   <FaArrowRight />
@@ -297,7 +312,7 @@ function VideoContent() {
 
             <div className="mt-6 flex gap-6">
               <AnimatePresence mode="wait">
-                {role === "student" ? (
+                {user.role === "student" ? (
                   <motion.div
                     key="player"
                     initial={{ opacity: 0, x: -20 }}
@@ -469,7 +484,7 @@ function VideoContent() {
                               </>
                             )}
                           </div>
-                          {role !== "student" && (
+                          {user.role !== "student" && (
                             <motion.div className="ml-auto flex items-center gap-2">
                               {editingVideoId === video.url ? (
                                 <motion.button
@@ -519,7 +534,7 @@ function VideoContent() {
           >
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Documents</h2>
-              {role !== "student" && (
+              {user.role !== "student" && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -532,7 +547,7 @@ function VideoContent() {
                 </motion.button>
               )}
             </div>
-            {role !== "student" && docsArray.length > 0 && (
+            {user.role !== "student" && docsArray.length > 0 && (
               <motion.form
                 onSubmit={handleSubmit(onDocSubmit)}
                 className="mt-4 space-y-4"
@@ -646,7 +661,7 @@ function VideoContent() {
                       {doc.title}
                     </p>
                   )}
-                  {role !== "student" && (
+                  {user.role !== "student" && (
                     <motion.div className="absolute top-2 right-2 flex items-center gap-2">
                       {editingDocId === doc.url ? (
                         <motion.button

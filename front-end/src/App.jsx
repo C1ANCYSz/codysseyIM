@@ -19,9 +19,9 @@ import AddRoadmap from "./features/content/AddRoadmap";
 
 function App() {
   return (
-    <AuthProvider>
-      <UiContextProvider>
-        <Router>
+    <Router>
+      <AuthProvider>
+        <UiContextProvider>
           <Routes>
             <Route path="/" element={<AppLayout />}>
               <Route index element={<Home />} />
@@ -77,10 +77,10 @@ function App() {
               element={<ResetPassword />}
             ></Route>
           </Routes>
-        </Router>
-        <Toaster />
-      </UiContextProvider>
-    </AuthProvider>
+          <Toaster />
+        </UiContextProvider>
+      </AuthProvider>
+    </Router>
   );
 }
 
