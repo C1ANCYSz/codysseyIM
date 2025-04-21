@@ -19,6 +19,7 @@ import { useUpdateStageContent } from "../../hooks/courses/useUpdateStageContent
 import { useAuth } from "../../context/AuthProvider";
 import { useUpdateStageProgress } from "../../hooks/user/useUpdateStageProgress";
 import { useGetStudent } from "../../hooks/user/useGetStudent";
+import { useGetUser } from "../../hooks/user/useGetUser";
 
 function VideoContent() {
   const navigate = useNavigate();
@@ -41,7 +42,7 @@ function VideoContent() {
   const { stage: { stage } = {}, isLoading, error } = useGetStage();
 
   const [isNextStageDisabled, setIsNextStageDisabled] = useState(true);
-  const { studentData: user, isLoading: studentLoading } = useGetStudent();
+  const { user, isLoading: studentLoading } = useGetUser();
   const {
     docs,
     number,
@@ -55,7 +56,7 @@ function VideoContent() {
   console.log(stage);
 
   const {
-    updateStage,
+    updateStageContent,
     isLoading: updateStageLoading,
     error: updateStageError,
   } = useUpdateStageContent();
@@ -87,7 +88,7 @@ function VideoContent() {
 
   function handleDeleteVideo(video) {
     const newVideos = videos.filter((v) => v.url !== video.url);
-    updateStage({
+    updateStageContent({
       stageId,
       data: { ...stage, videos: newVideos },
     });
@@ -95,7 +96,7 @@ function VideoContent() {
 
   function handleDeleteDoc(doc) {
     const newDocs = docs.filter((d) => d.url !== doc.url);
-    updateStage({
+    updateStageContent({
       stageId,
       data: { ...stage, docs: newDocs },
     });
@@ -154,7 +155,7 @@ function VideoContent() {
       return video;
     });
 
-    updateStage({
+    updateStageContent({
       stageId,
       data: { ...stage, videos: newVideos },
     });
@@ -175,7 +176,7 @@ function VideoContent() {
       return doc;
     });
 
-    updateStage({
+    updateStageContent({
       stageId,
       data: { ...stage, docs: newDocs },
     });
@@ -197,7 +198,7 @@ function VideoContent() {
       ...stage,
       videos: [...stage.videos, ...newVideos],
     };
-    updateStage(
+    updateStageContent(
       {
         stageId,
         data: newStage,
@@ -229,7 +230,7 @@ function VideoContent() {
       ...stage,
       docs: [...(stage.docs || []), ...filteredNewDocs],
     };
-    updateStage(
+    updateStageContent(
       {
         stageId,
         data: newStage,
@@ -241,7 +242,7 @@ function VideoContent() {
       },
     );
   };
-
+  console.log(user);
   if (isLoading || roadmapLoading || updateStageLoading || studentLoading)
     return <Loader />;
   if (error || roadmapError || updateStageError)
@@ -295,7 +296,7 @@ function VideoContent() {
           <div className="mt-10">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Videos</h2>
-              {user.role === "student" && (
+              {user?.role === "student" && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -319,7 +320,7 @@ function VideoContent() {
 
             <div className="mt-6 flex gap-6">
               <AnimatePresence mode="wait">
-                {user.role === "student" ? (
+                {user?.role === "student" ? (
                   <motion.div
                     key="player"
                     initial={{ opacity: 0, x: -20 }}
@@ -491,7 +492,7 @@ function VideoContent() {
                               </>
                             )}
                           </div>
-                          {user.role !== "student" && (
+                          {user?.role !== "student" && (
                             <motion.div className="ml-auto flex items-center gap-2">
                               {editingVideoId === video.url ? (
                                 <motion.button
@@ -541,7 +542,7 @@ function VideoContent() {
           >
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Documents</h2>
-              {user.role !== "student" && (
+              {user?.role !== "student" && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -554,7 +555,7 @@ function VideoContent() {
                 </motion.button>
               )}
             </div>
-            {user.role !== "student" && docsArray.length > 0 && (
+            {user?.role !== "student" && docsArray.length > 0 && (
               <motion.form
                 onSubmit={handleSubmit(onDocSubmit)}
                 className="mt-4 space-y-4"
@@ -668,7 +669,7 @@ function VideoContent() {
                       {doc.title}
                     </p>
                   )}
-                  {user.role !== "student" && (
+                  {user?.role !== "student" && (
                     <motion.div className="absolute top-2 right-2 flex items-center gap-2">
                       {editingDocId === doc.url ? (
                         <motion.button
