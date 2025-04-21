@@ -8,6 +8,7 @@ const User = require('../models/User');
 
 
 */
+
 router.get(
   '/dashboard',
   protectRoute,
@@ -17,12 +18,51 @@ router.get(
   }
 );
 
-router.put(
-  '/update-role/:id',
+router.get(
+  '/content-managers',
   protectRoute,
   restrictTo('admin'),
   async (req, res, next) => {
-    res.send('update role');
+    const contentManagers = await User.find({ role: 'content manager' });
+    if (!contentManagers) {
+      res.json({ success: true, data: {} });
+    }
+    res.json({ success: true, data: { contentManagers } });
+  }
+);
+
+router.post(
+  '/content-managers',
+  protectRoute,
+  restrictTo('admin'),
+  async (req, res, next) => {
+    const { email } = req.body;
+
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      return next(new AppError('No user found with this email', 404));
+    }
+
+    if (user.role !== 'content manager') {
+      user.role = 'content manager';
+      await user.save();
+    }
+
+    res.json({ success: true, message: 'User updated successfully' });
+  }
+);
+
+router.get(
+  '/academies',
+  protectRoute,
+  restrictTo('admin'),
+  async (req, res, next) => {
+    const academies = await User.find({ role: 'academy' });
+    if (!academies) {
+      res.json({ success: true, data: {} });
+    }
+    res.json({ success: true, data: { academies } });
   }
 );
 
