@@ -6,44 +6,48 @@ const fs = require('fs');
 const puppeteer = require('puppeteer');
 const { generateCertificateHTML } = require('../utils/generateCertificateHTML');
 const Certificate = require('../models/Certificate');
+const UserRoadmap = require('../models/UserRoadmap');
 
 exports.enrollInRoadmap = async (req, res, next) => {
   const roadmapId = req.params.id;
   const userId = req.user?._id;
 
-  const [roadmap, user] = await Promise.all([
+  const [roadmap, user, existingEnrollment] = await Promise.all([
     Roadmap.findById(roadmapId),
     User.findById(userId),
+    UserRoadmap.findOne({ user: userId, roadmap: roadmapId }),
   ]);
 
   if (!roadmap) return next(new AppError('Roadmap not found', 404));
   if (!user) return next(new AppError('User not found', 404));
 
-  const alreadyEnrolled = user.roadmaps.some(
-    (entry) => entry.roadmap.toString() === roadmapId
-  );
+  if (existingEnrollment) {
+    return next(new AppError('You are already enrolled in this roadmap', 400));
+  }
 
-  if (alreadyEnrolled)
-    return next(new AppError('you already enrolled in this roadmap', 400));
-
-  user.roadmaps.push({ roadmap: roadmapId });
-
-  await user.save({ validateBeforeSave: false });
+  await UserRoadmap.create({
+    user: userId,
+    roadmap: roadmapId,
+  });
 
   res.status(200).json({
     success: true,
+    message: 'Successfully enrolled in roadmap',
     data: { roadmap },
   });
 };
 
 exports.getDashboard = async (req, res, next) => {
   const userId = req.user._id;
-  const user = await User.findById(userId)
+  const user = await User.findById(userId).lean();
+  const userRoadmaps = await UserRoadmap.find({ user: userId })
     .populate({
-      path: 'roadmaps.roadmap',
+      path: 'roadmap',
       select: 'title image stagesCount',
     })
+    .select('roadmap completedStages completed _id')
     .lean();
+  user.roadmaps = userRoadmaps;
 
   if (!user) return next(new AppError('User not found', 404));
 
@@ -56,11 +60,6 @@ exports.getDashboard = async (req, res, next) => {
         name: user.name,
         roadmaps: user.roadmaps,
       },
-    });
-  } else {
-    return res.status(200).json({
-      success: true,
-      message: 'other dashboards to be added',
     });
   }
 };
@@ -86,9 +85,10 @@ exports.roadmapProgress = async (req, res, next) => {
     return next(new AppError('User not found', 404));
   }
 
-  const userRoadmap = user.roadmaps.find(
-    (entry) => entry.roadmap.toString() === id
-  );
+  const userRoadmap = await UserRoadmap.findOne({
+    user: user._id,
+    roadmap: id,
+  });
 
   if (!userRoadmap) {
     return next(new AppError('User is not enrolled in this roadmap', 404));
@@ -106,6 +106,8 @@ exports.roadmapProgress = async (req, res, next) => {
   userRoadmap.completedStages = completedStages;
   userRoadmap.completed = completedStages === roadmap.stagesCount;
 
+  await userRoadmap.save({ validateBeforeSave: false });
+
   const certificate = await Certificate.findOne({
     user: user._id,
     roadmap: roadmap._id,
@@ -120,8 +122,6 @@ exports.roadmapProgress = async (req, res, next) => {
   } else if (!userRoadmap.completed && certificate) {
     await Certificate.deleteOne({ user: user._id, roadmap: roadmap._id });
   }
-
-  await user.save({ validateBeforeSave: false });
 
   res.status(200).json({
     success: true,

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { ContentStage, QuizStage } = require('./models/Stage');
 require('dotenv').config();
-const Quiz = require('./models/Quiz');
+const User = require('./models/User');
 
 const { MONGO_URI } = process.env;
 mongoose.connect(MONGO_URI);
@@ -170,8 +170,25 @@ const updateQuizzesAnswer = async () => {
   }
 };
 
+const createDummyUsers = async () => {
+  for (let i = 0; i < 10; i++) {
+    const newUser = new User({
+      name: `User ${i + 1}`,
+      email: `user${i + 1}@example.com`,
+      password: 'password123',
+      role: 'student',
+      confirmPassword: 'password123',
+      isVerified: true,
+    });
+    await newUser.save();
+  }
+  console.log('✅ Done creating dummy users!');
+  mongoose.connection.close();
+};
 //seedStages();
 
 //updateQuizzes();
 
-updateQuizzesAnswer();
+//updateQuizzesAnswer();
+
+createDummyUsers();

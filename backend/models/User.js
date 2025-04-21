@@ -3,22 +3,6 @@ const validator = require('validator');
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
-const userRoadmapSchema = new mongoose.Schema({
-  roadmap: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'Roadmap',
-    required: true,
-  },
-  completedStages: {
-    type: Number,
-    default: 0,
-  },
-  completed: {
-    type: Boolean,
-    default: false,
-  },
-});
-
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -49,8 +33,6 @@ const userSchema = new mongoose.Schema(
         message: 'Passwords do not match',
       },
     },
-
-    roadmaps: [userRoadmapSchema],
 
     role: {
       type: String,

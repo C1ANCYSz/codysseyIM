@@ -4,6 +4,7 @@ const validator = require('validator');
 const User = require('./../models/User');
 const mongoose = require('mongoose');
 const AppError = require('../utils/AppError');
+const UserRoadmap = require('../models/UserRoadmap');
 const {
   generateVerificationToken,
 } = require('../utils/generateVerificationToken');
@@ -62,7 +63,14 @@ exports.login = async (req, res, next) => {
   return res.status(200).json({
     success: true,
     message: 'logged in successfully',
-    user,
+    user: {
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isVerified: user.isVerified,
+      tookQuestionnaire: user.tookQuestionnaire,
+    },
   });
 };
 
@@ -271,7 +279,7 @@ exports.resetPassword = async (req, res, next) => {
     session.endSession();
   }
 };
-exports.checkAuth = async (req, res) => {
+exports.checkAuth = async (req, res, next) => {
   const token = req.cookies.token;
 
   if (!token) {
@@ -280,7 +288,16 @@ exports.checkAuth = async (req, res) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id);
+    const user = await User.findById(decoded.id).select('-password').lean();
+    const userRoadmaps = await UserRoadmap.find({ user: user._id })
+      .populate({
+        path: 'roadmap',
+        select: 'title image stagesCount _id',
+      })
+      .lean()
+      .select('roadmap completedStages completed _id');
+
+    user.roadmaps = userRoadmaps;
     if (!user) {
       return next(new AppError('User not found', 401));
     }
