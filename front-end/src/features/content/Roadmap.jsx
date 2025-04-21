@@ -261,7 +261,7 @@ function Roadmap() {
               </button>
             ) : studentData?.roadmaps.some(
                 (currentRoadmap) =>
-                  currentRoadmap.roadmap === roadmap._id &&
+                  currentRoadmap.roadmap._id === roadmap._id &&
                   currentRoadmap.completed,
               ) ? (
               <button
