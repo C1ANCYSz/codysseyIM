@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { motion } from "framer-motion";
 import { useDeleteStage } from "../../hooks/user/content-manager/useDeleteStage";
 import { useDeleteRoadmap } from "../../hooks/user/content-manager/useDeleteRoadmap";
+
 function Roadmap() {
   const navigate = useNavigate();
   const [openModal, setOpenModal] = useState(false);
@@ -32,6 +33,7 @@ function Roadmap() {
 
   console.log(user);
   const { role } = user || {};
+  console.log(role);
   const { enroll, isLoading: enrollLoading, error: enrollError } = useEnroll();
   const { register, handleSubmit } = useForm();
   const {
@@ -39,6 +41,7 @@ function Roadmap() {
     isLoading: userLoading,
     error: userError,
   } = useGetStudent();
+  console.log(studentData);
   const {
     addStage,
     isLoading: addStageLoading,
@@ -46,11 +49,12 @@ function Roadmap() {
   } = useAddStage();
   const { deleteStage, isLoading: deleteStageLoading } = useDeleteStage();
   const { deleteRoadmap, isLoading: deleteRoadmapLoading } = useDeleteRoadmap();
-  const isEnrolled = studentData?.roadmaps.some(
+
+  const isEnrolled = studentData?.roadmaps?.some(
     (currentRoadmap) => currentRoadmap.roadmap._id === roadmap?._id,
   );
-
-  const completedStages = studentData?.roadmaps.find(
+  console.log(isEnrolled);
+  const completedStages = studentData?.roadmaps?.find(
     (currentRoadmap) => currentRoadmap.roadmap._id === roadmap?._id,
   )?.completedStages;
 
@@ -87,8 +91,7 @@ function Roadmap() {
       },
     });
   }
-  if (isLoading) return <Loader />;
-  if (error) return <div>Error: {error.message}</div>;
+  if (isLoading || userLoading) return <Loader />;
 
   return (
     <div className="bg-footer-800 font-body flex min-h-screen">
@@ -241,8 +244,8 @@ function Roadmap() {
               </span>
             </div>
           </div>
-          {role === "student" ? (
-            !isEnrolled ? (
+          {(role === "student" || role === undefined) &&
+            (!isEnrolled ? (
               <button
                 className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
                 onClick={() => {
@@ -258,7 +261,7 @@ function Roadmap() {
               </button>
             ) : studentData?.roadmaps.some(
                 (currentRoadmap) =>
-                  currentRoadmap.roadmap._id === roadmap._id &&
+                  currentRoadmap.roadmap === roadmap._id &&
                   currentRoadmap.completed,
               ) ? (
               <button
@@ -280,8 +283,9 @@ function Roadmap() {
                   ? "Continue Learning"
                   : "Start Learning"}
               </Link>
-            )
-          ) : (
+            ))}
+
+          {role === "content manager" && (
             <div className="flex gap-2">
               <button
                 className="bg-primary-600 hover:bg-primary-700 flex cursor-pointer items-center gap-2 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"

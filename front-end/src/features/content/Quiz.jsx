@@ -10,7 +10,7 @@ import {
 } from "react-icons/pi";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthProvider";
-import { useUpdateStageContent } from "../../hooks/courses/useUpdateStageContent";
+import { useUpdateStageContent } from "../../hooks/user/content-manager/useUpdateStageContent";
 import { useUpdateStageProgress } from "../../hooks/user/useUpdateStageProgress";
 
 function ManageQuiz({ stage }) {

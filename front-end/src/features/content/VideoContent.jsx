@@ -15,15 +15,213 @@ import { useEffect, useState } from "react";
 import Loader from "../../ui/Loader";
 import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
-import { useUpdateStageContent } from "../../hooks/courses/useUpdateStageContent";
-import { useAuth } from "../../context/AuthProvider";
+import { useUpdateStageContent } from "../../hooks/user/content-manager/useUpdateStageContent";
 import { useUpdateStageProgress } from "../../hooks/user/useUpdateStageProgress";
-import { useGetStudent } from "../../hooks/user/useGetStudent";
 import { useGetUser } from "../../hooks/user/useGetUser";
+import { useGetStudent } from "../../hooks/user/useGetStudent";
+
+function AddVideosForm({ stage, updateStageContent }) {
+  console.log(stage);
+  const [videosArray, setVideosArray] = useState([]);
+
+  const { register, handleSubmit, getValues, setValue } = useForm();
+
+  const onSubmit = (data) => {
+    const newVideos = data.videos.map((video) => ({
+      ...video,
+      url: video.url.slice(0, video.url.indexOf("&")),
+    }));
+    const newStage = {
+      ...stage,
+      videos: [...stage.videos, ...newVideos],
+    };
+    updateStageContent(
+      {
+        stageId,
+        data: newStage,
+      },
+      {
+        onSuccess: () => {
+          setVideosArray([]);
+        },
+      },
+    );
+  };
+  return (
+    <motion.form
+      key="form"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20 }}
+      onSubmit={handleSubmit(onSubmit)}
+      className="bg-footer-900/50 flex grow flex-col items-center gap-4 overflow-hidden rounded-xl p-6 backdrop-blur-sm"
+    >
+      <h3 className="text-2xl font-semibold">Add Videos</h3>
+      <AnimatePresence>
+        {videosArray.map((video, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="flex w-full gap-4"
+          >
+            <input
+              type="text"
+              placeholder="Video Title"
+              className="bg-footer-800 ring-primary-500 flex-1 rounded-lg px-4 py-2 text-white outline-none focus:ring-2"
+              {...register(`videos.${index}.title`, {
+                required: true,
+              })}
+            />
+            <input
+              type="text"
+              placeholder="Video URL"
+              className="bg-footer-800 ring-primary-500 flex-1 rounded-lg px-4 py-2 text-white outline-none focus:ring-2"
+              {...register(`videos.${index}.url`, {
+                required: true,
+              })}
+            />
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              type="button"
+              onClick={() => {
+                setVideosArray((curr) => curr.filter((_, i) => i !== index));
+                const values = getValues();
+                const newVideos = values.videos.filter((_, i) => i !== index);
+                setValue("videos", newVideos);
+              }}
+              className="text-xl text-red-400 hover:text-red-500"
+            >
+              <FaTrash />
+            </motion.button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+
+      <div className="flex gap-4">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          type="button"
+          onClick={() =>
+            setVideosArray([...videosArray, { title: "", url: "" }])
+          }
+          className="bg-primary-700 hover:bg-primary-600 rounded-full px-6 py-2 font-bold text-white transition-colors"
+        >
+          <FaPlus />
+        </motion.button>
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          type="submit"
+          className="bg-primary-700 hover:bg-primary-600 rounded-full px-6 py-2 font-bold text-white transition-colors"
+        >
+          Add Videos
+        </motion.button>
+      </div>
+    </motion.form>
+  );
+}
+
+function AddDocsForm({ stage, updateStageContent, docsArray, setDocsArray }) {
+  const { _id: stageId } = stage;
+  const { register, handleSubmit, getValues, setValue } = useForm();
+  const onDocSubmit = (data) => {
+    // Filter out docs that already exist based on URL
+    const filteredNewDocs = data.docs
+      .filter(
+        (newDoc) =>
+          !stage.docs?.some(
+            (existingDoc) => existingDoc.url === newDoc.url.toString(),
+          ),
+      )
+      .map((doc) => ({
+        ...doc,
+        url: doc.url.toString(),
+      }));
+
+    const newStage = {
+      ...stage,
+      docs: [...(stage.docs || []), ...filteredNewDocs],
+    };
+    updateStageContent(
+      {
+        stageId,
+        data: newStage,
+      },
+      {
+        onSuccess: () => {
+          setDocsArray([]);
+        },
+      },
+    );
+  };
+
+  return (
+    <motion.form
+      onSubmit={handleSubmit(onDocSubmit)}
+      className="mt-4 space-y-4"
+    >
+      <AnimatePresence mode="popLayout">
+        {docsArray.map((doc, index) => (
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ type: "spring", stiffness: 300 }}
+            className="bg-footer-800/50 flex items-center gap-4 rounded-xl p-4 backdrop-blur-sm"
+          >
+            <input
+              type="text"
+              placeholder="Document Title"
+              className="bg-footer-800 ring-primary-500 hover:bg-footer-700 flex-1 rounded-lg px-4 py-2 text-white transition-all duration-200 outline-none focus:ring-2"
+              {...register(`docs.${index}.title`, { required: true })}
+            />
+            <input
+              type="text"
+              placeholder="Document URL"
+              className="bg-footer-800 ring-primary-500 hover:bg-footer-700 flex-1 rounded-lg px-4 py-2 text-white transition-all duration-200 outline-none focus:ring-2"
+              {...register(`docs.${index}.url`, { required: true })}
+            />
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              type="button"
+              onClick={() => {
+                setDocsArray((curr) => curr.filter((_, i) => i !== index));
+                const values = getValues();
+                const newDocs = values.docs.filter((_, i) => i !== index);
+                setValue("docs", newDocs);
+              }}
+              className="text-xl text-red-400 transition-colors duration-200 hover:text-red-500"
+            >
+              <FaTrash />
+            </motion.button>
+          </motion.div>
+        ))}
+      </AnimatePresence>
+      {docsArray.length > 0 && (
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          type="submit"
+          className="bg-primary-700 hover:bg-primary-600 hover:shadow-primary-500/20 rounded-full px-6 py-2 font-bold text-white shadow-lg transition-all duration-300"
+        >
+          Add Documents
+        </motion.button>
+      )}
+    </motion.form>
+  );
+}
 
 function VideoContent() {
   const navigate = useNavigate();
-  const { register, handleSubmit, getValues, setValue } = useForm();
+  const { updateStageProgress } = useUpdateStageProgress();
+
+  const [docsArray, setDocsArray] = useState([]);
 
   const [editingVideoId, setEditingVideoId] = useState(null);
   const [editingDocId, setEditingDocId] = useState(null);
@@ -35,14 +233,11 @@ function VideoContent() {
     title: "",
     url: "",
   });
-  const [videosArray, setVideosArray] = useState([]);
-  const [docsArray, setDocsArray] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const { updateStageProgress } = useUpdateStageProgress();
   const { stage: { stage } = {}, isLoading, error } = useGetStage();
-
+  const { studentData, isLoading: studentLoading } = useGetStudent();
   const [isNextStageDisabled, setIsNextStageDisabled] = useState(true);
-  const { user, isLoading: studentLoading } = useGetUser();
+  const { user, isLoading: userLoading } = useGetUser();
   const {
     docs,
     number,
@@ -52,8 +247,6 @@ function VideoContent() {
     roadmap: roadmapId,
     _id: stageId,
   } = stage || {};
-
-  console.log(stage);
 
   const {
     updateStageContent,
@@ -119,17 +312,10 @@ function VideoContent() {
   }
 
   function handleUpdateStageProgress() {
-    console.log("update stage progress");
-    console.log(user);
-    console.log(roadmapId);
-    console.log(
-      user.roadmaps?.find((roadmap) => roadmap.roadmap._id === roadmapId)
-        ?.completedStages,
-      number - 1,
-    );
     if (
-      user.roadmaps?.find((roadmap) => roadmap.roadmap._id === roadmapId)
-        ?.completedStages ===
+      studentData?.roadmaps?.find(
+        (roadmap) => roadmap.roadmap._id === roadmapId,
+      )?.completedStages ===
       number - 1
     ) {
       updateStageProgress();
@@ -189,60 +375,6 @@ function VideoContent() {
     setSelectedVideo(videoId);
   };
 
-  const onSubmit = (data) => {
-    const newVideos = data.videos.map((video) => ({
-      ...video,
-      url: video.url.slice(0, video.url.indexOf("&")),
-    }));
-    const newStage = {
-      ...stage,
-      videos: [...stage.videos, ...newVideos],
-    };
-    updateStageContent(
-      {
-        stageId,
-        data: newStage,
-      },
-      {
-        onSuccess: () => {
-          setVideosArray([]);
-        },
-      },
-    );
-  };
-
-  const onDocSubmit = (data) => {
-    console.log(data);
-    // Filter out docs that already exist based on URL
-    const filteredNewDocs = data.docs
-      .filter(
-        (newDoc) =>
-          !stage.docs?.some(
-            (existingDoc) => existingDoc.url === newDoc.url.toString(),
-          ),
-      )
-      .map((doc) => ({
-        ...doc,
-        url: doc.url.toString(),
-      }));
-
-    const newStage = {
-      ...stage,
-      docs: [...(stage.docs || []), ...filteredNewDocs],
-    };
-    updateStageContent(
-      {
-        stageId,
-        data: newStage,
-      },
-      {
-        onSuccess: () => {
-          setDocsArray([]);
-        },
-      },
-    );
-  };
-  console.log(user);
   if (isLoading || roadmapLoading || updateStageLoading || studentLoading)
     return <Loader />;
   if (error || roadmapError || updateStageError)
@@ -313,7 +445,7 @@ function VideoContent() {
                   onClick={handleUpdateStageProgress}
                 >
                   next stage
-                  <FaArrowRight />
+                  <FaArrowRight className="transition-all duration-300 hover:translate-x-1" />
                 </motion.button>
               )}
             </div>
@@ -336,87 +468,7 @@ function VideoContent() {
                     />
                   </motion.div>
                 ) : (
-                  <motion.form
-                    key="form"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 20 }}
-                    onSubmit={handleSubmit(onSubmit)}
-                    className="bg-footer-900/50 flex grow flex-col items-center gap-4 overflow-hidden rounded-xl p-6 backdrop-blur-sm"
-                  >
-                    <h3 className="text-2xl font-semibold">Add Videos</h3>
-                    <AnimatePresence>
-                      {videosArray.map((video, index) => (
-                        <motion.div
-                          key={index}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          className="flex w-full gap-4"
-                        >
-                          <input
-                            type="text"
-                            placeholder="Video Title"
-                            className="bg-footer-800 ring-primary-500 flex-1 rounded-lg px-4 py-2 text-white outline-none focus:ring-2"
-                            {...register(`videos.${index}.title`, {
-                              required: true,
-                            })}
-                          />
-                          <input
-                            type="text"
-                            placeholder="Video URL"
-                            className="bg-footer-800 ring-primary-500 flex-1 rounded-lg px-4 py-2 text-white outline-none focus:ring-2"
-                            {...register(`videos.${index}.url`, {
-                              required: true,
-                            })}
-                          />
-                          <motion.button
-                            whileHover={{ scale: 1.1 }}
-                            whileTap={{ scale: 0.9 }}
-                            type="button"
-                            onClick={() => {
-                              setVideosArray((curr) =>
-                                curr.filter((_, i) => i !== index),
-                              );
-                              const values = getValues();
-                              const newVideos = values.videos.filter(
-                                (_, i) => i !== index,
-                              );
-                              setValue("videos", newVideos);
-                            }}
-                            className="text-xl text-red-400 hover:text-red-500"
-                          >
-                            <FaTrash />
-                          </motion.button>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-
-                    <div className="flex gap-4">
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        type="button"
-                        onClick={() =>
-                          setVideosArray([
-                            ...videosArray,
-                            { title: "", url: "" },
-                          ])
-                        }
-                        className="bg-primary-700 hover:bg-primary-600 rounded-full px-6 py-2 font-bold text-white transition-colors"
-                      >
-                        <FaPlus />
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.05 }}
-                        whileTap={{ scale: 0.95 }}
-                        type="submit"
-                        className="bg-primary-700 hover:bg-primary-600 rounded-full px-6 py-2 font-bold text-white transition-colors"
-                      >
-                        Add Videos
-                      </motion.button>
-                    </div>
-                  </motion.form>
+                  <AddVideosForm />
                 )}
               </AnimatePresence>
 
@@ -542,7 +594,7 @@ function VideoContent() {
           >
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold">Documents</h2>
-              {user?.role !== "student" && (
+              {user?.role === "content manager" && (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
@@ -555,65 +607,8 @@ function VideoContent() {
                 </motion.button>
               )}
             </div>
-            {user?.role !== "student" && docsArray.length > 0 && (
-              <motion.form
-                onSubmit={handleSubmit(onDocSubmit)}
-                className="mt-4 space-y-4"
-              >
-                <AnimatePresence mode="popLayout">
-                  {docsArray.map((doc, index) => (
-                    <motion.div
-                      key={index}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -20 }}
-                      transition={{ type: "spring", stiffness: 300 }}
-                      className="bg-footer-800/50 flex items-center gap-4 rounded-xl p-4 backdrop-blur-sm"
-                    >
-                      <input
-                        type="text"
-                        placeholder="Document Title"
-                        className="bg-footer-800 ring-primary-500 hover:bg-footer-700 flex-1 rounded-lg px-4 py-2 text-white transition-all duration-200 outline-none focus:ring-2"
-                        {...register(`docs.${index}.title`, { required: true })}
-                      />
-                      <input
-                        type="text"
-                        placeholder="Document URL"
-                        className="bg-footer-800 ring-primary-500 hover:bg-footer-700 flex-1 rounded-lg px-4 py-2 text-white transition-all duration-200 outline-none focus:ring-2"
-                        {...register(`docs.${index}.url`, { required: true })}
-                      />
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        type="button"
-                        onClick={() => {
-                          setDocsArray((curr) =>
-                            curr.filter((_, i) => i !== index),
-                          );
-                          const values = getValues();
-                          const newDocs = values.docs.filter(
-                            (_, i) => i !== index,
-                          );
-                          setValue("docs", newDocs);
-                        }}
-                        className="text-xl text-red-400 transition-colors duration-200 hover:text-red-500"
-                      >
-                        <FaTrash />
-                      </motion.button>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
-                {docsArray.length > 0 && (
-                  <motion.button
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    type="submit"
-                    className="bg-primary-700 hover:bg-primary-600 hover:shadow-primary-500/20 rounded-full px-6 py-2 font-bold text-white shadow-lg transition-all duration-300"
-                  >
-                    Add Documents
-                  </motion.button>
-                )}
-              </motion.form>
+            {user?.role === "content manager" && docsArray.length > 0 && (
+              <AddDocsForm />
             )}
             <ul className="mt-4 grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {docs?.map((doc) => (

@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { MdOutlineEmail } from "react-icons/md";
-import { useForgotPassword } from "../hooks/useForgotPassword";
+import { useForgotPassword } from "../hooks/auth/useForgotPassword";
 import { useSearchParams } from "react-router-dom";
 
 function EmailForm({ setStep }) {

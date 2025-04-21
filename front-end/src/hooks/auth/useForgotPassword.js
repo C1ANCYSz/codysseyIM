@@ -94,7 +94,7 @@ export function useResetPassword() {
     isLoading,
     error,
   } = useMutation({
-    mutationFn: async ({ email, password, confirmPassword }) => {
+    mutationFn: async ({ password, confirmPassword }) => {
       try {
         const res = await fetch(
           `http://localhost:3000/api/auth/reset-password/${token}`,

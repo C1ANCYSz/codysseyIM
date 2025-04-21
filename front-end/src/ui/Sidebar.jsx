@@ -10,7 +10,7 @@ import {
 } from "react-icons/fi";
 import { TbFileCertificate } from "react-icons/tb";
 import { NavLink } from "react-router-dom";
-import { useLogout } from "../hooks/useLogout";
+import { useLogout } from "../hooks/auth/useLogout";
 import { useUiContext } from "../context/UiContext";
 
 const navItemsStudent = [
