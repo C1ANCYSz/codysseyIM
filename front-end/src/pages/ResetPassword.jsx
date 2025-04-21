@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useResetPassword } from "../hooks/useForgotPassword";
+import { useResetPassword } from "../hooks/auth/useForgotPassword";
 import { useSearchParams } from "react-router-dom";
 
 function ResetPassword() {

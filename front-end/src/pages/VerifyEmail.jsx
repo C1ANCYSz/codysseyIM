@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useVerifyEmail } from "../hooks/useForgotPassword";
+import { useVerifyEmail } from "../hooks/auth/useForgotPassword";
 import { useSearchParams } from "react-router-dom";
 
 // Add this helper function at the top of your file
@@ -26,7 +26,6 @@ function VerifyEmail({ setStep }) {
   });
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email");
-  const { verifyEmail, isLoading, error } = useVerifyEmail();
 
   const inputRefs = {
     code1: useRef(null),

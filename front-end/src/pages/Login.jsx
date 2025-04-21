@@ -3,7 +3,7 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../context/AuthProvider";
-import { useLogin } from "../hooks/useLogin";
+import { useLogin } from "../hooks/auth/useLogin";
 
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);

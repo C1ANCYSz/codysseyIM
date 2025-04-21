@@ -1,8 +1,6 @@
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { FiMenu, FiX } from "react-icons/fi";
-import { useAuth } from "../context/AuthProvider";
-import { useLogout } from "../hooks/useLogout";
 import { motion, AnimatePresence } from "framer-motion";
 
 function Header() {

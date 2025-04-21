@@ -7,7 +7,6 @@ import Loader from "../../ui/Loader";
 function StudentDashboard() {
   const { studentData: { roadmaps } = {}, isLoading } = useGetStudent();
   const [filter, setFilter] = useState("all");
-  console.log(roadmaps);
   const filteredRoadmaps =
     filter === "all"
       ? roadmaps
