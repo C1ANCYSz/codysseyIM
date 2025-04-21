@@ -17,8 +17,8 @@ import { useForm } from "react-hook-form";
 import { motion, AnimatePresence } from "framer-motion";
 import { useUpdateStageContent } from "../../hooks/courses/useUpdateStageContent";
 import { useAuth } from "../../context/AuthProvider";
-import toast from "react-hot-toast";
-import { useUpdateStage as useUpdateStageProgress } from "../../hooks/user/useUpdateStage";
+import { useUpdateStageProgress } from "../../hooks/user/useUpdateStageProgress";
+import { useGetStudent } from "../../hooks/user/useGetStudent";
 
 function VideoContent() {
   const navigate = useNavigate();
@@ -37,12 +37,11 @@ function VideoContent() {
   const [videosArray, setVideosArray] = useState([]);
   const [docsArray, setDocsArray] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
-  const { updateStage: updateStageProgress } = useUpdateStageProgress();
+  const { updateStageProgress } = useUpdateStageProgress();
   const { stage: { stage } = {}, isLoading, error } = useGetStage();
 
   const [isNextStageDisabled, setIsNextStageDisabled] = useState(true);
-  const { user = {} } = useAuth();
-
+  const { studentData: user, isLoading: studentLoading } = useGetStudent();
   const {
     docs,
     number,
@@ -121,9 +120,16 @@ function VideoContent() {
   function handleUpdateStageProgress() {
     console.log("update stage progress");
     console.log(user);
+    console.log(roadmapId);
+    console.log(
+      user.roadmaps?.find((roadmap) => roadmap.roadmap._id === roadmapId)
+        ?.completedStages,
+      number - 1,
+    );
     if (
-      user.roadmaps?.find((roadmap) => roadmap._id === roadmapId)
-        ?.completedStages >= number
+      user.roadmaps?.find((roadmap) => roadmap.roadmap._id === roadmapId)
+        ?.completedStages ===
+      number - 1
     ) {
       updateStageProgress();
     } else {
@@ -236,7 +242,8 @@ function VideoContent() {
     );
   };
 
-  if (isLoading || roadmapLoading || updateStageLoading) return <Loader />;
+  if (isLoading || roadmapLoading || updateStageLoading || studentLoading)
+    return <Loader />;
   if (error || roadmapError || updateStageError)
     return <div>Error: {error.message}</div>;
 

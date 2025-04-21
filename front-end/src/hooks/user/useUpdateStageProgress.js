@@ -1,12 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useParams, useNavigate } from "react-router-dom";
-export const useUpdateStage = () => {
+import { useAuth } from "../../context/AuthProvider";
+
+export const useUpdateStageProgress = () => {
   const queryClient = useQueryClient();
   const { roadmapId, stageNumber } = useParams();
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const {
-    mutate: updateStage,
+    mutate: updateStageProgress,
     isLoading,
     error,
   } = useMutation({
@@ -37,6 +40,7 @@ export const useUpdateStage = () => {
         queryClient.invalidateQueries({
           refetchType: "active",
         });
+
         if (data.completed) navigate(`/roadmaps/${roadmapId}`);
         else
           navigate(`/roadmaps/${roadmapId}/stage/${Number(stageNumber) + 1}`);
@@ -47,5 +51,5 @@ export const useUpdateStage = () => {
     },
   });
 
-  return { updateStage, isLoading, error };
+  return { updateStageProgress, isLoading, error };
 };
