@@ -1,13 +1,338 @@
-import { FaArrowLeft } from "react-icons/fa";
+import { FaArrowLeft, FaEdit } from "react-icons/fa";
 import { useGetStage } from "../../hooks/courses/useGetStage";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { PiCheckCircleFill, PiPlusBold, PiXCircleFill } from "react-icons/pi";
-import { useUpdateStage } from "../../hooks/user/useUpdateStage";
+import {
+  PiCheckBold,
+  PiCheckCircleFill,
+  PiPlusBold,
+  PiXCircleFill,
+} from "react-icons/pi";
 import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthProvider";
 import { useUpdateStageContent } from "../../hooks/courses/useUpdateStageContent";
-const Quiz = () => {
+import { useUpdateStageProgress } from "../../hooks/user/useUpdateStageProgress";
+
+function ManageQuiz({ stage }) {
+  const { register, handleSubmit, reset } = useForm();
+  const [newQuestions, setNewQuestions] = useState([]);
+  const [editingQuestion, setEditingQuestion] = useState(null);
+
+  const { updateStageContent, isLoading: isUpdatingContent } =
+    useUpdateStageContent();
+
+  const handleAddQuestion = () => {
+    setNewQuestions((current) => [...current, { question: "", options: [] }]);
+  };
+
+  const onSubmit = (data) => {
+    console.log(data);
+    console.log(stage);
+    const updatedQuestions = {
+      questions: [
+        ...stage.questions,
+        ...data.questions.map((question) => ({
+          questionText: question.questionText,
+          options: question.options.map((option, index) => ({
+            answer: option.answer,
+            isCorrect: index === Number(question.correctOption),
+          })),
+        })),
+      ],
+    };
+    updatedQuestions.questionsCount = updatedQuestions.questions.length;
+    updateStageContent(
+      { stageId: stage._id, data: updatedQuestions },
+      {
+        onSuccess: () => {
+          reset();
+          setNewQuestions([]);
+        },
+      },
+    );
+  };
+
+  const submitEditedQuestion = (data) => {
+    const editedQuestionIndex = stage.questions.findIndex(
+      (q) => q._id === editingQuestion._id,
+    );
+
+    const updatedQuestion = {
+      _id: editingQuestion._id,
+      questionText: data.questions[editedQuestionIndex].questionText,
+      options: data.questions[editedQuestionIndex].options.map(
+        (option, index) => ({
+          answer: option.answer,
+          isCorrect:
+            index === Number(data.questions[editedQuestionIndex].correctOption),
+        }),
+      ),
+    };
+
+    const updatedQuestions = {
+      questions: [
+        ...stage.questions.slice(0, editedQuestionIndex),
+        updatedQuestion,
+        ...stage.questions.slice(editedQuestionIndex + 1),
+      ],
+      questionsCount: stage.questions.length,
+    };
+
+    updateStageContent(
+      { stageId: stage._id, data: updatedQuestions },
+      {
+        onSuccess: () => {
+          setEditingQuestion(null);
+        },
+      },
+    );
+  };
+
+  function handleDeleteQuestion(questionId) {
+    const updatedQuestions = {
+      questions: stage.questions.filter((q) => q._id !== questionId),
+      questionsCount: stage.questions.length - 1,
+    };
+    updateStageContent(
+      { stageId: stage._id, data: updatedQuestions },
+      {
+        onSuccess: () => {
+          setEditingQuestion(null);
+        },
+      },
+    );
+  }
+
+  function handleEditQuestion(question) {
+    setEditingQuestion(question);
+  }
+
+  return (
+    <main className="mx-auto mt-12 flex max-w-7xl flex-col gap-8 px-4 lg:flex-row">
+      <div className="flex-1">
+        <div className="sticky top-8">
+          <h2 className="mb-8 flex items-center gap-3 text-3xl font-bold text-white">
+            <span className="from-primary-500 to-primary-600 bg-gradient-to-r bg-clip-text text-transparent">
+              Questions
+            </span>
+            <span className="rounded-full bg-white/10 px-3 py-1 text-lg">
+              {stage.questions.length}
+            </span>
+          </h2>
+          <div className="space-y-6">
+            {stage.questions.map((question, index) => (
+              <div
+                key={question._id}
+                className="group relative rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-6 shadow-xl backdrop-blur-xl transition-all hover:border-white/20"
+              >
+                {editingQuestion === question ? (
+                  <form
+                    onSubmit={handleSubmit(submitEditedQuestion)}
+                    className="space-y-6"
+                  >
+                    <div>
+                      <input
+                        type="text"
+                        defaultValue={editingQuestion?.questionText}
+                        {...register(`questions.${index}.questionText`)}
+                        className="focus:ring-primary-500 w-full rounded-xl border-0 bg-white/5 p-4 text-white placeholder-white/40 ring-1 ring-white/10 transition-all focus:ring-2"
+                        placeholder="Enter question text..."
+                      />
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-2">
+                      {[0, 1, 2, 3].map((optionIndex) => (
+                        <div
+                          key={optionIndex}
+                          className="flex items-center gap-3 rounded-xl bg-white/5 p-4 ring-1 ring-white/10"
+                        >
+                          <input
+                            type="text"
+                            placeholder={`Option ${optionIndex + 1}`}
+                            defaultValue={
+                              editingQuestion?.options[optionIndex]?.answer
+                            }
+                            {...register(
+                              `questions.${index}.options.${optionIndex}.answer`,
+                            )}
+                            className="flex-1 rounded-lg border-0 bg-transparent p-2 text-white placeholder-white/40 ring-0 focus:ring-0"
+                          />
+                          <label className="flex cursor-pointer items-center gap-2">
+                            <input
+                              type="radio"
+                              {...register(`questions.${index}.correctOption`)}
+                              value={optionIndex}
+                              defaultChecked={
+                                editingQuestion?.options[optionIndex]?.isCorrect
+                              }
+                              className="accent-primary-500 h-5 w-5"
+                            />
+                            <span className="text-sm text-white/60">
+                              Correct
+                            </span>
+                          </label>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-end gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setEditingQuestion(null)}
+                        className="rounded-xl border border-white/10 px-6 py-2.5 text-white/80 transition-all hover:bg-white/5"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        className="from-primary-600 to-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 flex items-center gap-2 rounded-xl bg-gradient-to-r px-6 py-2.5 font-medium text-white shadow-lg transition-all"
+                      >
+                        <PiCheckBold className="h-5 w-5" />
+                        Save Changes
+                      </button>
+                    </div>
+                  </form>
+                ) : (
+                  <div className="flex items-start justify-between gap-6">
+                    <div className="flex-1 space-y-4">
+                      <div className="flex items-center gap-3">
+                        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-sm font-medium text-white">
+                          {index + 1}
+                        </span>
+                        <h3 className="text-xl font-medium text-white">
+                          {question.questionText}
+                        </h3>
+                      </div>
+                      <div className="grid gap-3 md:grid-cols-2">
+                        {question.options.map((option, idx) => (
+                          <div
+                            key={idx}
+                            className={`rounded-xl p-4 transition-all ${
+                              option.isCorrect
+                                ? "bg-gradient-to-r from-green-500/20 to-green-600/20 ring-1 ring-green-500/30"
+                                : "bg-white/5"
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              {option.isCorrect && (
+                                <PiCheckCircleFill className="h-5 w-5 text-green-500" />
+                              )}
+                              <span className="text-white/90">
+                                {option.answer}
+                              </span>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                      <button
+                        onClick={() => handleEditQuestion(question)}
+                        className="hover:text-primary-400 rounded-xl bg-white/5 p-3 text-white/60 transition-all hover:bg-white/10"
+                      >
+                        <FaEdit className="h-5 w-5" />
+                      </button>
+                      <button
+                        className="rounded-xl bg-white/5 p-3 text-white/60 transition-all hover:bg-white/10 hover:text-red-400"
+                        onClick={() => handleDeleteQuestion(question._id)}
+                      >
+                        <PiXCircleFill className="h-5 w-5" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <div className="lg:w-[400px]">
+        <div className="sticky top-8">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-3xl font-bold text-white">Add Questions</h2>
+            <button
+              className="from-primary-600 to-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 rounded-xl bg-gradient-to-r p-3 text-white shadow-lg transition-all"
+              onClick={handleAddQuestion}
+            >
+              <PiPlusBold className="h-6 w-6" />
+            </button>
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {newQuestions.map((question, index) => (
+              <div
+                key={index}
+                className="rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-6 shadow-xl backdrop-blur-xl"
+              >
+                <div className="space-y-4">
+                  <div>
+                    <label
+                      htmlFor={`question-${index}`}
+                      className="mb-2 block text-sm font-medium text-white/60"
+                    >
+                      Question {index + 1}
+                    </label>
+                    <input
+                      {...register(`questions.${index}.questionText`)}
+                      type="text"
+                      id={`question-${index}`}
+                      className="focus:ring-primary-500 w-full rounded-xl border-0 bg-white/5 p-4 text-white placeholder-white/40 ring-1 ring-white/10 transition-all focus:ring-2"
+                      placeholder="Enter your question..."
+                    />
+                  </div>
+
+                  <div className="space-y-3">
+                    {[1, 2, 3, 4].map((optionNum) => (
+                      <div
+                        key={optionNum}
+                        className="flex items-center gap-3 rounded-xl bg-white/5 p-4 ring-1 ring-white/10"
+                      >
+                        <input
+                          {...register(
+                            `questions.${index}.options.${optionNum - 1}.answer`,
+                          )}
+                          type="text"
+                          placeholder={`Option ${optionNum}`}
+                          className="flex-1 rounded-lg border-0 bg-transparent p-2 text-white placeholder-white/40 ring-0 focus:ring-0"
+                        />
+                        <label className="flex cursor-pointer items-center gap-2">
+                          <input
+                            type="radio"
+                            {...register(`questions.${index}.correctOption`)}
+                            value={optionNum - 1}
+                            className="accent-primary-500 h-5 w-5"
+                          />
+                          <span className="text-sm text-white/60">Correct</span>
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {newQuestions.length > 0 && (
+              <button
+                type="submit"
+                disabled={isUpdatingContent}
+                className="from-primary-600 to-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 w-full rounded-xl bg-gradient-to-r py-3 font-medium text-white shadow-lg transition-all disabled:opacity-50"
+              >
+                Save Questions
+              </button>
+            )}
+          </form>
+        </div>
+      </div>
+    </main>
+  );
+}
+
+function QuizContent({ stage }) {
+  const { questions, questionsCount = questions.length } = stage ?? {};
+  console.log(stage);
+  const { updateStageProgress, isLoading } = useUpdateStageProgress();
   const [quizState, setQuizState] = useState({
     selectedQuestion: null,
     score: 0,
@@ -16,23 +341,8 @@ const Quiz = () => {
     isLastQuestion: false,
     currentAnswer: null,
   });
-  const { user } = useAuth();
-  const { register, handleSubmit } = useForm();
-  const [newQuestions, setNewQuestions] = useState([]);
-  const { stage: { stage } = {}, isLoading } = useGetStage();
-  const navigate = useNavigate();
-  const { updateStage, isLoading: isUpdating } = useUpdateStage();
-  const { updateStageContent, isLoading: isUpdatingContent } =
-    useUpdateStageContent();
-  const {
-    description,
-    questions,
-    number,
-    title,
-    roadmap: roadmapId,
-    questionsCount,
-    type,
-  } = stage ?? {};
+
+  const isPassed = quizState.score / questionsCount >= 0.7;
 
   const handleOptionClick = (option) => {
     if (quizState.currentAnswer !== null) return;
@@ -77,12 +387,8 @@ const Quiz = () => {
     });
   };
 
-  const handleAddQuestion = () => {
-    setNewQuestions((current) => [...current, { question: "", options: [] }]);
-  };
-
   const handleNextStage = () => {
-    updateStage();
+    updateStageProgress();
   };
 
   const startQuiz = () => {
@@ -93,37 +399,181 @@ const Quiz = () => {
     }));
   };
 
-  const onSubmit = (data) => {
-    const newQuestions = {
-      questions: data.questions.map((question) => ({
-        questionText: question.questionText,
-        options: question.options.map((option, index) => ({
-          answer: option.answer,
-          isCorrect: index === Number(question.correctOption),
-        })),
-      })),
-    };
-    newQuestions.questionsCount = newQuestions.questions.length;
-    updateStageContent({ stageId: stage._id, data: newQuestions });
-  };
+  return (
+    <main className="mx-auto mt-12 max-w-4xl px-4">
+      <div className="flex items-center justify-between">
+        <h2 className="from-primary-500 to-primary-600 bg-gradient-to-r bg-clip-text text-3xl font-bold text-transparent">
+          Quiz
+        </h2>
+        {quizState.isStarted && !quizState.isCompleted && (
+          <div className="flex items-center gap-3 rounded-full bg-white/5 px-6 py-3 ring-1 ring-white/10 backdrop-blur-md">
+            <span className="text-primary-500 text-2xl font-bold">
+              {questions.indexOf(quizState.selectedQuestion) + 1}
+            </span>
+            <span className="text-xl text-white/60">/ {questionsCount}</span>
+          </div>
+        )}
+      </div>
 
-  const isPassed = quizState.score / questionsCount >= 0.7;
+      <section className="mt-8 rounded-2xl border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] p-8 shadow-xl backdrop-blur-xl">
+        {!quizState.isStarted && (
+          <div className="space-y-8 text-center">
+            <div className="space-y-6">
+              <h3 className="text-3xl font-bold text-white">Quiz Overview</h3>
+              <div className="space-y-6">
+                <div className="flex justify-center gap-8">
+                  <div className="rounded-xl bg-white/5 p-6 ring-1 ring-white/10 backdrop-blur-md">
+                    <p className="text-sm text-white/60">Time Limit</p>
+                    <p className="from-primary-500 to-primary-600 bg-gradient-to-r bg-clip-text text-2xl font-bold text-transparent">
+                      15 minutes
+                    </p>
+                  </div>
+                  <div className="rounded-xl bg-white/5 p-6 ring-1 ring-white/10 backdrop-blur-md">
+                    <p className="text-sm text-white/60">Questions</p>
+                    <p className="from-primary-500 to-primary-600 bg-gradient-to-r bg-clip-text text-2xl font-bold text-transparent">
+                      {questionsCount}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-white/60">
+                  Complete all questions within the time limit. You need 70% to
+                  pass.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={startQuiz}
+              className="from-primary-600 to-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 rounded-xl bg-gradient-to-r px-10 py-4 text-lg font-medium text-white shadow-lg transition-all"
+            >
+              Start Quiz
+            </button>
+          </div>
+        )}
 
-  if (isLoading || isUpdating) {
+        {quizState.isStarted && !quizState.isCompleted && (
+          <div className="space-y-8">
+            <h3 className="text-center text-2xl font-bold text-white">
+              {quizState.selectedQuestion?.questionText}
+            </h3>
+            <div className="space-y-4">
+              {quizState.selectedQuestion?.options.map((option) => (
+                <button
+                  disabled={quizState.currentAnswer !== null}
+                  key={option.answer}
+                  onClick={() => handleOptionClick(option)}
+                  className={`group relative w-full overflow-hidden rounded-xl p-6 text-left transition-all ${
+                    quizState.currentAnswer === option
+                      ? option.isCorrect
+                        ? "bg-gradient-to-r from-green-500/20 to-green-600/20 text-green-400 ring-1 ring-green-500/30"
+                        : "bg-gradient-to-r from-red-500/20 to-red-600/20 text-red-400 ring-1 ring-red-500/30"
+                      : quizState.currentAnswer !== null && option.isCorrect
+                        ? "bg-gradient-to-r from-green-500/20 to-green-600/20 text-green-400 ring-1 ring-green-500/30"
+                        : "bg-white/5 text-white ring-1 ring-white/10 hover:bg-white/10"
+                  }`}
+                >
+                  <div className="relative z-10 text-lg font-medium">
+                    {option.answer}
+                  </div>
+                </button>
+              ))}
+            </div>
+            <div className="flex justify-end">
+              <button
+                disabled={quizState.currentAnswer === null}
+                className={`rounded-xl px-10 py-4 text-lg font-medium transition-all ${
+                  quizState.currentAnswer === null
+                    ? "cursor-not-allowed bg-white/5 text-white/40"
+                    : "from-primary-600 to-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 bg-gradient-to-r text-white shadow-lg"
+                }`}
+                onClick={handleNextQuestion}
+              >
+                {quizState.isLastQuestion ? "Finish" : "Next Question"}
+              </button>
+            </div>
+          </div>
+        )}
+
+        {quizState.isCompleted && (
+          <div className="space-y-8 text-center">
+            <div className="space-y-4">
+              <h3 className="text-3xl font-bold text-white">Quiz Completed</h3>
+              <div className="inline-flex items-center gap-3 rounded-full bg-white/5 px-6 py-3 ring-1 ring-white/10">
+                <span className="text-primary-500 text-2xl font-bold">
+                  {quizState.score}
+                </span>
+                <span className="text-white/60">/ {questionsCount}</span>
+                <span className="text-lg text-white/60">
+                  ({Math.round((quizState.score / questionsCount) * 100)}%)
+                </span>
+              </div>
+            </div>
+
+            <div
+              className={`flex flex-col items-center gap-4 ${
+                isPassed ? "text-green-400" : "text-red-400"
+              }`}
+            >
+              {isPassed ? (
+                <PiCheckCircleFill className="text-6xl" />
+              ) : (
+                <PiXCircleFill className="text-6xl" />
+              )}
+              <p className="text-3xl font-bold">
+                {isPassed ? "Passed!" : "Failed"}
+              </p>
+            </div>
+
+            {isPassed ? (
+              <button
+                onClick={handleNextStage}
+                className="from-primary-600 to-primary-500 shadow-primary-500/25 hover:shadow-primary-500/40 rounded-xl bg-gradient-to-r px-10 py-4 text-lg font-medium text-white shadow-lg transition-all"
+              >
+                Continue to Next Stage
+              </button>
+            ) : (
+              <button
+                onClick={handleRetakeQuiz}
+                className="rounded-xl bg-gradient-to-r from-red-600 to-red-500 px-10 py-4 text-lg font-medium text-white shadow-lg shadow-red-500/25 transition-all hover:shadow-red-500/40"
+              >
+                Retake Quiz
+              </button>
+            )}
+          </div>
+        )}
+      </section>
+    </main>
+  );
+}
+
+const Quiz = () => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
+
+  const { stage: { stage } = {}, isLoading } = useGetStage();
+
+  const {
+    description,
+    title,
+    roadmap: roadmapId,
+    questionsCount,
+    type,
+  } = stage ?? {};
+
+  if (isLoading) {
     return (
       <div className="flex h-screen items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-        <div className="border-primary-500 h-16 w-16 animate-spin rounded-full border-t-4" />
+        <div className="border-primary-500 h-16 w-16 animate-spin rounded-full border-4 border-t-transparent" />
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-black">
-      <div className="mx-auto max-w-7xl px-6 py-8">
+      <div className="mx-auto px-6 py-8">
         <nav className="flex items-center justify-between">
           <button
             onClick={() => navigate(`/roadmaps/${roadmapId}`)}
-            className="group flex items-center gap-3 rounded-full bg-white/10 px-6 py-3 text-lg font-medium text-white backdrop-blur-sm transition-all hover:bg-white/20"
+            className="group flex items-center gap-3 rounded-xl bg-white/5 px-6 py-3 text-lg font-medium text-white ring-1 ring-white/10 backdrop-blur-md transition-all hover:bg-white/10"
           >
             <FaArrowLeft className="transition-transform group-hover:-translate-x-1" />
             <span>Back to Roadmap</span>
@@ -131,251 +581,20 @@ const Quiz = () => {
         </nav>
 
         <header className="mt-16 text-center">
-          <div className="inline-flex items-center gap-4 rounded-full bg-white/5 p-2 backdrop-blur-sm">
-            <span className="bg-primary-600/80 rounded-full px-4 py-2 text-sm font-medium text-white">
+          <div className="inline-flex items-center gap-4 rounded-full bg-white/5 p-2 ring-1 ring-white/10 backdrop-blur-md">
+            <span className="from-primary-600 to-primary-500 rounded-full bg-gradient-to-r px-4 py-2 text-sm font-medium text-white">
               {type}
             </span>
             <h1 className="pr-4 text-2xl font-bold text-white">{title}</h1>
           </div>
-          <p className="mt-6 text-lg text-gray-400">{stage?.description}</p>
+          <p className="mt-6 text-lg text-white/60">{stage?.description}</p>
         </header>
 
         {user.role === "content manager" && (
-          <main className="mx-auto mt-12 max-w-4xl">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold text-white">Add Questions</h2>
-              <button
-                className="bg-primary-600 hover:bg-primary-500 hover:shadow-primary-600/50 rounded-full p-4 text-lg font-bold text-white shadow-lg transition-all duration-300 hover:scale-105 active:scale-95"
-                onClick={handleAddQuestion}
-              >
-                <PiPlusBold className="h-6 w-6" />
-              </button>
-            </div>
-            <form onSubmit={handleSubmit(onSubmit)} className="mt-8">
-              <div className="space-y-6">
-                {newQuestions.map((question, index) => (
-                  <div
-                    key={index}
-                    className="rounded-xl border border-gray-700/30 bg-gray-800/50 p-6 shadow-lg backdrop-blur-lg"
-                  >
-                    <div className="space-y-4">
-                      <div className="flex items-center gap-3">
-                        <label
-                          htmlFor={`question-${index}`}
-                          className="flex items-center gap-1 text-sm font-medium text-gray-300"
-                        >
-                          Question <span>{index + 1}</span>
-                        </label>
-                        <input
-                          {...register(`questions.${index}.questionText`)}
-                          type="text"
-                          id={`question-${index}`}
-                          className="focus:border-primary-500 focus:ring-primary-500 w-full rounded-lg border border-gray-600/50 bg-gray-700/50 p-3 text-white placeholder-gray-400 transition-all duration-200 focus:ring-1"
-                          placeholder="Enter your question..."
-                        />
-                      </div>
-
-                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                        {[1, 2, 3, 4].map((optionNum) => (
-                          <div
-                            key={optionNum}
-                            className="flex items-center gap-3 rounded-lg bg-gray-700/30 p-3"
-                          >
-                            <input
-                              {...register(
-                                `questions.${index}.options.${optionNum - 1}.answer`,
-                              )}
-                              type="text"
-                              placeholder={`Option ${optionNum}`}
-                              className="flex-1 border-0 bg-transparent text-white placeholder-gray-400 focus:ring-0"
-                            />
-                            <div className="relative flex items-center">
-                              <input
-                                type="radio"
-                                {...register(
-                                  `questions.${index}.correctOption`,
-                                )}
-                                value={optionNum - 1}
-                                className="text-primary-600 focus:ring-primary-500 h-5 w-5 border-gray-600 bg-gray-700"
-                              />
-                              <span className="ml-2 text-sm text-gray-400">
-                                Correct
-                              </span>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {newQuestions.length > 0 && (
-                <button
-                  type="submit"
-                  disabled={isUpdatingContent}
-                  className="bg-primary-600 hover:bg-primary-500 hover:shadow-primary-600/30 mt-6 w-full rounded-lg px-6 py-3 font-bold text-white transition-all duration-300 hover:shadow-lg"
-                >
-                  Save Questions
-                </button>
-              )}
-            </form>
-          </main>
+          <ManageQuiz user={user} stage={stage} />
         )}
 
-        {user.role === "student" && (
-          <main className="mx-auto mt-12 max-w-4xl">
-            <div className="flex items-center justify-between">
-              <h2 className="text-3xl font-bold text-white">Quiz</h2>
-              {quizState.isStarted && !quizState.isCompleted && (
-                <div className="flex items-center gap-2 rounded-full bg-white/10 px-6 py-3 backdrop-blur-sm">
-                  <span className="text-primary-500 text-2xl font-bold">
-                    {questions.indexOf(quizState.selectedQuestion) + 1}
-                  </span>
-                  <span className="text-xl text-gray-400">
-                    / {questionsCount}
-                  </span>
-                </div>
-              )}
-            </div>
-
-            <section className="mt-8 rounded-2xl bg-white/5 p-8 backdrop-blur-md">
-              {!quizState.isStarted && (
-                <div className="space-y-8 text-center">
-                  <div className="space-y-6">
-                    <h3 className="text-3xl font-bold text-white">
-                      Quiz Overview
-                    </h3>
-                    <div className="space-y-4">
-                      <div className="flex justify-center gap-8">
-                        <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm">
-                          <p className="text-sm text-gray-400">Time Limit</p>
-                          <p className="text-primary-500 text-2xl font-bold">
-                            15 minutes
-                          </p>
-                        </div>
-                        <div className="rounded-xl bg-white/10 p-6 backdrop-blur-sm">
-                          <p className="text-sm text-gray-400">Questions</p>
-                          <p className="text-primary-500 text-2xl font-bold">
-                            {questionsCount}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="text-gray-400">
-                        Complete all questions within the time limit. You need
-                        70% to pass.
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    onClick={startQuiz}
-                    className="bg-primary-600 hover:bg-primary-500 focus:ring-primary-500 transform rounded-full px-10 py-4 text-lg font-bold text-white transition-all hover:scale-105 focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-900 focus:outline-none"
-                  >
-                    Start Quiz
-                  </button>
-                </div>
-              )}
-
-              {quizState.isStarted && !quizState.isCompleted && (
-                <div className="space-y-8">
-                  <h3 className="text-center text-2xl font-bold text-white">
-                    {quizState.selectedQuestion?.questionText}
-                  </h3>
-                  <div className="space-y-4">
-                    {quizState.selectedQuestion?.options.map((option) => (
-                      <button
-                        disabled={quizState.currentAnswer !== null}
-                        key={option.answer}
-                        className={`group relative w-full overflow-hidden rounded-xl p-6 text-left text-lg font-medium transition-all duration-300 ${
-                          quizState.currentAnswer === option
-                            ? option.isCorrect
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-red-500/20 text-red-400"
-                            : quizState.currentAnswer !== null &&
-                                option.isCorrect
-                              ? "bg-green-500/20 text-green-400"
-                              : "bg-white/5 text-white hover:bg-white/10"
-                        }`}
-                        onClick={() => handleOptionClick(option)}
-                      >
-                        <div className="relative z-10">{option.answer}</div>
-                        <div
-                          className={`absolute inset-0 transform transition-transform duration-300 ${
-                            quizState.currentAnswer === null
-                              ? "group-hover:scale-105"
-                              : ""
-                          }`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                  <button
-                    disabled={quizState.currentAnswer === null}
-                    className={`ml-auto block transform rounded-full px-10 py-4 text-lg font-bold transition-all ${
-                      quizState.currentAnswer === null
-                        ? "cursor-not-allowed bg-gray-600 text-gray-400"
-                        : "bg-primary-600 hover:bg-primary-500 text-white hover:scale-105"
-                    }`}
-                    onClick={handleNextQuestion}
-                  >
-                    {quizState.isLastQuestion ? "Finish" : "Next Question"}
-                  </button>
-                </div>
-              )}
-
-              {quizState.isCompleted && (
-                <div className="space-y-8 text-center">
-                  <div className="space-y-4">
-                    <h3 className="text-3xl font-bold text-white">
-                      Quiz Completed
-                    </h3>
-                    <div className="inline-flex items-center gap-2 rounded-full bg-white/10 px-6 py-3">
-                      <span className="text-primary-500 text-2xl font-bold">
-                        {quizState.score}
-                      </span>
-                      <span className="text-gray-400">/ {questionsCount}</span>
-                      <span className="text-lg text-gray-400">
-                        ({Math.round((quizState.score / questionsCount) * 100)}
-                        %)
-                      </span>
-                    </div>
-                  </div>
-
-                  <div
-                    className={`flex flex-col items-center gap-4 ${
-                      isPassed ? "text-green-400" : "text-red-400"
-                    }`}
-                  >
-                    {isPassed ? (
-                      <PiCheckCircleFill className="text-6xl" />
-                    ) : (
-                      <PiXCircleFill className="text-6xl" />
-                    )}
-                    <p className="text-3xl font-bold">
-                      {isPassed ? "Passed!" : "Failed"}
-                    </p>
-                  </div>
-
-                  {isPassed ? (
-                    <button
-                      onClick={handleNextStage}
-                      className="bg-primary-600 hover:bg-primary-500 transform rounded-full px-10 py-4 text-lg font-bold text-white transition-all hover:scale-105"
-                    >
-                      Continue to Next Stage
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleRetakeQuiz}
-                      className="transform rounded-full bg-red-600 px-10 py-4 text-lg font-bold text-white transition-all hover:scale-105 hover:bg-red-500"
-                    >
-                      Retake Quiz
-                    </button>
-                  )}
-                </div>
-              )}
-            </section>
-          </main>
-        )}
+        {user.role === "student" && <QuizContent stage={stage} />}
       </div>
     </div>
   );
