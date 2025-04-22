@@ -1,7 +1,7 @@
 function Loader() {
   return (
-    <div className="bg-footer-800 flex h-screen items-center justify-center">
-      <div className="border-primary-500 h-[200px] w-[200px] animate-spin rounded-full border-4 border-t-transparent"></div>
+    <div className="from-primary-900 flex h-screen min-h-screen items-center justify-center bg-gradient-to-br to-black p-8">
+      <div className="border-primary-500 h-64 w-64 animate-spin rounded-full border-t-2 border-b-2"></div>
     </div>
   );
 }

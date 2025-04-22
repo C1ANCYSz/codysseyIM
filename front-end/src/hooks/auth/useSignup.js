@@ -27,6 +27,7 @@ export function useSignup() {
         const data = await res.json();
 
         if (data.success) {
+          console.log(data);
           setIsLoggedIn(true);
           setUser(data.user);
         } else {

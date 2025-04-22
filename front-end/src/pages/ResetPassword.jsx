@@ -9,8 +9,6 @@ function ResetPassword() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { reset, isLoading, error } = useResetPassword();
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get("email");
   const {
     register,
     handleSubmit,
@@ -28,7 +26,6 @@ function ResetPassword() {
 
   function onSubmit(data) {
     reset({
-      email,
       password: data.newPassword,
       confirmPassword: data.confirmNewPassword,
     });

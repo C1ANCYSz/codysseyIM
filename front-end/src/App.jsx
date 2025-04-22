@@ -16,7 +16,7 @@ import Stage from "./features/content/Stage";
 import Appointements from "./pages/Appointements";
 import { UiContextProvider } from "./context/UiContext";
 import AddRoadmap from "./features/content/AddRoadmap";
-
+import VerifyEmail from "./pages/VerifyEmail";
 function App() {
   return (
     <Router>
@@ -71,6 +71,7 @@ function App() {
               />
             </Route>
             <Route path="roadmaps/:roadmapId" element={<Roadmap />} />
+            <Route path="verify-email" element={<VerifyEmail />} />
 
             <Route
               path="/reset-password/:token"

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FaCalendar } from "react-icons/fa";
+import { FaCalendar, FaUsers } from "react-icons/fa";
 import {
   FiBookOpen,
   FiHome,
@@ -7,6 +7,7 @@ import {
   FiSettings,
   FiUser,
   FiMenu,
+  FiBell,
 } from "react-icons/fi";
 import { TbFileCertificate } from "react-icons/tb";
 import { NavLink } from "react-router-dom";
@@ -35,7 +36,9 @@ const navItemsContentManager = [
 
 const navItemsAdmin = [
   { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
-  { to: "/roadmaps", icon: <FiBookOpen />, label: "Roadmaps" },
+  { to: "/content-managers", icon: <FaUsers />, label: "Content Managers" },
+  { to: "/academies", icon: <FaUsers />, label: "Academies" },
+  { label: "Notifications", icon: <FiBell />, button: true },
 ];
 
 const navItems = {

@@ -1,7 +1,7 @@
 import { useRef } from "react";
 import { useForm } from "react-hook-form";
-import { useVerifyEmail } from "../hooks/auth/useForgotPassword";
-import { useSearchParams } from "react-router-dom";
+import { useVerifyEmail } from "../hooks/auth/useVerifyEmail";
+import { MdOutlineMarkEmailUnread } from "react-icons/md";
 
 // Add this helper function at the top of your file
 const mergeRefs = (...refs) => {
@@ -16,7 +16,8 @@ const mergeRefs = (...refs) => {
   };
 };
 
-function VerifyEmail({ setStep }) {
+function VerifyEmail() {
+  const { verifyEmail: verifyUserEmail, isLoading } = useVerifyEmail();
   const {
     register,
     handleSubmit,
@@ -24,8 +25,6 @@ function VerifyEmail({ setStep }) {
   } = useForm({
     mode: "onChange", // This will enable real-time validation
   });
-  const [searchParams] = useSearchParams();
-  const email = searchParams.get("email");
 
   const inputRefs = {
     code1: useRef(null),
@@ -66,19 +65,16 @@ function VerifyEmail({ setStep }) {
       .join("");
 
     console.log(verificationCode);
-    verifyEmail({ email, code: verificationCode, setStep });
+    verifyUserEmail(verificationCode);
   }
 
   return (
-    <div className="via-primary-600 flex min-h-dvh w-full items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 p-4 text-center lg:min-h-[calc(100dvh-80px)]">
+    <div className="via-primary-600 flex min-h-dvh w-full items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 p-4 text-center lg:min-h-screen">
       <div className="flex w-full max-w-md flex-col rounded-3xl bg-gradient-to-r from-purple-800 to-purple-600 p-1 md:max-w-2xl">
         {/* Top Section */}
         <div className="flex flex-col items-center justify-center space-y-4 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 p-6 md:space-y-6 md:p-8">
-          <img
-            src="/src/assets/images/VerifyEmail.png"
-            alt="locker"
-            className="h-[120px] w-auto object-cover md:h-[200px]"
-          />
+          <MdOutlineMarkEmailUnread className="text-9xl text-white" />
+
           <h1 className="text-2xl font-bold text-white md:text-4xl">
             Verification Email sent successfully
           </h1>
