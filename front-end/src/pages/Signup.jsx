@@ -2,10 +2,13 @@ import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { useSignup } from "../hooks/auth/useSignup";
 
 function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  const { signup, isLoading, error } = useSignup();
 
   const {
     register,
@@ -15,7 +18,7 @@ function Signup() {
   } = useForm();
 
   function onSubmit(data) {
-    console.log(data);
+    signup(data);
   }
 
   return (

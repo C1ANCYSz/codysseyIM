@@ -141,7 +141,7 @@ exports.getCertificates = async (req, res, next) => {
     if (certificates.length === 0) {
       return res.status(200).json({
         success: true,
-        data: { message: 'No certificates found' },
+        data: { certificates: [] },
       });
     }
 

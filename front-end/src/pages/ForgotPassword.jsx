@@ -1,7 +1,8 @@
 import { useState } from "react";
 import EmailForm from "../ui/EmailForm";
-import VerifyEmail from "./VerifyEmail";
-import ResetPassword from "./ResetPassword";
+
+import ResetEmailSent from "./ResetEmailSent";
+
 function ForgotPassword() {
   const [step, setStep] = useState(1);
 
@@ -10,11 +11,7 @@ function ForgotPassword() {
   }
 
   if (step === 2) {
-    return <VerifyEmail setStep={setStep} />;
-  }
-
-  if (step === 3) {
-    return <ResetPassword />;
+    return <ResetEmailSent setStep={setStep} />;
   }
 }
 

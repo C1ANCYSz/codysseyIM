@@ -125,13 +125,13 @@ exports.signUp = async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    data: {
-      user: {
-        _id: newUser._id,
-        name,
-        email: newUser.email,
-        verified: false,
-      },
+    user: {
+      _id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+      role: newUser.role,
+      isVerified: newUser.isVerified,
+      tookQuestionnaire: newUser.tookQuestionnaire,
     },
   });
 };

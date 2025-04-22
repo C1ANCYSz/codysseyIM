@@ -1,4 +1,5 @@
 import { useGetCertificates } from "../hooks/user/useGetCertificates";
+import { GiCancel } from "react-icons/gi";
 import { FiDownload } from "react-icons/fi";
 
 function Certificates() {
@@ -24,11 +25,7 @@ function Certificates() {
   if (!certificates?.length) {
     return (
       <div className="flex h-screen flex-col items-center justify-center gap-4">
-        <img
-          src="/src/assets/empty.svg"
-          alt="No certificates"
-          className="h-64 w-64"
-        />
+        <GiCancel className="text-6xl text-red-400" />
         <h2 className="text-2xl font-semibold text-gray-300">
           No certificates yet
         </h2>

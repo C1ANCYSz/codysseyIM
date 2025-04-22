@@ -122,7 +122,6 @@ exports.createRoadmap = async (req, res, next) => {
     title,
     description,
     category,
-    image,
   });
 
   if (!roadmap) {
@@ -340,18 +339,17 @@ exports.updateRoadmapStage = async (req, res, next) => {
 };
 
 exports.deleteRoadmap = async (req, res, next) => {
-  const session = await User.startSession();
+  const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    const users = await User.find({ 'roadmaps.roadmap': req.params.id });
+    const roadmapId = req.params.id;
 
-    for (const user of users) {
-      user.roadmaps.pull({ roadmap: req.params.id });
-      await user.save({ session, validateBeforeSave: false });
-    }
+    // Delete all UserRoadmap entries associated with the roadmap
+    await UserRoadmap.deleteMany({ roadmap: roadmapId }, { session });
 
-    const roadmap = await Roadmap.findByIdAndDelete(req.params.id, { session });
+    // Delete the roadmap itself
+    const roadmap = await Roadmap.findByIdAndDelete(roadmapId, { session });
 
     if (!roadmap) {
       await session.abortTransaction();
