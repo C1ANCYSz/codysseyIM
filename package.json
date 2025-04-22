@@ -8,8 +8,8 @@
     "frontend": "cd front-end && npm run dev",
     "all": "concurrently \"npm run backend\" \"npm run frontend\"",
     "install": "cd front-end && npm install && cd ../backend && npm install",
-    "git":"git pull origin main",
-    "start":"npm run install && npm run all"
+    "git": "git pull origin main",
+    "start": "npm run install && npm run all"
   },
   "keywords": [],
   "author": "",
@@ -17,5 +17,8 @@
   "description": "",
   "devDependencies": {
     "concurrently": "^9.1.2"
+  },
+  "dependencies": {
+    "nodemon": "^3.1.9"
   }
 }

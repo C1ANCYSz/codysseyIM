@@ -1,7 +1,6 @@
 import { useForm } from "react-hook-form";
 import { MdOutlineEmail } from "react-icons/md";
 import { useForgotPassword } from "../hooks/auth/useForgotPassword";
-import { useSearchParams } from "react-router-dom";
 
 function EmailForm({ setStep }) {
   const {
@@ -9,12 +8,10 @@ function EmailForm({ setStep }) {
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const [searchParams, setSearchParams] = useSearchParams();
   const { forgotPassword, isLoading, error } = useForgotPassword();
 
   function onSubmit(data) {
     forgotPassword({ email: data.email, setStep });
-    setSearchParams({ email: data.email });
   }
   return (
     <div className="via-primary-600 flex min-h-dvh w-full items-center justify-center bg-gradient-to-br from-blue-950 to-blue-950 p-4 text-center lg:min-h-[calc(100dvh-80px)]">
