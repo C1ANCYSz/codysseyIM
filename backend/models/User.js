@@ -53,7 +53,10 @@ const userSchema = new mongoose.Schema(
 
     image: String,
     phoneNumber: String,
-
+    isRevoked: {
+      type: Boolean,
+      default: false,
+    },
     verificationToken: String,
     verificationTokenExpiresAt: Date,
     resetPasswordToken: String,

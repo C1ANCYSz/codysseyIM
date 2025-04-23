@@ -115,7 +115,7 @@ router.get(
   restrictTo('admin'),
   async (req, res, next) => {
     const contentManagers = await User.find({ role: 'content manager' }).select(
-      '_id name email'
+      '_id name email phoneNumber image'
     );
     if (!contentManagers) {
       res.json({ success: true, data: {} });
@@ -221,5 +221,20 @@ router.delete(
     res.json({ success: true, message: 'Notification deleted successfully' });
   }
 );
+
+router.put('/revoke', protectRoute, restrictTo('admin'), async (req, res) => {
+  const { email } = req.body;
+
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    return next(new AppError('No user found with this email', 404));
+  }
+
+  user.isRevoked = true;
+  await user.save({ validateBeforeSave: false });
+
+  res.json({ success: true, message: 'User revoked' });
+});
 
 module.exports = router;

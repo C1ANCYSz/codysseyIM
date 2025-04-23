@@ -56,6 +56,10 @@ exports.login = async (req, res, next) => {
     return next(new AppError('Incorrect username or password', 401));
   }
 
+  if (user.isRevoked) {
+    return next(new AppError('Your account has been revoked', 401));
+  }
+
   tokenAndCookie(user._id, res);
 
   req.user = user;
