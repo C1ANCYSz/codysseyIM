@@ -1,20 +1,20 @@
-const jwt = require("jsonwebtoken");
-const crypto = require("crypto");
-const validator = require("validator");
-const User = require("./../models/User");
-const mongoose = require("mongoose");
-const AppError = require("../utils/AppError");
-const UserRoadmap = require("../models/UserRoadmap");
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
+const validator = require('validator');
+const User = require('./../models/User');
+const mongoose = require('mongoose');
+const AppError = require('../utils/AppError');
+const UserRoadmap = require('../models/UserRoadmap');
 const {
   generateVerificationToken,
-} = require("../utils/generateVerificationToken");
+} = require('../utils/generateVerificationToken');
 
 const {
   sendVerificationEmail,
   sendWelcomeEmail,
   sendPasswordResetEmail,
   sendPasswordResetSuccess,
-} = require("../mailtrap/emails");
+} = require('../mailtrap/emails');
 /* 
 
 
@@ -26,10 +26,10 @@ const tokenAndCookie = (id, res) => {
     expiresIn: process.env.JWT_EXPIRE,
   });
 
-  res.cookie("token", token, {
+  res.cookie('token', token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "strict" : "lax",
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'strict' : 'lax',
 
     maxAge: 7 * 24 * 60 * 60 * 1000, //7 days
   });
@@ -42,18 +42,18 @@ exports.login = async (req, res, next) => {
 
   if (!email || !password) {
     return next(
-      new AppError("Please provide username or email and password", 400)
+      new AppError('Please provide username or email and password', 400)
     );
   }
   email = validator.escape(email);
 
-  const user = await User.findOne({ email: email }).select("+password");
+  const user = await User.findOne({ email: email }).select('+password');
 
   //to mitigate bruce force attack [TO BE IMPROVED]
 
   if (!user || !(await user.comparePassword(password))) {
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    return next(new AppError("Incorrect username or password", 401));
+    return next(new AppError('Incorrect username or password', 401));
   }
 
   tokenAndCookie(user._id, res);
@@ -62,14 +62,24 @@ exports.login = async (req, res, next) => {
 
   return res.status(200).json({
     success: true,
-    message: "logged in successfully",
+    message: 'logged in successfully',
     user: {
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
       isVerified: user.isVerified,
-      tookQuestionnaire: user.tookQuestionnaire,
+      tookQuestionnaire:
+        user.role === 'student' ? user.tookQuestionnaire : undefined,
+      image:
+        user.role === 'content manager' || user.role === 'academy'
+          ? user.image
+          : undefined,
+      locations: user.role === 'academy' ? user.locations : undefined,
+      phoneNumber:
+        user.role === 'academy' || user.role === 'content manager'
+          ? user.phoneNumber
+          : undefined,
     },
   });
 };
@@ -83,28 +93,28 @@ exports.signUp = async (req, res, next) => {
   email = validator.escape(email);
 
   if (!name || !email || !password || !confirmPassword) {
-    return next(new AppError("Please provide all required fields", 400));
+    return next(new AppError('Please provide all required fields', 400));
   }
 
   if (!validator.isEmail(email)) {
-    return next(new AppError("Please provide a valid email", 400));
+    return next(new AppError('Please provide a valid email', 400));
   }
 
   if (password.length < 8) {
     return next(
-      new AppError("Password must be at least 8 characters long", 400)
+      new AppError('Password must be at least 8 characters long', 400)
     );
   }
 
   if (password !== confirmPassword) {
-    return next(new AppError("Passwords do not match", 400));
+    return next(new AppError('Passwords do not match', 400));
   }
 
   const existingUser = await User.findOne({ email });
 
   if (existingUser) {
     return next(
-      new AppError("User with this email or username already exists", 400)
+      new AppError('User with this email or username already exists', 400)
     );
   }
   const verificationToken = generateVerificationToken();
@@ -118,7 +128,7 @@ exports.signUp = async (req, res, next) => {
   });
 
   await sendVerificationEmail(newUser.email, verificationToken).catch((err) => {
-    console.error("Error sending verification email:", err);
+    console.error('Error sending verification email:', err);
   });
 
   tokenAndCookie(newUser._id, res);
@@ -137,10 +147,10 @@ exports.signUp = async (req, res, next) => {
 };
 
 exports.logout = async (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie('token');
   res.status(200).json({
     success: true,
-    message: "logged out successfully",
+    message: 'logged out successfully',
   });
 };
 
@@ -148,7 +158,7 @@ exports.verifyEmail = async (req, res, next) => {
   const { verificationToken } = req.body;
 
   if (!verificationToken) {
-    return next(new AppError("Please provide a verification token", 400));
+    return next(new AppError('Please provide a verification token', 400));
   }
   console.log(verificationToken);
 
@@ -158,7 +168,7 @@ exports.verifyEmail = async (req, res, next) => {
   });
 
   if (!user) {
-    return next(new AppError("Invalid verification token", 400));
+    return next(new AppError('Invalid verification token', 400));
   }
 
   user.isVerified = true;
@@ -173,7 +183,7 @@ exports.verifyEmail = async (req, res, next) => {
 
   res.status(200).json({
     success: true,
-    message: "Email verified successfully",
+    message: 'Email verified successfully',
     user: {
       _id: user._id,
       name: user.name,
@@ -189,14 +199,14 @@ exports.forgotPassword = async (req, res, next) => {
   const { email } = req.body;
 
   if (!email || !validator.isEmail(email)) {
-    return next(new AppError("Please provide a valid email address", 400));
+    return next(new AppError('Please provide a valid email address', 400));
   }
 
   const user = await User.findOne({ email });
   if (!user) {
     return res.status(200).json({
       success: true,
-      message: "Password reset link sent to email",
+      message: 'Password reset link sent to email',
     });
   }
 
@@ -211,7 +221,7 @@ exports.forgotPassword = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Password reset link sent to email",
+      message: 'Password reset link sent to email',
     });
   } catch (emailErr) {
     user.resetPasswordToken = undefined;
@@ -220,7 +230,7 @@ exports.forgotPassword = async (req, res, next) => {
 
     return next(
       new AppError(
-        "There was an error sending the email. Please try again later.",
+        'There was an error sending the email. Please try again later.',
         500
       )
     );
@@ -238,21 +248,21 @@ exports.resetPassword = async (req, res, next) => {
     if (!password || !confirmPassword) {
       await session.abortTransaction();
       return next(
-        new AppError("Please provide both password and confirmation", 400)
+        new AppError('Please provide both password and confirmation', 400)
       );
     }
 
     if (password !== confirmPassword) {
       await session.abortTransaction();
-      return next(new AppError("Passwords do not match", 400));
+      return next(new AppError('Passwords do not match', 400));
     }
 
     if (password.length < 8) {
       await session.abortTransaction();
-      return next(new AppError("Password must be at least 8 characters", 400));
+      return next(new AppError('Password must be at least 8 characters', 400));
     }
 
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
@@ -261,7 +271,7 @@ exports.resetPassword = async (req, res, next) => {
 
     if (!user) {
       await session.abortTransaction();
-      return next(new AppError("Token is invalid or has expired", 400));
+      return next(new AppError('Token is invalid or has expired', 400));
     }
 
     user.password = password;
@@ -277,7 +287,7 @@ exports.resetPassword = async (req, res, next) => {
 
     return res.status(200).json({
       success: true,
-      message: "Password reset successfully!",
+      message: 'Password reset successfully!',
     });
   } catch (err) {
     await session.abortTransaction();
@@ -295,22 +305,22 @@ exports.checkAuth = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const user = await User.findById(decoded.id).select("-password").lean();
+    const user = await User.findById(decoded.id).select('-password').lean();
     const userRoadmaps = await UserRoadmap.find({ user: user._id })
       .populate({
-        path: "roadmap",
-        select: "title image stagesCount _id",
+        path: 'roadmap',
+        select: 'title image stagesCount _id',
       })
       .lean()
-      .select("roadmap completedStages completed _id");
+      .select('roadmap completedStages completed _id');
 
     user.roadmaps = userRoadmaps;
     if (!user) {
-      return next(new AppError("User not found", 401));
+      return next(new AppError('User not found', 401));
     }
     return res.json({ success: true, user });
   } catch (err) {
-    console.error("JWT verification failed:", err.message);
+    console.error('JWT verification failed:', err.message);
     return res.json({ success: false });
   }
 };

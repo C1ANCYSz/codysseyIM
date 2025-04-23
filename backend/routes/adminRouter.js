@@ -4,6 +4,8 @@ const { protectRoute } = require('../middlewares/protectRoute');
 const Roadmap = require('../models/Roadmap');
 const User = require('../models/User');
 const UserRoadmap = require('../models/UserRoadmap');
+const AppError = require('../utils/AppError');
+const Notification = require('../models/Notification');
 /*
 
 
@@ -176,6 +178,47 @@ router.post(
     }
 
     res.json({ success: true, message: 'User updated successfully' });
+  }
+);
+
+router.post(
+  '/notification',
+  protectRoute,
+  restrictTo('admin'),
+  async (req, res, next) => {
+    const { text } = req.body;
+
+    let notification = await Notification.findOne();
+
+    if (!notification) {
+      await Notification.create({ text });
+      return res.json({
+        success: true,
+        message: 'Notification created successfully',
+      });
+    }
+
+    notification.text = text;
+    await notification.save({ validateBeforeSave: false });
+
+    res.json({ success: true, message: 'Notification updated successfully' });
+  }
+);
+
+router.delete(
+  '/notification',
+  protectRoute,
+  restrictTo('admin'),
+  async (req, res, next) => {
+    let notification = await Notification.findOne();
+
+    if (!notification) {
+      return next(new AppError('No notification found', 404));
+    }
+
+    await Notification.findByIdAndDelete(notification._id);
+
+    res.json({ success: true, message: 'Notification deleted successfully' });
   }
 );
 

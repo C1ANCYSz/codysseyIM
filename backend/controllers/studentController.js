@@ -7,6 +7,7 @@ const puppeteer = require('puppeteer');
 const { generateCertificateHTML } = require('../utils/generateCertificateHTML');
 const Certificate = require('../models/Certificate');
 const UserRoadmap = require('../models/UserRoadmap');
+const Notification = require('../models/Notification');
 
 exports.enrollInRoadmap = async (req, res, next) => {
   const roadmapId = req.params.id;
@@ -209,4 +210,28 @@ exports.downloadCertificate = async (req, res, next) => {
   } catch (err) {
     next(err);
   }
+};
+
+exports.getNotification = async (req, res, next) => {
+  const notification = await Notification.findOne();
+  if (!notification) {
+    return next(new AppError('No notification found', 404));
+  }
+  res.json({ success: true, data: { notification } });
+};
+
+exports.updateStudent = async (req, res, next) => {
+  const { id } = req.user;
+
+  const { password, name, email } = req.body;
+  const user = await User.findById(id);
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+  if (password) user.password = password;
+
+  if (name) user.name = name;
+  if (email) user.email = email;
+  await user.save({ validateBeforeSave: false });
+  res.json({ success: true, message: 'User updated successfully' });
 };

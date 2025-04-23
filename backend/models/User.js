@@ -49,6 +49,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    locations: [String],
+
+    image: String,
+    phoneNumber: String,
 
     verificationToken: String,
     verificationTokenExpiresAt: Date,

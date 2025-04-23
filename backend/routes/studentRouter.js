@@ -9,6 +9,7 @@ const {
   roadmapProgress,
   getCertificates,
   downloadCertificate,
+  getNotification,
 } = require('../controllers/studentController');
 
 router.post(
@@ -39,6 +40,13 @@ router.get(
   protectRoute,
   restrictTo('student'),
   downloadCertificate
+);
+
+router.get(
+  '/notification',
+  protectRoute,
+  restrictTo('student'),
+  getNotification
 );
 
 router.get('/exam-appointments', protectRoute, async (req, res, next) => {});
