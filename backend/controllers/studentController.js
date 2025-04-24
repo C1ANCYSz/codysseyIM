@@ -212,14 +212,6 @@ exports.downloadCertificate = async (req, res, next) => {
   }
 };
 
-exports.getNotification = async (req, res, next) => {
-  const notification = await Notification.findOne();
-  if (!notification) {
-    return next(new AppError('No notification found', 404));
-  }
-  res.json({ success: true, data: { notification } });
-};
-
 exports.updateStudent = async (req, res, next) => {
   const { id } = req.user;
 

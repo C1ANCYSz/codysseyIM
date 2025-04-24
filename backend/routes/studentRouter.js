@@ -42,13 +42,6 @@ router.get(
   downloadCertificate
 );
 
-router.get(
-  '/notification',
-  protectRoute,
-  restrictTo('student'),
-  getNotification
-);
-
 router.get('/exam-appointments', protectRoute, async (req, res, next) => {});
 
 module.exports = router;

@@ -1,9 +1,15 @@
 const router = require('express').Router();
 
 const { protectRoute } = require('../middlewares/protectRoute');
-const { getNotification } = require('../controllers/studentController');
-const { updateUser } = require('../controllers/userController');
+const {
+  getNotification,
+  getSettings,
+  updateUser,
+} = require('../controllers/userController');
+
 router.get('/notification', protectRoute, getNotification);
+
+router.get('/settings', protectRoute, getSettings);
 
 router.put('/settings', protectRoute, updateUser);
 
