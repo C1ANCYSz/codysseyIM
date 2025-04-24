@@ -2,27 +2,75 @@ exports.VERIFICATION_EMAIL_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Verify Your Email</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .email-wrapper {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(to right, rebeccapurple, #6a0dad);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+    }
+    .content {
+      padding: 24px;
+    }
+    .code {
+      text-align: center;
+      font-size: 36px;
+      font-weight: bold;
+      letter-spacing: 8px;
+      color: rebeccapurple;
+      margin: 24px 0;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      padding: 16px;
+      background-color: #f1f1f1;
+    }
+    p {
+      margin: 16px 0;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
-    <h1 style="color: white; margin: 0;">Verify Your Email</h1>
-  </div>
-  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <p>Hello,</p>
-    <p>Thank you for signing up! Your verification code is:</p>
-    <div style="text-align: center; margin: 30px 0;">
-      <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #4CAF50;">{verificationCode}</span>
+<body>
+  <div class="email-wrapper">
+    <div class="header">
+      <h1>Verify Your Email</h1>
     </div>
-    <p>Enter this code on the verification page to complete your registration.</p>
-    <p>This code will expire in 15 minutes for security reasons.</p>
-    <p>If you didn't create an account with us, please ignore this email.</p>
-    <p>Best regards,<br>Your App Team</p>
-  </div>
-  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
-    <p>This is an automated message, please do not reply to this email.</p>
+    <div class="content">
+      <p>Hello,</p>
+      <p>Thank you for signing up! Your verification code is:</p>
+      <div class="code">{verificationCode}</div>
+      <p>Enter this code on the verification page to complete your registration.</p>
+      <p>This code will expire in 15 minutes for security reasons.</p>
+      <p>If you didn't create an account with us, please ignore this email.</p>
+      <p>Best regards,<br><strong>CODYSSEY</strong></p>
+    </div>
+    <div class="footer">
+      This is an automated message, please do not reply to this email.
+    </div>
   </div>
 </body>
 </html>
@@ -32,34 +80,78 @@ exports.PASSWORD_RESET_SUCCESS_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Password Reset Successful</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .wrapper {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(to right, rebeccapurple, #6a0dad);
+      color: white;
+      text-align: center;
+      padding: 24px;
+    }
+    .content {
+      padding: 24px;
+    }
+    .icon-circle {
+      background-color: rebeccapurple;
+      color: white;
+      width: 60px;
+      height: 60px;
+      line-height: 60px;
+      border-radius: 50%;
+      font-size: 30px;
+      margin: 0 auto 24px auto;
+      text-align: center;
+    }
+    ul {
+      padding-left: 20px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      background-color: #f1f1f1;
+      padding: 16px;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
-    <h1 style="color: white; margin: 0;">Password Reset Successful</h1>
-  </div>
-  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <p>Hello,</p>
-    <p>We're writing to confirm that your password has been successfully reset.</p>
-    <div style="text-align: center; margin: 30px 0;">
-      <div style="background-color: #4CAF50; color: white; width: 50px; height: 50px; line-height: 50px; border-radius: 50%; display: inline-block; font-size: 30px;">
-        ✓
-      </div>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>Password Reset Successful</h1>
     </div>
-    <p>If you did not initiate this password reset, please contact our support team immediately.</p>
-    <p>For security reasons, we recommend that you:</p>
-    <ul>
-      <li>Use a strong, unique password</li>
-      <li>Enable two-factor authentication if available</li>
-      <li>Avoid using the same password across multiple sites</li>
-    </ul>
-    <p>Thank you for helping us keep your account secure.</p>
-    <p>Best regards,<br>Your App Team</p>
-  </div>
-  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
-    <p>This is an automated message, please do not reply to this email.</p>
+    <div class="content">
+      <p>Hello,</p>
+      <p>Your password has been successfully reset.</p>
+      <div class="icon-circle">✓</div>
+      <p>If you didn't initiate this, contact support immediately.</p>
+      <p>Security recommendations:</p>
+      <ul>
+        <li>Use a strong, unique password</li>
+        <li>Enable two-factor authentication</li>
+        <li>Don’t reuse passwords across websites</li>
+      </ul>
+      <p>Best regards,<br><strong>CODYSSEY</strong></p>
+    </div>
+    <div class="footer">
+      This is an automated message, please do not reply.
+    </div>
   </div>
 </body>
 </html>
@@ -69,81 +161,136 @@ exports.PASSWORD_RESET_REQUEST_TEMPLATE = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Reset Your Password</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .wrapper {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+      overflow: hidden;
+    }
+    .header {
+      background: linear-gradient(to right, rebeccapurple, #6a0dad);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    .content {
+      padding: 24px;
+    }
+    .btn {
+      display: inline-block;
+      background-color: rebeccapurple;
+      color: white;
+      padding: 12px 24px;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: bold;
+      margin: 24px auto;
+      text-align: center;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #888;
+      background-color: #f1f1f1;
+      padding: 16px;
+    }
+  </style>
 </head>
-<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-  <div style="background: linear-gradient(to right, #4CAF50, #45a049); padding: 20px; text-align: center;">
-    <h1 style="color: white; margin: 0;">Password Reset</h1>
-  </div>
-  <div style="background-color: #f9f9f9; padding: 20px; border-radius: 0 0 5px 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-    <p>Hello,</p>
-    <p>We received a request to reset your password. If you didn't make this request, please ignore this email.</p>
-    <p>To reset your password, click the button below:</p>
-    <div style="text-align: center; margin: 30px 0;">
-      <a href="{resetURL}" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-weight: bold;">Reset Password</a>
+<body>
+  <div class="wrapper">
+    <div class="header">
+      <h1>Password Reset</h1>
     </div>
-    <p>This link will expire in 1 hour for security reasons.</p>
-    <p>Best regards,<br>Your App Team</p>
-  </div>
-  <div style="text-align: center; margin-top: 20px; color: #888; font-size: 0.8em;">
-    <p>This is an automated message, please do not reply to this email.</p>
+    <div class="content">
+      <p>Hello,</p>
+      <p>We received a request to reset your password.</p>
+      <p>If this wasn't you, you can safely ignore this message.</p>
+      <div style="text-align: center;">
+        <a href="{resetURL}" class="btn">Reset Password</a>
+      </div>
+      <p>This link will expire in 1 hour.</p>
+      <p>Best regards,<br><strong>CODYSSEY</strong></p>
+    </div>
+    <div class="footer">
+      This is an automated message, please do not reply.
+    </div>
   </div>
 </body>
 </html>
 `;
 
 exports.WELCOME_EMAIL = `
- <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to Our Platform</title>
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-        color: #333;
-        margin: 0;
-        padding: 0;
-        background-color: #f4f4f4;
-      }
-      .container {
-        width: 80%;
-        margin: 0 auto;
-        background: #ffffff;
-        padding: 20px;
-        border-radius: 8px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      }
-      h1 {
-        color: #333;
-      }
-      p {
-        font-size: 16px;
-        line-height: 1.5;
-      }
-      .footer {
-        margin-top: 20px;
-        font-size: 14px;
-        color: #777;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Welcome to Our Platform</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(to right, rebeccapurple, #6a0dad);
+      color: white;
+      text-align: center;
+      padding: 24px;
+      border-radius: 10px 10px 0 0;
+    }
+    h1 {
+      margin: 0;
+    }
+    .footer {
+      margin-top: 24px;
+      font-size: 12px;
+      text-align: center;
+      color: #888;
+      border-top: 1px solid #eaeaea;
+      padding-top: 16px;
+    }
+    p {
+      line-height: 1.6;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
       <h1>Welcome, {name}!</h1>
-      <p>Hello,</p>
-      <p>Thank you for joining our platform. We’re excited to have you on board!</p>
-      <p>If you have any questions or need assistance, feel free to reach out to our support team.</p>
-      <p>Best regards,<br>The Team</p>
-      <div class="footer">
-        <p>&copy; ${new Date().getFullYear()} Our Platform. All rights reserved.</p>
-      </div>
     </div>
-  </body>
-  </html>
-  
-
+    <p>Hello,</p>
+    <p>We're thrilled to have you join our platform. Get ready for an awesome experience!</p>
+    <p>If you have any questions or need help, just reach out to our support team—we're here for you.</p>
+    <p>Best regards,<br><strong>CODYSSEY</strong></p>
+    <div class="footer">
+      &copy; ${new Date().getFullYear()} Our Platform. All rights reserved.
+    </div>
+  </div>
+</body>
+</html>
 `;
