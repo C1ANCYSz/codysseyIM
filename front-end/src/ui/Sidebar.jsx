@@ -15,7 +15,7 @@ import {
   FiBell,
 } from "react-icons/fi";
 import { TbFileCertificate } from "react-icons/tb";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { useLogout } from "../hooks/auth/useLogout";
 import { useUiContext } from "../context/UiContext";
 import { useGetNotification } from "../hooks/user/useGetNotification";
@@ -179,7 +179,7 @@ function Sidebar({ user }) {
         {/* Navigation */}
         <nav className="mt-8">
           <ul className="space-y-4">
-            {navItems[role].map((item) => (
+            {navItems[role]?.map((item) => (
               <li key={item.id}>
                 {item.button ? (
                   <button
@@ -220,12 +220,15 @@ function Sidebar({ user }) {
 
               <span className="text-sm font-medium tracking-wide">Logout</span>
             </button>
-            <button className="bg-primary-700 hover:bg-primary-600 flex w-full flex-col items-center justify-center rounded-xl px-4 py-3 text-white shadow-md transition hover:shadow-lg">
+            <Link
+              to="/settings"
+              className="bg-primary-700 hover:bg-primary-600 flex w-full flex-col items-center justify-center rounded-xl px-4 py-3 text-white shadow-md transition hover:shadow-lg"
+            >
               <FiSettings className="mb-1 text-3xl" />
               <span className="text-sm font-medium tracking-wide">
                 Settings
               </span>
-            </button>
+            </Link>
           </div>
         </div>
       </aside>
