@@ -1,5 +1,10 @@
-import { useState } from "react";
-import { FaCalendar, FaUsers } from "react-icons/fa";
+import { useEffect, useRef, useState } from "react";
+import {
+  FaCalendar,
+  FaCheckCircle,
+  FaUsers,
+  FaUserSecret,
+} from "react-icons/fa";
 import {
   FiBookOpen,
   FiHome,
@@ -13,6 +18,9 @@ import { TbFileCertificate } from "react-icons/tb";
 import { NavLink } from "react-router-dom";
 import { useLogout } from "../hooks/auth/useLogout";
 import { useUiContext } from "../context/UiContext";
+import { useGetNotification } from "../hooks/user/useGetNotification";
+import { useEditNotification } from "../hooks/user/admin/useEditNotification";
+import { useForm } from "react-hook-form";
 
 const navItemsStudent = [
   { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
@@ -36,9 +44,17 @@ const navItemsContentManager = [
 
 const navItemsAdmin = [
   { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
-  { to: "/content-managers", icon: <FaUsers />, label: "Content Managers" },
-  { to: "/academies", icon: <FaUsers />, label: "Academies" },
-  { label: "Notifications", icon: <FiBell />, button: true },
+  {
+    to: "/admin/content-managers",
+    icon: <FaUsers />,
+    label: "Content Managers",
+  },
+  { to: "/admin/academies", icon: <FaUsers />, label: "Academies" },
+  {
+    label: "Notifications",
+    icon: <FiBell className="text-xl" />,
+    button: true,
+  },
 ];
 
 const navItems = {
@@ -48,18 +64,86 @@ const navItems = {
 };
 
 function Sidebar({ user }) {
+  const { register, handleSubmit } = useForm();
+
   const { name, role } = user || {};
-  const { setOpenModal } = useUiContext();
   const { logout } = useLogout();
   const [isOpen, setIsOpen] = useState(false);
   const toggleSidebar = () => setIsOpen(!isOpen);
+  const containerRef = useRef(null);
+  const modalRef = useRef(null);
+  const { openModal, setOpenModal } = useUiContext();
+  const { notification, isLoading: isLoadingNotification } =
+    useGetNotification();
+  const { editNotification, isEditing } = useEditNotification();
 
   const handleOpenModal = () => {
     setOpenModal(true);
   };
 
+  function editNotificationHandler(data) {
+    editNotification(data, {
+      onSuccess: () => {
+        setOpenModal(false);
+      },
+    });
+  }
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setOpenModal(false);
+      }
+    }
+    function handleKeyDown(event) {
+      if (event.key === "Escape" && openModal) {
+        setOpenModal(false);
+      }
+    }
+    modalRef.current?.addEventListener("click", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      modalRef.current?.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [openModal]);
   return (
     <>
+      {openModal && (
+        <div
+          ref={modalRef}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm transition-all duration-300"
+        >
+          <div
+            ref={containerRef}
+            className="w-full max-w-md transform rounded-2xl bg-white/10 p-6 shadow-2xl ring-1 ring-white/10 backdrop-blur-md transition-all duration-300 hover:ring-white/20"
+          >
+            <form
+              className="flex flex-col gap-4"
+              onSubmit={handleSubmit(editNotificationHandler)}
+            >
+              <h2 className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-center text-2xl font-bold text-transparent">
+                Notification
+              </h2>
+              <div className="flex items-center justify-between gap-2 rounded-xl border border-white/10 bg-white/5 p-3 text-center text-white placeholder-white/50 transition-all duration-300 outline-none focus:border-white/20 focus:bg-white/10 focus:ring-2 focus:ring-white/10">
+                <input
+                  type="text"
+                  placeholder="Message"
+                  className="flex-1 outline-none"
+                  defaultValue={notification?.text}
+                  {...register("text")}
+                />
+                <button className="cursor-pointer">
+                  <FaCheckCircle className="text-2xl text-green-500" />
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       <button
         onClick={toggleSidebar}
         className="fixed top-4 left-4 z-50 block md:hidden"
@@ -78,7 +162,11 @@ function Sidebar({ user }) {
             Codyssey
           </h2>
           <div className="flex items-center gap-3">
-            <FiUser className="text-4xl text-white" />
+            {role === "admin" ? (
+              <FaUserSecret className="text-4xl text-white" />
+            ) : (
+              <FiUser className="text-4xl text-white" />
+            )}
             <div>
               <p className="text-sm md:text-base">Welcome back,</p>
               <p className="text-primary-500 font-bold uppercase md:text-lg">
@@ -95,7 +183,7 @@ function Sidebar({ user }) {
               <li key={item.id}>
                 {item.button ? (
                   <button
-                    className="bg-primary-800/20 hover:bg-primary-800/30 flex w-full cursor-pointer items-center gap-3 rounded-xl px-4 py-3 text-left text-base font-medium capitalize transition-all duration-200"
+                    className="flex w-full cursor-pointer items-center justify-center gap-3 rounded-xl bg-orange-400 px-4 py-3 text-left text-base font-medium capitalize transition-all duration-200 hover:bg-orange-500"
                     onClick={handleOpenModal}
                   >
                     {item.icon}

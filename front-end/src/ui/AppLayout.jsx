@@ -7,9 +7,9 @@ function AppLayout() {
   const { isLoggedIn, user } = useAuth();
   if (isLoggedIn) {
     return (
-      <div className="bg-footer-800 font-body flex h-screen overflow-hidden">
+      <div className="font-body from-primary-900 flex h-screen overflow-hidden bg-gradient-to-br to-black">
         <Sidebar user={user} />
-        <div className="flex-1 overflow-y-auto">
+        <div className="from-primary-900 flex-1 overflow-y-auto bg-gradient-to-br to-black">
           <Outlet />
         </div>
       </div>

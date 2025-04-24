@@ -24,7 +24,7 @@ function Roadmaps() {
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="from-footer-900 to-footer-800 flex min-h-screen bg-gradient-to-br">
+    <div className="flex min-h-screen">
       <div className="container mx-auto p-8">
         <div className="space-y-12">
           {/* Categories Navigation - Fixed */}
@@ -42,7 +42,7 @@ function Roadmaps() {
             {categories.map((category) => (
               <button
                 key={category}
-                className={`transform rounded-full px-6 py-3 text-sm font-medium shadow-lg transition-all duration-300 hover:-translate-y-1 ${
+                className={`transform rounded-full bg-white/5 p-6 px-6 py-3 text-sm font-medium shadow-lg backdrop-blur-sm transition-all duration-300 hover:-translate-y-1 hover:bg-white/10 hover:shadow-xl ${
                   selectedCategory === category
                     ? "bg-primary-600 shadow-primary-600/50 text-white"
                     : "bg-footer-800/80 text-footer-300 hover:bg-footer-700 hover:text-white"
@@ -61,7 +61,7 @@ function Roadmaps() {
                 <Link
                   to={`/roadmaps/${roadmap._id}`}
                   key={roadmap._id}
-                  className="group bg-footer-800/80 hover:shadow-primary-600/20 relative overflow-hidden rounded-2xl p-6 backdrop-blur-sm transition-all duration-500 hover:scale-[1.02] hover:shadow-2xl"
+                  className="group hover:shadow-primary-600/20 relative overflow-hidden rounded-2xl bg-white/10 p-6 backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 hover:shadow-xl"
                 >
                   <div className="from-primary-600/10 absolute inset-0 bg-gradient-to-br to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
                   <div className="relative z-10 flex flex-col items-center">

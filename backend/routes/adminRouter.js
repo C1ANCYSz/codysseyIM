@@ -1,11 +1,11 @@
-const router = require('express').Router();
-const { restrictTo } = require('../middlewares/restrictTo');
-const { protectRoute } = require('../middlewares/protectRoute');
-const Roadmap = require('../models/Roadmap');
-const User = require('../models/User');
-const UserRoadmap = require('../models/UserRoadmap');
-const AppError = require('../utils/AppError');
-const Notification = require('../models/Notification');
+const router = require("express").Router();
+const { restrictTo } = require("../middlewares/restrictTo");
+const { protectRoute } = require("../middlewares/protectRoute");
+const Roadmap = require("../models/Roadmap");
+const User = require("../models/User");
+const UserRoadmap = require("../models/UserRoadmap");
+const AppError = require("../utils/AppError");
+const Notification = require("../models/Notification");
 /*
 
 
@@ -13,34 +13,34 @@ const Notification = require('../models/Notification');
 */
 
 router.get(
-  '/dashboard',
+  "/dashboard",
   protectRoute,
-  restrictTo('admin'),
+  restrictTo("admin"),
   async (req, res, next) => {
     const roadmaps = await Roadmap.countDocuments();
     const contentManagers = await User.countDocuments({
-      role: 'content manager',
+      role: "content manager",
     });
-    const academies = await User.countDocuments({ role: 'academy' });
-    const students = await User.countDocuments({ role: 'student' });
+    const academies = await User.countDocuments({ role: "academy" });
+    const students = await User.countDocuments({ role: "student" });
     //get top 5 roadmaps and how many students completed them
 
     const topRoadmaps = await UserRoadmap.aggregate([
       { $match: { completed: true } },
       {
         $lookup: {
-          from: 'roadmaps',
-          localField: 'roadmap',
-          foreignField: '_id',
-          as: 'roadmap',
+          from: "roadmaps",
+          localField: "roadmap",
+          foreignField: "_id",
+          as: "roadmap",
         },
       },
-      { $unwind: '$roadmap' },
+      { $unwind: "$roadmap" },
       {
         $group: {
-          _id: '$roadmap._id',
-          title: { $first: '$roadmap.title' },
-          category: { $first: '$roadmap.category' },
+          _id: "$roadmap._id",
+          title: { $first: "$roadmap.title" },
+          category: { $first: "$roadmap.category" },
           count: { $sum: 1 },
         },
       },
@@ -59,25 +59,25 @@ router.get(
     const roadmapsByCategory = await Roadmap.aggregate([
       {
         $group: {
-          _id: '$category',
+          _id: "$category",
           count: { $sum: 1 },
         },
       },
       {
         $project: {
           _id: 0,
-          category: '$_id',
+          category: "$_id",
           count: 1,
         },
       },
     ]);
 
     const usersPerDay = await User.aggregate([
-      { $match: { role: 'student' } },
+      { $match: { role: "student" } },
       {
         $group: {
           _id: {
-            $dateToString: { format: '%Y-%m-%d', date: '$createdAt' },
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
           },
           count: { $sum: 1 },
         },
@@ -88,7 +88,7 @@ router.get(
       {
         $project: {
           _id: 0,
-          date: '$_id',
+          date: "$_id",
           count: 1,
         },
       },
@@ -110,12 +110,12 @@ router.get(
 );
 
 router.get(
-  '/content-managers',
+  "/content-managers",
   protectRoute,
-  restrictTo('admin'),
+  restrictTo("admin"),
   async (req, res, next) => {
-    const contentManagers = await User.find({ role: 'content manager' }).select(
-      '_id name email phoneNumber image'
+    const contentManagers = await User.find({ role: "content manager" }).select(
+      "_id name email phoneNumber image isRevoked"
     );
     if (!contentManagers) {
       res.json({ success: true, data: {} });
@@ -125,33 +125,37 @@ router.get(
 );
 
 router.post(
-  '/content-managers',
+  "/content-managers",
   protectRoute,
-  restrictTo('admin'),
+  restrictTo("admin"),
   async (req, res, next) => {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return next(new AppError('No user found with this email', 404));
+      return next(new AppError("No user found with this email", 404));
     }
 
-    if (user.role !== 'content manager') {
-      user.role = 'content manager';
+    if (user.role !== "content manager") {
+      user.role = "content manager";
       await user.save({ validateBeforeSave: false });
     }
 
-    res.json({ success: true, message: 'User updated successfully' });
+    res.json({
+      success: true,
+      message: "User updated successfully",
+      data: { user },
+    });
   }
 );
 
 router.get(
-  '/academies',
+  "/academies",
   protectRoute,
-  restrictTo('admin'),
+  restrictTo("admin"),
   async (req, res, next) => {
-    const academies = await User.find({ role: 'academy' });
+    const academies = await User.find({ role: "academy" });
     if (!academies) {
       res.json({ success: true, data: {} });
     }
@@ -160,31 +164,31 @@ router.get(
 );
 
 router.post(
-  '/academies',
+  "/academies",
   protectRoute,
-  restrictTo('admin'),
+  restrictTo("admin"),
   async (req, res, next) => {
     const { email } = req.body;
 
     const user = await User.findOne({ email });
 
     if (!user) {
-      return next(new AppError('No user found with this email', 404));
+      return next(new AppError("No user found with this email", 404));
     }
 
-    if (user.role !== 'academy') {
-      user.role = 'academy';
+    if (user.role !== "academy") {
+      user.role = "academy";
       await user.save({ validateBeforeSave: false });
     }
 
-    res.json({ success: true, message: 'User updated successfully' });
+    res.json({ success: true, message: "User updated successfully" });
   }
 );
 
 router.post(
-  '/notification',
+  "/notification",
   protectRoute,
-  restrictTo('admin'),
+  restrictTo("admin"),
   async (req, res, next) => {
     const { text } = req.body;
 
@@ -194,47 +198,55 @@ router.post(
       await Notification.create({ text });
       return res.json({
         success: true,
-        message: 'Notification created successfully',
+        message: "Notification created successfully",
       });
     }
 
     notification.text = text;
     await notification.save({ validateBeforeSave: false });
 
-    res.json({ success: true, message: 'Notification updated successfully' });
+    res.json({ success: true, message: "Notification updated successfully" });
   }
 );
 
 router.delete(
-  '/notification',
+  "/notification",
   protectRoute,
-  restrictTo('admin'),
+  restrictTo("admin"),
   async (req, res, next) => {
     let notification = await Notification.findOne();
 
     if (!notification) {
-      return next(new AppError('No notification found', 404));
+      return next(new AppError("No notification found", 404));
     }
 
     await Notification.findByIdAndDelete(notification._id);
 
-    res.json({ success: true, message: 'Notification deleted successfully' });
+    res.json({ success: true, message: "Notification deleted successfully" });
   }
 );
 
-router.put('/revoke', protectRoute, restrictTo('admin'), async (req, res) => {
-  const { email } = req.body;
+router.put(
+  "/toggle-revoke",
+  protectRoute,
+  restrictTo("admin"),
+  async (req, res, next) => {
+    const { email } = req.body;
 
-  const user = await User.findOne({ email });
+    const user = await User.findOne({ email });
 
-  if (!user) {
-    return next(new AppError('No user found with this email', 404));
+    if (!user) {
+      return next(new AppError("No user found with this email", 404));
+    }
+
+    user.isRevoked = !user.isRevoked;
+    await user.save({ validateBeforeSave: false });
+
+    res.json({
+      success: true,
+      message: `User has been ${user.isRevoked ? "revoked" : "unrevoked"}`,
+    });
   }
-
-  user.isRevoked = true;
-  await user.save({ validateBeforeSave: false });
-
-  res.json({ success: true, message: 'User revoked' });
-});
+);
 
 module.exports = router;
