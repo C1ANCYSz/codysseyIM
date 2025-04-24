@@ -24,11 +24,11 @@ export function AuthProvider({ children }) {
 
         const data = await res.json();
         if (data.success) {
+          console.log(data.user);
           setIsLoggedIn(true);
           setUser(data.user);
           // Redirect to the last location if available
           const lastLocation = localStorage.getItem("lastLocation");
-          console.log(lastLocation);
           if (lastLocation) {
             navigate(lastLocation, { replace: true });
           }

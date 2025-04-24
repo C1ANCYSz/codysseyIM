@@ -19,6 +19,7 @@ import AddRoadmap from "./features/content/AddRoadmap";
 import VerifyEmail from "./pages/VerifyEmail";
 import AdminContentManagers from "./ui/AdminContentManagers";
 import AdminAcademies from "./ui/AdminAcademies";
+import Settings from "./pages/Settings";
 function App() {
   return (
     <Router>
@@ -84,6 +85,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <AddRoadmap />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/settings"
+                element={
+                  <PrivateRoute>
+                    <Settings />
                   </PrivateRoute>
                 }
               />
