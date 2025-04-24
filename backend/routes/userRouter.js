@@ -1,5 +1,8 @@
-const router = require('express').Router();
+const router = require("express").Router();
 
-router.get('/settings');
+const { protectRoute } = require("../middlewares/protectRoute");
+const { getNotification } = require("../controllers/studentController");
+
+router.get("/notification", protectRoute, getNotification);
 
 module.exports = router;

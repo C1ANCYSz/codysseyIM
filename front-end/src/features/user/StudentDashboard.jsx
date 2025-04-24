@@ -1,10 +1,12 @@
 import { useGetStudent } from "../../hooks/user/useGetStudent";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaCheck } from "react-icons/fa";
 import Loader from "../../ui/Loader";
-
+import { useGetNotification } from "../../hooks/user/useGetNotification";
+import { toast } from "react-hot-toast";
 function StudentDashboard() {
+  const { notification: { text } = {} } = useGetNotification();
   const { studentData: { roadmaps } = {}, isLoading } = useGetStudent();
   const [filter, setFilter] = useState("all");
   const filteredRoadmaps =
@@ -16,6 +18,19 @@ function StudentDashboard() {
             (roadmap) =>
               roadmap.completedStages !== roadmap.roadmap.stagesCount,
           );
+  useEffect(
+    function () {
+      console.log(text);
+      if (text) {
+        toast.success(text, {
+          duration: 5000,
+          position: "top-right",
+          icon: "🔔",
+        });
+      }
+    },
+    [text],
+  );
 
   if (isLoading) {
     return <Loader />;

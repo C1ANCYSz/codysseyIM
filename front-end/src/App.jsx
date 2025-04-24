@@ -17,6 +17,8 @@ import Appointements from "./pages/Appointements";
 import { UiContextProvider } from "./context/UiContext";
 import AddRoadmap from "./features/content/AddRoadmap";
 import VerifyEmail from "./pages/VerifyEmail";
+import AdminContentManagers from "./ui/AdminContentManagers";
+import AdminAcademies from "./ui/AdminAcademies";
 function App() {
   return (
     <Router>
@@ -33,6 +35,22 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Dashboard />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/content-managers"
+                element={
+                  <PrivateRoute>
+                    <AdminContentManagers />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="/admin/academies"
+                element={
+                  <PrivateRoute>
+                    <AdminAcademies />
                   </PrivateRoute>
                 }
               />
@@ -78,7 +96,25 @@ function App() {
               element={<ResetPassword />}
             ></Route>
           </Routes>
-          <Toaster />
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              duration: 3000,
+              style: {
+                padding: "16px",
+                borderRadius: "12px",
+                fontFamily: "var(--font-body)",
+                fontSize: "18px",
+                fontWeight: "bold",
+                color: "#ffffff",
+                backgroundColor: "var(--color-primary-600)",
+                boxShadow: "rgba(0, 0, 0, 0.25) 0px 25px 50px -12px",
+                backdropFilter: "blur(10px)",
+                WebkitBackdropFilter: "blur(10px)",
+                transition: "all 0.3s ease",
+              },
+            }}
+          />
         </UiContextProvider>
       </AuthProvider>
     </Router>

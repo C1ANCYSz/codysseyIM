@@ -250,7 +250,7 @@ function AdminDashboard() {
       </div>
 
       <div className="flex gap-6">
-        <div className="mb-10 grid flex-2/3 grow-0 grid-cols-2 grid-rows-2 gap-6">
+        <div className="grid flex-2/3 grow-0 grid-cols-2 grid-rows-2 gap-6">
           {stats.map(({ label, value, icon }) => (
             <div
               key={label}
@@ -268,7 +268,7 @@ function AdminDashboard() {
         </div>
 
         <div className="h-[400px] flex-1/3 grow-0 rounded-2xl bg-gray-800/40 p-6 shadow-xl backdrop-blur-sm">
-          <h2 className="mb-6 text-xl font-semibold text-white/90">
+          <h2 className="text-xl font-semibold text-white/90">
             🥧 Roadmap Categories
           </h2>
           <div className="h-full w-full">

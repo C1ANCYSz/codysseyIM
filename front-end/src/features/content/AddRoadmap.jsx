@@ -39,11 +39,11 @@ function AddRoadmap() {
   };
 
   return (
-    <div className="bg-footer-800 font-body flex min-h-screen items-center justify-center p-4">
+    <div className="font-body flex min-h-screen items-center justify-center p-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-footer-900 container max-w-4xl rounded-2xl p-8 shadow-2xl"
+        className="container max-w-4xl rounded-2xl border border-white/10 bg-white/5 p-8 shadow-2xl"
       >
         <h1 className="mb-8 text-center text-3xl font-bold text-white">
           Create New Roadmap
@@ -79,14 +79,14 @@ function AddRoadmap() {
                   <input
                     type="text"
                     placeholder="Enter new category"
-                    className="bg-footer-800 border-primary-600 focus:border-primary-500 w-full rounded-lg border-2 p-3 text-white transition-colors outline-none"
+                    className="border-primary-600 focus:border-primary-500 w-full rounded-lg border-2 bg-white/5 p-3 text-white transition-colors outline-none"
                     {...register("category", {
                       required: "Category is required",
                     })}
                   />
                 ) : (
                   <select
-                    className="bg-footer-800 border-primary-600 focus:border-primary-500 w-full rounded-lg border-2 p-3 text-white transition-colors outline-none"
+                    className="border-primary-600 focus:border-primary-500 w-full rounded-lg border-2 bg-white/10 p-3 text-white transition-colors outline-none focus:bg-black"
                     {...register("category", {
                       required: "Category is required",
                     })}
@@ -116,7 +116,7 @@ function AddRoadmap() {
               <input
                 type="text"
                 placeholder="Roadmap Title"
-                className="bg-footer-800 border-primary-600 focus:border-primary-500 w-full rounded-lg border-2 p-3 text-xl text-white transition-colors outline-none"
+                className="border-primary-600 focus:border-primary-500 w-full rounded-lg border-2 bg-white/5 p-3 text-xl text-white transition-colors outline-none"
                 {...register("title", { required: "Title is required" })}
               />
               {errors.title && (
@@ -127,7 +127,7 @@ function AddRoadmap() {
 
               <textarea
                 placeholder="Roadmap Description"
-                className="bg-footer-800 border-primary-600 focus:border-primary-500 min-h-[100px] w-full rounded-lg border-2 p-3 text-white transition-colors outline-none"
+                className="border-primary-600 focus:border-primary-500 min-h-[100px] w-full rounded-lg border-2 bg-white/5 p-3 text-white transition-colors outline-none"
                 {...register("description", {
                   required: "Description is required",
                 })}
