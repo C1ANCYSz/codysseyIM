@@ -8,6 +8,7 @@ const { generateCertificateHTML } = require('../utils/generateCertificateHTML');
 const Certificate = require('../models/Certificate');
 const UserRoadmap = require('../models/UserRoadmap');
 const Notification = require('../models/Notification');
+const Appointment = require('../models/Appointment');
 
 exports.enrollInRoadmap = async (req, res, next) => {
   const roadmapId = req.params.id;
@@ -134,10 +135,21 @@ exports.roadmapProgress = async (req, res, next) => {
 exports.getCertificates = async (req, res, next) => {
   try {
     const userId = req.user._id;
-    const certificates = await Certificate.find({ user: userId }).populate({
-      path: 'roadmap',
-      select: 'title image',
-    });
+    const certificates = await Certificate.find({ user: userId })
+      .populate({
+        path: 'roadmap',
+        select: 'title image',
+      })
+      .lean();
+
+    for (const certificate of certificates) {
+      const exists = await Appointment.exists({
+        user: userId,
+        roadmap: certificate.roadmap._id,
+      });
+
+      certificate.isBooked = !!exists;
+    }
 
     if (certificates.length === 0) {
       return res.status(200).json({

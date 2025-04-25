@@ -66,27 +66,12 @@ router.get('/appointments', protectRoute, async (req, res, next) => {
 
 router.get('/book-appointment', protectRoute, async (req, res, next) => {
   const academies = await User.find({ role: 'academy' });
-  const userRoadmaps = await UserRoadmap.find({
-    user: req.user.id,
-    completed: true,
-  })
-    .populate({
-      path: 'roadmap',
-      select: 'title image _id',
-    })
-    .select('roadmap -_id');
+
   if (!academies) {
     return res.json({ success: true, message: 'No academies found', data: {} });
   }
 
-  if (!userRoadmaps) {
-    return res.json({
-      success: true,
-      message: 'complete some roadmaps first to undergo a final exam',
-      data: {},
-    });
-  }
-  res.json({ success: true, data: { academies, userRoadmaps } });
+  res.json({ success: true, data: { academies } });
 });
 
 router.post('/book-appointment', protectRoute, async (req, res, next) => {

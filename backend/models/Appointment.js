@@ -20,7 +20,7 @@ const appointmentSchema = new mongoose.Schema({
   location: String,
   status: {
     type: String,
-    enum: ['pending', 'accepted', 'rejected'],
+    enum: ['pending', 'accepted', 'rejected', 'completed'],
     default: 'pending',
   },
   examDate: Date,
