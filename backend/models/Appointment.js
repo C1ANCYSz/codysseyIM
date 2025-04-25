@@ -8,7 +8,7 @@ const appointmentSchema = new mongoose.Schema({
   },
   academy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Academy',
+    ref: 'User',
     required: true,
   },
   roadmap: {

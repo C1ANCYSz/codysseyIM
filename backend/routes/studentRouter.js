@@ -47,7 +47,15 @@ router.get(
 );
 
 router.get('/appointments', protectRoute, async (req, res, next) => {
-  const appointments = await Appointment.find({ user: req.user.id });
+  const appointments = await Appointment.find({ user: req.user.id })
+    .populate({
+      path: 'roadmap',
+      select: 'title image',
+    })
+    .populate({
+      path: 'academy',
+      select: 'name email image',
+    });
 
   if (!appointments) {
     return res.json({ success: true, data: {} });
