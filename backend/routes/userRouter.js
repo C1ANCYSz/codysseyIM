@@ -1,6 +1,9 @@
 const router = require('express').Router();
 
 const { protectRoute } = require('../middlewares/protectRoute');
+const { restrictTo } = require('../middlewares/restrictTo');
+const AppError = require('../utils/AppError');
+const Appointment = require('../models/Appointment');
 const {
   getNotification,
   getSettings,

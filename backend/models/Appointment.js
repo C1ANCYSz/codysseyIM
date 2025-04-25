@@ -16,8 +16,7 @@ const appointmentSchema = new mongoose.Schema({
     ref: 'Roadmap',
     required: true,
   },
-  from: Date,
-  to: Date,
+
   location: String,
   status: {
     type: String,
