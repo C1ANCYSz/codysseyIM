@@ -3,6 +3,7 @@ import { useAuth } from "../context/AuthProvider";
 import Loader from "../ui/Loader";
 import ContentManagerDashboard from "../features/user/ContentManagerDashboard";
 import AdminDashboard from "../features/user/AdminDashboard";
+import AcademyDashboard from "../features/user/AcademyDashboard";
 function Dashboard() {
   const { user, isLoading } = useAuth();
 
@@ -17,6 +18,9 @@ function Dashboard() {
   }
   if (user.role === "content manager") {
     return <ContentManagerDashboard />;
+  }
+  if (user.role === "academy") {
+    return <AcademyDashboard />;
   }
 }
 

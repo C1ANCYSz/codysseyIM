@@ -20,6 +20,7 @@ import VerifyEmail from "./pages/VerifyEmail";
 import AdminContentManagers from "./ui/AdminContentManagers";
 import AdminAcademies from "./ui/AdminAcademies";
 import Settings from "./pages/Settings";
+import BookAppointment from "./features/content/BookAppointment";
 function App() {
   return (
     <Router>
@@ -60,6 +61,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Certificates />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="book-appointment/:roadmapId"
+                element={
+                  <PrivateRoute>
+                    <BookAppointment />
                   </PrivateRoute>
                 }
               />
