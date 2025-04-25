@@ -21,6 +21,9 @@ import { useUiContext } from "../context/UiContext";
 import { useGetNotification } from "../hooks/user/useGetNotification";
 import { useEditNotification } from "../hooks/user/admin/useEditNotification";
 import { useForm } from "react-hook-form";
+import { RiCalendarScheduleLine } from "react-icons/ri";
+import { AiOutlineSchedule } from "react-icons/ai";
+import { GrScheduleNew } from "react-icons/gr";
 
 const navItemsStudent = [
   { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
@@ -32,8 +35,8 @@ const navItemsStudent = [
   },
   {
     to: "/appointments",
-    icon: <FaCalendar />,
-    label: "Book an appointment",
+    icon: <GrScheduleNew />,
+    label: "Appointments",
   },
 ];
 
@@ -56,11 +59,25 @@ const navItemsAdmin = [
     button: true,
   },
 ];
+const navItemsAcademy = [
+  { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
+  {
+    to: "/academy/pending-appointments",
+    icon: <RiCalendarScheduleLine />,
+    label: "Pending Appointments",
+  },
+  {
+    to: "/academy/accepted-appointments",
+    icon: <AiOutlineSchedule />,
+    label: "Accepted Appointments",
+  },
+];
 
 const navItems = {
   student: navItemsStudent,
   "content manager": navItemsContentManager,
   admin: navItemsAdmin,
+  academy: navItemsAcademy,
 };
 
 function Sidebar({ user }) {

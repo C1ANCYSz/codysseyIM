@@ -13,7 +13,6 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     // Store the current location before checking login status
     localStorage.setItem("lastLocation", location.pathname);
-    console.log(location.pathname);
     const checkLogin = async () => {
       try {
         setIsLoading(true);
@@ -24,7 +23,6 @@ export function AuthProvider({ children }) {
 
         const data = await res.json();
         if (data.success) {
-          console.log(data.user);
           setIsLoggedIn(true);
           setUser(data.user);
           // Redirect to the last location if available
@@ -34,7 +32,6 @@ export function AuthProvider({ children }) {
           }
         }
       } catch (error) {
-        console.error("Error checking login status:", error);
         setIsLoggedIn(false);
         navigate("/login", { replace: true });
       } finally {

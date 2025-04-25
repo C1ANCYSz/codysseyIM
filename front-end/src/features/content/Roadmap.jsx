@@ -14,11 +14,12 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthProvider";
 import Loader from "../../ui/Loader";
 import { useAddStage } from "../../hooks/user/content-manager/useAddStage";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useDeleteStage } from "../../hooks/user/content-manager/useDeleteStage";
 import { useDeleteRoadmap } from "../../hooks/user/content-manager/useDeleteRoadmap";
+import confetti from "canvas-confetti";
 
 function Roadmap() {
   const navigate = useNavigate();
@@ -26,217 +27,288 @@ function Roadmap() {
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [stageToDelete, setStageToDelete] = useState(null);
   const [openDeleteRoadmapModal, setOpenDeleteRoadmapModal] = useState(false);
-  const [roadmapToDelete, setRoadmapToDelete] = useState(null);
+  const addStageModalRef = useRef(null);
+  const containerRef = useRef(null);
   const { roadmap, isLoading, error } = useGetRoadmap();
-  console.log(roadmap);
   const { isLoggedIn, user } = useAuth();
-
-  console.log(user);
   const { role } = user || {};
-  console.log(role);
-  const { enroll, isLoading: enrollLoading, error: enrollError } = useEnroll();
-  const { register, handleSubmit } = useForm();
-  const {
-    studentData,
-    isLoading: userLoading,
-    error: userError,
-  } = useGetStudent();
-  console.log(studentData);
-  const {
-    addStage,
-    isLoading: addStageLoading,
-    error: addStageError,
-  } = useAddStage();
+  const { enroll, isLoading: enrollLoading } = useEnroll();
+  const { register, handleSubmit, reset } = useForm();
+  const { studentData, isLoading: userLoading } = useGetStudent();
+  const { addStage, isLoading: addStageLoading } = useAddStage();
   const { deleteStage, isLoading: deleteStageLoading } = useDeleteStage();
   const { deleteRoadmap, isLoading: deleteRoadmapLoading } = useDeleteRoadmap();
 
   const isEnrolled = studentData?.roadmaps?.some(
     (currentRoadmap) => currentRoadmap.roadmap._id === roadmap?._id,
   );
-  console.log(isEnrolled);
+
   const completedStages = studentData?.roadmaps?.find(
     (currentRoadmap) => currentRoadmap.roadmap._id === roadmap?._id,
   )?.completedStages;
 
+  useEffect(() => {
+    if (completedStages === roadmap?.stagesCount && isEnrolled) {
+      confetti({
+        particleCount: 500,
+        spread: 520,
+        origin: { y: -0.5 },
+        colors: ["#FF0000", "#00FF00", "#0000FF"],
+      });
+    }
+  }, [completedStages, roadmap?.stagesCount, isEnrolled]);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target)
+      ) {
+        setOpenModal(false);
+      }
+    };
+    const handleEscapeKey = (event) => {
+      if (event.key === "Escape" && openModal) {
+        setOpenModal(false);
+      }
+    };
+    if (openModal) {
+      addStageModalRef.current.addEventListener("click", handleClickOutside);
+      document.addEventListener("keydown", handleEscapeKey);
+    }
+    return () => {
+      if (addStageModalRef.current) {
+        addStageModalRef.current.removeEventListener(
+          "click",
+          handleClickOutside,
+        );
+      }
+      document.removeEventListener("keydown", handleEscapeKey);
+    };
+  }, [openModal]);
+
   let currentStage;
 
   if (
-    roadmap &&
-    roadmap.stages &&
+    roadmap?.stages &&
     typeof completedStages === "number" &&
     typeof roadmap.stagesCount === "number"
   ) {
-    if (completedStages === roadmap.stagesCount) {
-      currentStage = roadmap.stagesCount;
-    } else {
-      currentStage =
-        roadmap.stages.find((stage) => stage.number === completedStages + 1) ??
-        completedStages + 1;
-    }
+    currentStage =
+      completedStages === roadmap.stagesCount
+        ? roadmap.stagesCount
+        : (roadmap.stages.find(
+            (stage) => stage.number === completedStages + 1,
+          ) ?? completedStages + 1);
   }
 
-  function onSubmit(data) {
+  const onSubmit = async (data) => {
     const stageData = {
       title: data.title,
       description: data.description,
       type: data.type,
       number: roadmap.stagesCount + 1,
+      ...(data.type === "quiz" && { questions: [] }),
+      ...(data.type === "content" && { videos: [] }),
     };
-    data.type === "quiz" && (stageData.questions = []);
-    data.type === "content" && (stageData.videos = []);
-    console.log(stageData);
-    addStage(stageData, {
-      onSuccess: () => {
-        setOpenModal(false);
-      },
-    });
-  }
+
+    try {
+      await addStage(stageData);
+      setOpenModal(false);
+      reset();
+    } catch (err) {
+      console.error("Failed to add stage:", err);
+    }
+  };
+
   if (isLoading || userLoading) return <Loader />;
 
   return (
-    <div className="bg-footer-800 font-body flex min-h-screen">
-      {openDeleteRoadmapModal && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-        >
+    <div className="from-primary-900 font-body min-h-screen bg-gradient-to-br to-black">
+      <AnimatePresence>
+        {openDeleteRoadmapModal && (
           <motion.div
-            initial={{ opacity: 0, translateY: 100 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            exit={{ opacity: 0, translateY: -100 }}
-            className="bg-footer-900 z-50 w-full max-w-md space-y-4 rounded-lg p-8 text-white shadow-lg"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
           >
-            <h2 className="mb-4 text-center text-2xl font-bold">
-              Are you sure you want to delete this roadmap?
-            </h2>
-            <div className="flex justify-center gap-4">
-              <button
-                className="rounded-full bg-red-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-red-700"
-                onClick={() => {
-                  deleteRoadmap();
-                  setOpenDeleteRoadmapModal(false);
-                }}
-                disabled={deleteRoadmapLoading}
-              >
-                {deleteRoadmapLoading ? "Deleting..." : "Yes"}
-              </button>
-              <button
-                className="bg-primary-600 hover:bg-primary-700 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
-                onClick={() => setOpenDeleteRoadmapModal(false)}
-                disabled={deleteRoadmapLoading}
-              >
-                {deleteRoadmapLoading ? "Cancelling..." : "No"}
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-      {openDeleteModal && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
-        >
-          <motion.div
-            initial={{ opacity: 0, translateY: 100 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            exit={{ opacity: 0, translateY: -100 }}
-            className="bg-footer-900 z-50 w-full max-w-md space-y-4 rounded-lg p-8 text-white shadow-lg"
-          >
-            <h2 className="mb-4 text-center text-2xl font-bold">
-              Are you sure you want to delete this stage?
-            </h2>
-            <div className="flex justify-center gap-4">
-              <button
-                className="rounded-full bg-red-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-red-700"
-                onClick={() => {
-                  deleteStage(stageToDelete);
-                  setOpenDeleteModal(false);
-                }}
-                disabled={deleteStageLoading}
-              >
-                {deleteStageLoading ? "Deleting..." : "Yes"}
-              </button>
-              <button
-                className="bg-primary-600 hover:bg-primary-700 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
-                onClick={() => setOpenDeleteModal(false)}
-                disabled={deleteStageLoading}
-              >
-                {deleteStageLoading ? "Cancelling..." : "No"}
-              </button>
-            </div>
-          </motion.div>
-        </motion.div>
-      )}
-      {openModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70">
-          <div className="bg-footer-900 z-50 w-full max-w-md space-y-4 rounded-lg p-8 text-white shadow-lg">
-            <h2 className="mb-4 text-center text-2xl font-bold">Add Stage</h2>
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-              <div className="flex flex-col gap-2">
-                <label htmlFor="title" className="text-sm font-medium">
-                  Title
-                </label>
-                <input
-                  type="text"
-                  id="title"
-                  placeholder="Stage title"
-                  className="border-primary-600 w-full rounded-md border-2 p-2 outline-none"
-                  {...register("title", { required: true })}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <label htmlFor="description" className="text-sm font-medium">
-                  Description
-                </label>
-                <input
-                  type="text"
-                  id="description"
-                  placeholder="Stage description"
-                  className="border-primary-600 w-full rounded-md border-2 p-2 outline-none"
-                  {...register("description", { required: true })}
-                />
-              </div>
-              <div className="flex flex-col gap-2">
-                <select
-                  id="type"
-                  className="border-primary-600 bg-footer-900 w-full rounded-md border-2 p-2 outline-none"
-                  {...register("type", { required: true })}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-footer-900 z-50 w-full max-w-md space-y-4 rounded-2xl border border-white/10 p-8 text-white shadow-2xl"
+            >
+              <h2 className="mb-4 bg-gradient-to-r from-red-500 to-purple-600 bg-clip-text text-center text-2xl font-bold text-transparent">
+                Are you sure you want to delete this roadmap?
+              </h2>
+              <div className="flex justify-center gap-4">
+                <button
+                  className="rounded-full bg-gradient-to-r from-red-600 to-red-700 px-6 py-2 text-sm font-semibold text-white transition-all hover:from-red-700 hover:to-red-800 hover:shadow-lg disabled:opacity-50"
+                  onClick={() => {
+                    deleteRoadmap();
+                    setOpenDeleteRoadmapModal(false);
+                  }}
+                  disabled={deleteRoadmapLoading}
                 >
-                  <option value="content" className="text-white">
-                    Content
-                  </option>
-                  <option value="quiz" className="text-white">
-                    Quiz
-                  </option>
-                </select>
+                  {deleteRoadmapLoading ? "Deleting..." : "Yes"}
+                </button>
+                <button
+                  className="from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 rounded-full bg-gradient-to-r px-6 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg disabled:opacity-50"
+                  onClick={() => setOpenDeleteRoadmapModal(false)}
+                  disabled={deleteRoadmapLoading}
+                >
+                  {deleteRoadmapLoading ? "Cancelling..." : "No"}
+                </button>
               </div>
-              <button
-                type="submit"
-                className="bg-primary-600 hover:bg-primary-700 w-full cursor-pointer rounded-md px-4 py-2 text-white transition-all duration-300"
-              >
+            </motion.div>
+          </motion.div>
+        )}
+
+        {openDeleteModal && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-footer-900 z-50 w-full max-w-md space-y-4 rounded-2xl border border-white/10 p-8 text-white shadow-2xl"
+            >
+              <h2 className="mb-4 bg-gradient-to-r from-red-500 to-purple-600 bg-clip-text text-center text-2xl font-bold text-transparent">
+                Are you sure you want to delete this stage?
+              </h2>
+              <div className="flex justify-center gap-4">
+                <button
+                  className="rounded-full bg-gradient-to-r from-red-600 to-red-700 px-6 py-2 text-sm font-semibold text-white transition-all hover:from-red-700 hover:to-red-800 hover:shadow-lg disabled:opacity-50"
+                  onClick={() => {
+                    deleteStage(stageToDelete);
+                    setOpenDeleteModal(false);
+                  }}
+                  disabled={deleteStageLoading}
+                >
+                  {deleteStageLoading ? "Deleting..." : "Yes"}
+                </button>
+                <button
+                  className="from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 rounded-full bg-gradient-to-r px-6 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg disabled:opacity-50"
+                  onClick={() => setOpenDeleteModal(false)}
+                  disabled={deleteStageLoading}
+                >
+                  {deleteStageLoading ? "Cancelling..." : "No"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+
+        {openModal && (
+          <motion.div
+            ref={addStageModalRef}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+          >
+            <motion.div
+              ref={containerRef}
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="bg-footer-900 z-50 w-full max-w-md space-y-4 rounded-2xl border border-white/10 p-8 text-white shadow-2xl"
+            >
+              <h2 className="mb-4 bg-gradient-to-r from-blue-500 to-purple-600 bg-clip-text text-center text-2xl font-bold text-transparent">
                 Add Stage
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-      <div className="container mx-auto my-10">
+              </h2>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="title"
+                    className="text-sm font-medium text-gray-300"
+                  >
+                    Title
+                  </label>
+                  <input
+                    type="text"
+                    id="title"
+                    placeholder="Stage title"
+                    className="border-primary-600/50 bg-footer-800 focus:border-primary-600 w-full rounded-lg border-2 p-2 transition-all outline-none"
+                    {...register("title", { required: true })}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <label
+                    htmlFor="description"
+                    className="text-sm font-medium text-gray-300"
+                  >
+                    Description
+                  </label>
+                  <input
+                    type="text"
+                    id="description"
+                    placeholder="Stage description"
+                    className="border-primary-600/50 bg-footer-800 focus:border-primary-600 w-full rounded-lg border-2 p-2 transition-all outline-none"
+                    {...register("description", { required: true })}
+                  />
+                </div>
+                <div className="flex flex-col gap-2">
+                  <select
+                    id="type"
+                    className="border-primary-600/50 bg-footer-800 focus:border-primary-600 w-full rounded-lg border-2 p-2 transition-all outline-none"
+                    {...register("type", { required: true })}
+                  >
+                    <option
+                      value="content"
+                      className="bg-footer-800 text-white"
+                    >
+                      Content
+                    </option>
+                    <option value="quiz" className="bg-footer-800 text-white">
+                      Quiz
+                    </option>
+                  </select>
+                </div>
+                <button
+                  type="submit"
+                  className="from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 w-full cursor-pointer rounded-lg bg-gradient-to-r px-4 py-2 text-white transition-all duration-300 hover:shadow-lg"
+                >
+                  Add Stage
+                </button>
+              </form>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="container mx-auto px-4 py-10">
         {/* Header Section */}
-        <div className="mb-8 flex flex-col items-center gap-6 border-b border-white pb-4 md:flex-row">
-          <img
+        <div className="mb-8 flex flex-col items-center gap-6 border-b border-white/20 pb-4 md:flex-row">
+          <motion.img
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
             src={roadmap.image}
             alt={roadmap.title}
-            className="h-32 w-32 object-contain"
+            className="h-32 w-32 rounded-2xl object-contain shadow-2xl"
           />
           <div className="flex-1 space-y-2 text-center md:text-left">
-            <h1 className="text-3xl font-bold text-white">{roadmap.title}</h1>
-            <p className="text-lg text-gray-300">{roadmap.description}</p>
+            <motion.h1
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-gradient-to-r from-white to-gray-300 bg-clip-text text-4xl font-bold text-transparent"
+            >
+              {roadmap.title}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="text-lg text-gray-300"
+            >
+              {roadmap.description}
+            </motion.p>
             <div className="flex flex-wrap items-center gap-4">
-              <span className="rounded-full bg-blue-500/20 px-4 py-1 text-sm text-blue-300">
+              <span className="rounded-full border border-blue-500/30 bg-blue-500/20 px-4 py-1 text-sm text-blue-300">
                 {roadmap.category}
               </span>
               <span className="text-gray-400">
@@ -244,10 +316,13 @@ function Roadmap() {
               </span>
             </div>
           </div>
+
           {(role === "student" || role === undefined) &&
             (!isEnrolled ? (
-              <button
-                className="bg-primary-600 hover:bg-primary-700 cursor-pointer rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="from-primary-600 to-primary-700 rounded-full bg-gradient-to-r px-6 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg"
                 onClick={() => {
                   if (isLoggedIn) {
                     enroll(roadmap._id);
@@ -258,61 +333,78 @@ function Roadmap() {
                 disabled={enrollLoading}
               >
                 {enrollLoading ? "Enrolling..." : "Enroll"}
-              </button>
+              </motion.button>
             ) : studentData?.roadmaps.some(
                 (currentRoadmap) =>
                   currentRoadmap.roadmap._id === roadmap._id &&
                   currentRoadmap.completed,
               ) ? (
-              <button
-                className="flex cursor-pointer items-center gap-2 rounded-full bg-green-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-green-700"
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-green-600 to-green-700 px-6 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg"
                 onClick={() => {
                   navigate(`/certificates`);
                 }}
               >
                 <FaCertificate className="text-lg" />
                 Get Your Certificate
-              </button>
+              </motion.button>
             ) : (
-              <Link
-                to={`/roadmaps/${roadmap._id}/stage/${currentStage?.number}`}
-                className="bg-primary-600 hover:bg-primary-700 flex cursor-pointer items-center gap-2 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <FaPlay className="text-sm" />
-                {currentStage?.number > 1
-                  ? "Continue Learning"
-                  : "Start Learning"}
-              </Link>
+                <Link
+                  to={`/roadmaps/${roadmap._id}/stage/${currentStage?.number}`}
+                  className="from-primary-600 to-primary-700 flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r px-6 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg"
+                >
+                  <FaPlay className="text-sm" />
+                  {currentStage?.number > 1
+                    ? "Continue Learning"
+                    : "Start Learning"}
+                </Link>
+              </motion.div>
             ))}
 
           {role === "content manager" && (
             <div className="flex gap-2">
-              <button
-                className="bg-primary-600 hover:bg-primary-700 flex cursor-pointer items-center gap-2 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all"
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="from-primary-600 to-primary-700 flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r px-6 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg"
                 onClick={() => setOpenModal(true)}
               >
                 <FaPlus className="text-sm" />
                 Add Stage
-              </button>
-              <button
-                className="flex cursor-pointer items-center gap-2 rounded-full bg-red-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-red-700"
+              </motion.button>
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                className="flex cursor-pointer items-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-red-700 px-6 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg"
                 onClick={() => setOpenDeleteRoadmapModal(true)}
               >
                 <FaTrash className="text-sm" />
                 Delete Roadmap
-              </button>
+              </motion.button>
             </div>
           )}
         </div>
 
         {/* Roadmap Progress */}
         {isLoggedIn && isEnrolled && (
-          <div className="bg-footer-900/70 mb-8 flex flex-col gap-4 rounded-lg p-6">
-            <h2 className="text-2xl font-bold text-white">Roadmap Progress</h2>
-            <div className="bg-footer-700 relative h-4 w-full rounded-full">
-              <div
-                className="bg-primary-600 h-4 rounded-full transition-all duration-300"
-                style={{
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="from-footer-900/70 to-footer-800/70 mb-8 rounded-2xl bg-gradient-to-r p-6 backdrop-blur-sm"
+          >
+            <h2 className="mb-4 bg-gradient-to-r from-white to-gray-300 bg-clip-text text-2xl font-bold text-transparent">
+              Roadmap Progress
+            </h2>
+            <div className="bg-footer-700/50 relative h-4 w-full overflow-hidden rounded-full">
+              <motion.div
+                initial={{ width: "0%" }}
+                animate={{
                   width:
                     completedStages === roadmap.stagesCount
                       ? "100%"
@@ -320,36 +412,50 @@ function Roadmap() {
                         ? "0%"
                         : `${(completedStages / roadmap.stagesCount) * 100}%`,
                 }}
-              ></div>
+                transition={{ duration: 1, ease: "easeOut" }}
+                className="from-primary-600 to-primary-700 h-full rounded-full bg-gradient-to-r"
+              />
             </div>
-          </div>
+          </motion.div>
         )}
 
         {/* Stages Grid */}
-        <div className="grid gap-4 md:grid-cols-2">
-          {roadmap.stages.map((stage) => (
-            <div
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ staggerChildren: 0.1 }}
+          className="grid gap-4 md:grid-cols-2"
+        >
+          {roadmap.stages.map((stage, index) => (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
               key={stage._id}
-              className={`group relative overflow-visible rounded-xl transition-all ${
+              className={`group relative overflow-visible rounded-2xl transition-all ${
                 completedStages >= stage.number
-                  ? "bg-purple-700/70"
+                  ? "bg-gradient-to-br from-purple-700/70 to-purple-800/70"
                   : currentStage?.number === stage.number
-                    ? "bg-footer-900/70 border-4 border-purple-600"
-                    : "bg-footer-700/70"
+                    ? "bg-footer-900/70 border-4 border-purple-600/50"
+                    : "from-footer-700/70 to-footer-800/70 bg-gradient-to-br"
               }`}
             >
               {/* ✅ Checkmark */}
               {completedStages >= stage.number && (
-                <div className="absolute -top-2 -right-2 z-50 flex h-6 w-6 items-center justify-center rounded-full bg-green-500 text-xs text-white shadow-md">
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className="absolute -top-2 -right-2 z-50 flex h-6 w-6 items-center justify-center rounded-full bg-gradient-to-r from-green-500 to-green-600 text-xs text-white shadow-lg"
+                >
                   <FaCheck />
-                </div>
+                </motion.div>
               )}
 
-              {/* Padding wraps only actual content */}
-              <div className="p-4">
+              {/* Content */}
+              <div className="p-6">
                 <div className="flex items-center justify-between">
                   <div className="flex-1">
-                    <span className="bg-primary-600/20 text-primary-400 mb-2 inline-block rounded-full px-3 py-1 text-sm">
+                    <span className="from-primary-600/20 to-primary-500/20 text-primary-400 mb-2 inline-block rounded-full bg-gradient-to-r px-3 py-1 text-sm">
                       Stage {stage.number}
                     </span>
                     <h3 className="mb-2 text-xl font-semibold text-white">
@@ -360,11 +466,11 @@ function Roadmap() {
                   <div className="ml-4">
                     {stage.type === "quiz" ? (
                       <div className="flex items-center gap-2">
-                        {stage.score !== undefined ? (
+                        {stage.score !== undefined && (
                           <span className="text-sm font-semibold text-gray-300">
                             {stage.score}/{stage.questionsCount}
                           </span>
-                        ) : null}
+                        )}
                         <FaQuestionCircle className="text-2xl text-yellow-500" />
                       </div>
                     ) : (
@@ -376,15 +482,17 @@ function Roadmap() {
 
               {/* Hover Effect */}
               <div
-                className={`absolute inset-0 flex items-center justify-center gap-2 rounded-xl opacity-0 transition-opacity group-hover:opacity-100 ${
+                className={`absolute inset-0 flex items-center justify-center gap-2 rounded-2xl opacity-0 backdrop-blur-sm transition-opacity group-hover:opacity-100 ${
                   currentStage?.number === stage.number ||
                   (role === "content manager" && "bg-primary-600/60")
                 }`}
               >
                 {currentStage?.number >= stage.number ||
                 (completedStages >= stage.number && role === "student") ? (
-                  <button
-                    className="bg-footer-800/70 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-black"
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="bg-footer-800/90 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-black/90"
                     onClick={() => {
                       navigate(
                         `/roadmaps/${roadmap._id}/stage/${stage.number}`,
@@ -400,11 +508,13 @@ function Roadmap() {
                         : stage.number === 1
                           ? "Start Learning"
                           : "Continue Learning"}
-                  </button>
+                  </motion.button>
                 ) : (
                   role === "content manager" && (
-                    <button
-                      className="bg-footer-800/70 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-black"
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      className="bg-footer-800/90 rounded-full px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-black/90"
                       onClick={() => {
                         navigate(
                           `/roadmaps/${roadmap._id}/stage/${stage.number}`,
@@ -412,24 +522,26 @@ function Roadmap() {
                       }}
                     >
                       Edit Stage
-                    </button>
+                    </motion.button>
                   )
                 )}
                 {role === "content manager" && (
-                  <button
-                    className="rounded-full bg-red-600 px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-red-700"
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    className="rounded-full bg-gradient-to-r from-red-600 to-red-700 px-6 py-2 text-sm font-semibold text-white transition-all hover:shadow-lg"
                     onClick={() => {
                       setStageToDelete(stage._id);
                       setOpenDeleteModal(true);
                     }}
                   >
                     Delete Stage
-                  </button>
+                  </motion.button>
                 )}
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </div>
   );
