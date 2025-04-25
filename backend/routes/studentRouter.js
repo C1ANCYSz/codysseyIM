@@ -148,12 +148,14 @@ router.delete(
       if (!user) return next(new AppError('No user found with this ID', 404));
 
       const appointment = await Appointment.findById(id);
+
       if (!appointment)
         return next(new AppError('No appointment found with this ID', 404));
 
       if (
-        (user.role === 'student' && appointment.user.toString() !== userId) ||
-        (user.role === 'academy' && appointment.academy.toString() !== userId)
+        user.role !== 'student' ||
+        appointment.user.toString() !== userId ||
+        appointment.status !== 'pending'
       ) {
         return next(
           new AppError('You are not allowed to delete this appointment', 403)
