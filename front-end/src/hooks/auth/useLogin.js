@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthProvider";
 
 export function useLogin() {
   const navigate = useNavigate();
-  const { setIsLoggedIn, setUser, setIsLoading } = useAuth();
+  const { setIsLoggedIn, setUser } = useAuth();
   const {
     mutate: login,
     isLoading,
@@ -13,7 +13,6 @@ export function useLogin() {
   } = useMutation({
     mutationFn: async ({ email, password }) => {
       try {
-        setIsLoading(true);
         const res = await fetch("http://localhost:3000/api/auth/login", {
           method: "POST",
           headers: {
@@ -32,7 +31,6 @@ export function useLogin() {
       } catch (error) {
         throw new Error(error.message);
       } finally {
-        setIsLoading(false);
       }
     },
     onSuccess: () => {

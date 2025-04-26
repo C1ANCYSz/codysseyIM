@@ -18,10 +18,11 @@ export function useUpdateSettings() {
         throw new Error(errorData.message);
       }
       const data = await response.json();
+      console.log(data);
       return data;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["settings"] });
+      queryClient.invalidateQueries({ refetchType: "active" });
       toast.success("Settings updated successfully");
     },
     onError: (error) => {
