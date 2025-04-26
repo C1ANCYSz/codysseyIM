@@ -21,6 +21,9 @@ import AdminContentManagers from "./ui/AdminContentManagers";
 import AdminAcademies from "./ui/AdminAcademies";
 import Settings from "./pages/Settings";
 import BookAppointment from "./features/content/BookAppointment";
+import PendingAppointments from "./features/content/PendingAppointments";
+import AcceptedAppointments from "./features/content/AcceptedAppointments";
+import CompletedAppointments from "./features/content/CompletedAppointments";
 function App() {
   return (
     <Router>
@@ -94,6 +97,30 @@ function App() {
                 element={
                   <PrivateRoute>
                     <AddRoadmap />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="academy/pending-appointments"
+                element={
+                  <PrivateRoute>
+                    <PendingAppointments />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="academy/accepted-appointments"
+                element={
+                  <PrivateRoute>
+                    <AcceptedAppointments />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="academy/completed-appointments"
+                element={
+                  <PrivateRoute>
+                    <CompletedAppointments />
                   </PrivateRoute>
                 }
               />
