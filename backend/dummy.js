@@ -185,10 +185,27 @@ const createDummyUsers = async () => {
   console.log('✅ Done creating dummy users!');
   mongoose.connection.close();
 };
+
+const Appointment = require('./models/Appointment');
+const addTimeStamps = async () => {
+  const appointments = await Appointment.find();
+
+  for (const appointment of appointments) {
+    appointment.createdAt = new Date();
+    appointment.updatedAt = new Date();
+    await appointment.save();
+  }
+
+  console.log('✅ Done adding timestamps!');
+  mongoose.connection.close();
+};
+
 //seedStages();
 
 //updateQuizzes();
 
 //updateQuizzesAnswer();
 
-createDummyUsers();
+//createDummyUsers();
+
+addTimeStamps();
