@@ -23,18 +23,20 @@ import { useGetStudent } from "../../hooks/user/useGetStudent";
 function AddVideosForm({ stage, updateStageContent }) {
   console.log(stage);
   const [videosArray, setVideosArray] = useState([]);
-
+  const { _id: stageId } = stage || {};
   const { register, handleSubmit, getValues, setValue } = useForm();
 
   const onSubmit = (data) => {
+    console.log(data);
     const newVideos = data.videos.map((video) => ({
       ...video,
       url: video.url.slice(0, video.url.indexOf("&")),
     }));
     const newStage = {
       ...stage,
-      videos: [...stage.videos, ...newVideos],
+      videos: [...stage?.videos, ...newVideos],
     };
+    console.log(newStage);
     updateStageContent(
       {
         stageId,
@@ -58,7 +60,7 @@ function AddVideosForm({ stage, updateStageContent }) {
     >
       <h3 className="text-2xl font-semibold">Add Videos</h3>
       <AnimatePresence>
-        {videosArray.map((video, index) => (
+        {videosArray?.map((video, index) => (
           <motion.div
             key={index}
             initial={{ opacity: 0, y: 20 }}
@@ -468,7 +470,10 @@ function VideoContent() {
                     />
                   </motion.div>
                 ) : (
-                  <AddVideosForm />
+                  <AddVideosForm
+                    stage={stage}
+                    updateStageContent={updateStageContent}
+                  />
                 )}
               </AnimatePresence>
 

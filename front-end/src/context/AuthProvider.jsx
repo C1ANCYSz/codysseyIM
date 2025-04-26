@@ -1,3 +1,4 @@
+import { useQuery } from "@tanstack/react-query";
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -6,16 +7,15 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(null); // null = loading
   const [user, setUser] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  console.log(user);
   const location = useLocation();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Store the current location before checking login status
-    localStorage.setItem("lastLocation", location.pathname);
-    const checkLogin = async () => {
+  const { data, isLoading } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      // Store the current location before checking login status
+      localStorage.setItem("lastLocation", location.pathname);
       try {
-        setIsLoading(true);
         const res = await fetch("http://localhost:3000/api/auth/check", {
           method: "GET",
           credentials: "include", // Sends cookie
@@ -34,12 +34,9 @@ export function AuthProvider({ children }) {
       } catch (error) {
         setIsLoggedIn(false);
         navigate("/login", { replace: true });
-      } finally {
-        setIsLoading(false);
       }
-    };
-    checkLogin();
-  }, []);
+    },
+  });
 
   const value = useMemo(
     () => ({
@@ -48,9 +45,8 @@ export function AuthProvider({ children }) {
       user,
       setUser,
       isLoading,
-      setIsLoading,
     }),
-    [isLoggedIn, setIsLoggedIn, user, setUser, isLoading, setIsLoading],
+    [isLoggedIn, setIsLoggedIn, user, setUser, isLoading],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
