@@ -14,7 +14,7 @@ const {
   sendWelcomeEmail,
   sendPasswordResetEmail,
   sendPasswordResetSuccess,
-} = require('../mailtrap/emails');
+} = require('../mailing/emails');
 /* 
 
 

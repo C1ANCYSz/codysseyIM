@@ -1,9 +1,17 @@
 const mongoose = require('mongoose');
-const { ContentStage, QuizStage } = require('./models/Stage');
-require('dotenv').config();
+
+const Roadmap = require('./models/Roadmap');
+const Question = require('./models/Question');
+const UserRoadmap = require('./models/UserRoadmap');
 const User = require('./models/User');
+const Appointment = require('./models/Appointment');
+
+const { ContentStage, QuizStage } = require('./models/Stage');
+
+require('dotenv').config();
 
 const { MONGO_URI } = process.env;
+
 mongoose.connect(MONGO_URI);
 
 const videoPool = [
@@ -59,45 +67,6 @@ const docPool = [
   { url: 'https://html.spec.whatwg.org/', title: 'HTML Living Standard' },
 ];
 
-const getRandomItems = (arr, maxCount) => {
-  const shuffled = arr.sort(() => 0.5 - Math.random());
-  const count = Math.floor(Math.random() * maxCount) + 1;
-  return shuffled.slice(0, count);
-};
-const seedStages = async () => {
-  try {
-    const contentStages = await ContentStage.find();
-
-    for (const stage of contentStages) {
-      const videos = getRandomItems(videoPool, videoPool.length);
-      const docs = getRandomItems(docPool, docPool.length);
-      stage.videos = videos;
-      stage.docs = docs;
-      await stage.save();
-    }
-
-    console.log('✅ Done seeding content stages!');
-    mongoose.connection.close();
-  } catch (err) {
-    console.error('❌ Error seeding content stages:', err);
-    mongoose.connection.close();
-  }
-};
-
-const updateQuizzes = async () => {
-  try {
-    const quizzes = await QuizStage.find();
-    for (const quiz of quizzes) {
-      quiz.questionsCount = quiz.questions.length;
-      score = undefined;
-      await quiz.save();
-    }
-    console.log('✅ Done updating quizzes!');
-  } catch (err) {
-    console.error('❌ Error updating quizzes:', err);
-  }
-};
-
 const questionPool = [
   {
     questionText: 'What does HTML stand for?',
@@ -146,6 +115,344 @@ const questionPool = [
   },
 ];
 
+const questions = [
+  {
+    question: 'How experienced are you with coding?',
+    answers: [
+      {
+        text: 'Absolute Beginner',
+        impacts: [{ roadmap: 'HTML & CSS', score: 5 }],
+      },
+      {
+        text: 'Some Experience',
+        impacts: [
+          { roadmap: 'Vue.js', score: 4 },
+          { roadmap: 'React JS', score: 4 },
+          { roadmap: 'Express.js', score: 4 },
+        ],
+      },
+      {
+        text: 'Confident Coder',
+        impacts: [
+          { roadmap: 'MERN Stack', score: 5 },
+          { roadmap: 'Django', score: 5 },
+          { roadmap: 'MongoDB', score: 5 },
+        ],
+      },
+    ],
+  },
+  {
+    question: "What's your current goal?",
+    answers: [
+      {
+        text: 'Build my first website',
+        impacts: [
+          { roadmap: 'HTML & CSS', score: 5 },
+          { roadmap: 'React JS', score: 5 },
+        ],
+      },
+      {
+        text: 'Create full web apps',
+        impacts: [
+          { roadmap: 'MERN Stack', score: 5 },
+          { roadmap: 'Next.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Learn backend systems',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+          { roadmap: 'Django', score: 5 },
+        ],
+      },
+      {
+        text: 'Explore databases',
+        impacts: [{ roadmap: 'MongoDB', score: 5 }],
+      },
+    ],
+  },
+  {
+    question: "What's your learning vibe?",
+    answers: [
+      {
+        text: 'Visual and interactive',
+        impacts: [
+          { roadmap: 'Vue.js', score: 5 },
+          { roadmap: 'React JS', score: 5 },
+        ],
+      },
+      {
+        text: 'Logical and structured',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Curious about how computers work',
+        impacts: [{ roadmap: 'assembly', score: 5 }],
+      },
+      {
+        text: 'Love seeing fast results',
+        impacts: [
+          { roadmap: 'HTML & CSS', score: 5 },
+          { roadmap: 'Next.js', score: 5 },
+        ],
+      },
+    ],
+  },
+  {
+    question: 'How do you prefer learning?',
+    answers: [
+      {
+        text: 'Quick wins first, then deeper',
+        impacts: [
+          { roadmap: 'HTML & CSS', score: 5 },
+          { roadmap: 'Vue.js', score: 4 },
+        ],
+      },
+      {
+        text: 'Deep dive from Day 1',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Django', score: 5 },
+          { roadmap: 'MongoDB', score: 5 },
+        ],
+      },
+    ],
+  },
+  {
+    question: 'Which of these sounds like your dream job?',
+    answers: [
+      {
+        text: 'Frontend Developer',
+        impacts: [
+          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'Vue.js', score: 5 },
+          { roadmap: 'TypeScript', score: 5 },
+          { roadmap: 'Next.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Backend Developer',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+          { roadmap: 'Django', score: 5 },
+        ],
+      },
+      {
+        text: 'Fullstack Developer',
+        impacts: [
+          { roadmap: 'MERN Stack', score: 5 },
+          { roadmap: 'Next.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Database Administrator',
+        impacts: [{ roadmap: 'MongoDB', score: 5 }],
+      },
+    ],
+  },
+  {
+    question: 'What type of projects would you love to build first?',
+    answers: [
+      {
+        text: 'Beautiful websites and apps',
+        impacts: [
+          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'Vue.js', score: 5 },
+          { roadmap: 'HTML & CSS', score: 5 },
+          { roadmap: 'Next.js', score: 4 },
+        ],
+      },
+      {
+        text: 'Backend systems and APIs',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+          { roadmap: 'Django', score: 5 },
+        ],
+      },
+      {
+        text: 'Full applications from scratch',
+        impacts: [
+          { roadmap: 'MERN Stack', score: 5 },
+          { roadmap: 'Next.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Powerful databases',
+        impacts: [{ roadmap: 'MongoDB', score: 5 }],
+      },
+      {
+        text: 'Low-level software',
+        impacts: [{ roadmap: 'assembly', score: 5 }],
+      },
+    ],
+  },
+  {
+    question: 'Which topic do you find more exciting?',
+    answers: [
+      {
+        text: 'UI/UX and animations',
+        impacts: [
+          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'Vue.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Data handling and APIs',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+          { roadmap: 'MongoDB', score: 5 },
+        ],
+      },
+      {
+        text: 'Security, auth, scaling',
+        impacts: [
+          { roadmap: 'Django', score: 5 },
+          { roadmap: 'MERN Stack', score: 5 },
+        ],
+      },
+    ],
+  },
+  {
+    question: "What's more important for you?",
+    answers: [
+      {
+        text: 'Frontend looks and feels',
+        impacts: [
+          { roadmap: 'Vue.js', score: 5 },
+          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'TypeScript', score: 4 },
+        ],
+      },
+      {
+        text: 'Backend logic and power',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+          { roadmap: 'Django', score: 5 },
+        ],
+      },
+      {
+        text: 'Full package, both frontend and backend',
+        impacts: [
+          { roadmap: 'MERN Stack', score: 5 },
+          { roadmap: 'Next.js', score: 5 },
+        ],
+      },
+    ],
+  },
+  {
+    question: 'Which tech would you LOVE to master first?',
+    answers: [
+      {
+        text: 'React.js',
+        impacts: [
+          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'MERN Stack', score: 3 },
+          { roadmap: 'Next.js', score: 4 },
+        ],
+      },
+      {
+        text: 'Node.js',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+        ],
+      },
+      {
+        text: 'TypeScript',
+        impacts: [
+          { roadmap: 'TypeScript', score: 5 },
+          { roadmap: 'Next.js', score: 4 },
+        ],
+      },
+      { text: 'Vue.js', impacts: [{ roadmap: 'Vue.js', score: 5 }] },
+      { text: 'Django', impacts: [{ roadmap: 'django', score: 5 }] },
+    ],
+  },
+  {
+    question: 'Pick your future tech stack:',
+    answers: [
+      {
+        text: 'MERN (MongoDB, Express, React, Node)',
+        impacts: [
+          { roadmap: 'MERN Stack', score: 5 },
+          { roadmap: 'MongoDB', score: 4 },
+          { roadmap: 'Node.js', score: 4 },
+          { roadmap: 'React JS', score: 4 },
+        ],
+      },
+      {
+        text: 'React + Next.js',
+        impacts: [
+          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'Next.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Vue.js + Node.js',
+        impacts: [
+          { roadmap: 'Vue.js', score: 5 },
+          { roadmap: 'Node.js', score: 4 },
+          { roadmap: 'Express.js', score: 4 },
+        ],
+      },
+      {
+        text: 'Django + Database',
+        impacts: [
+          { roadmap: 'django', score: 5 },
+          { roadmap: 'MongoDB', score: 4 },
+        ],
+      },
+    ],
+  },
+];
+
+const getRandomItems = (arr, maxCount) => {
+  const shuffled = arr.sort(() => 0.5 - Math.random());
+  const count = Math.floor(Math.random() * maxCount) + 1;
+  return shuffled.slice(0, count);
+};
+const seedStages = async () => {
+  try {
+    const contentStages = await ContentStage.find();
+
+    for (const stage of contentStages) {
+      const videos = getRandomItems(videoPool, videoPool.length);
+      const docs = getRandomItems(docPool, docPool.length);
+      stage.videos = videos;
+      stage.docs = docs;
+      await stage.save();
+    }
+
+    console.log('✅ Done seeding content stages!');
+    mongoose.connection.close();
+  } catch (err) {
+    console.error('❌ Error seeding content stages:', err);
+    mongoose.connection.close();
+  }
+};
+
+const updateQuizzes = async () => {
+  try {
+    const quizzes = await QuizStage.find();
+    for (const quiz of quizzes) {
+      quiz.questionsCount = quiz.questions.length;
+      score = undefined;
+      await quiz.save();
+    }
+    console.log('✅ Done updating quizzes!');
+  } catch (err) {
+    console.error('❌ Error updating quizzes:', err);
+  }
+};
+
 const updateQuizzesAnswer = async () => {
   try {
     const quizzes = await QuizStage.find();
@@ -186,7 +493,6 @@ const createDummyUsers = async () => {
   mongoose.connection.close();
 };
 
-const Appointment = require('./models/Appointment');
 const addTimeStamps = async () => {
   const appointments = await Appointment.find();
 
@@ -200,6 +506,52 @@ const addTimeStamps = async () => {
   mongoose.connection.close();
 };
 
+async function findInvalidUserRoadmaps() {
+  try {
+    const userRoadmaps = await UserRoadmap.find();
+
+    const invalidUserRoadmaps = [];
+
+    for (const userRoadmap of userRoadmaps) {
+      const roadmapExists = await Roadmap.exists({ _id: userRoadmap.roadmap });
+
+      if (!roadmapExists) {
+        invalidUserRoadmaps.push(userRoadmap);
+        await UserRoadmap.findByIdAndDelete(userRoadmap._id);
+      }
+    }
+
+    console.log(`Found ${invalidUserRoadmaps.length} invalid UserRoadmaps:`);
+
+    invalidUserRoadmaps.forEach((doc) => {
+      console.log(
+        `UserRoadmap ID: ${doc._id}, Missing Roadmap ID: ${doc.roadmap}`
+      );
+    });
+
+    await mongoose.disconnect();
+    console.log('Disconnected from MongoDB');
+  } catch (error) {
+    console.error('Error:', error);
+    await mongoose.disconnect();
+  }
+}
+
+async function seed() {
+  try {
+    await Question.deleteMany();
+    await Question.insertMany(questions);
+
+    console.log('🎉 Questions seeded successfully');
+    process.exit();
+  } catch (error) {
+    console.error('❌ Error seeding questions:', error);
+    process.exit(1);
+  }
+}
+
+//findInvalidUserRoadmaps();
+
 //seedStages();
 
 //updateQuizzes();
@@ -208,4 +560,8 @@ const addTimeStamps = async () => {
 
 //createDummyUsers();
 
-addTimeStamps();
+//addTimeStamps();
+
+// seedQuestions.js
+
+//seed();
