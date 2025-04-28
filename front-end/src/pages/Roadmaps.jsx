@@ -27,7 +27,6 @@ function Roadmaps() {
     <div className="flex min-h-screen">
       <div className="container mx-auto p-8">
         <div className="space-y-12">
-          {/* Categories Navigation - Fixed */}
           <div className="flex flex-wrap items-center justify-center gap-4">
             <button
               className={`transform rounded-full px-6 py-3 text-sm font-medium shadow-lg transition-all duration-300 hover:-translate-y-1 ${
@@ -54,7 +53,6 @@ function Roadmaps() {
             ))}
           </div>
 
-          {/* Scrollable Roadmaps Grid */}
           <div className="h-[calc(100vh-16rem)] overflow-y-auto p-4">
             <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
               {filteredRoadmaps.map((roadmap) => (
