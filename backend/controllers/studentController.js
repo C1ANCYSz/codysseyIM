@@ -353,7 +353,7 @@ exports.deleteAppointment = async (req, res, next) => {
     if (
       user.role !== 'student' ||
       appointment.user.toString() !== userId ||
-      appointment.status !== 'pending'
+      !['pending', 'rejected'].includes(appointment.status)
     ) {
       return next(
         new AppError('You are not allowed to delete this appointment', 403)
