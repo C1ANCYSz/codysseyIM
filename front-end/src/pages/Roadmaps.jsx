@@ -1,15 +1,24 @@
-import { useState } from "react";
+import { use, useEffect, useState } from "react";
 import { useGetRoadmaps } from "../hooks/courses/useGetRoadmaps";
-import { Link } from "react-router-dom";
+import { Link, useParams, useSearchParams } from "react-router-dom";
 import Loader from "../ui/Loader";
 
 function Roadmaps() {
-  const [selectedCategory, setSelectedCategory] = useState("all");
+  const [searchParams] = useSearchParams();
+  const category = searchParams.get("category");
+  const [selectedCategory, setSelectedCategory] = useState(category || "all");
   const {
     roadmaps: { categories, roadmaps } = {},
     isLoading,
     error,
   } = useGetRoadmaps();
+  useEffect(() => {
+    if (category) {
+      setSelectedCategory(category);
+    } else {
+      setSelectedCategory("all");
+    }
+  }, [category]);
 
   function handleCategoryClick(category) {
     setSelectedCategory(category);
@@ -18,13 +27,13 @@ function Roadmaps() {
   const filteredRoadmaps =
     selectedCategory === "all"
       ? roadmaps
-      : roadmaps.filter((roadmap) => roadmap.category === selectedCategory);
+      : roadmaps?.filter((roadmap) => roadmap.category === selectedCategory);
 
   if (isLoading) return <Loader />;
   if (error) return <div>Error: {error.message}</div>;
 
   return (
-    <div className="flex min-h-screen">
+    <div className="from-primary-900 flex min-h-screen bg-gradient-to-br to-black">
       <div className="container mx-auto p-8">
         <div className="space-y-12">
           <div className="flex flex-wrap items-center justify-center gap-4">
