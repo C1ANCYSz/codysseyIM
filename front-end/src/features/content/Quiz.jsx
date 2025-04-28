@@ -12,6 +12,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "../../context/AuthProvider";
 import { useUpdateStageContent } from "../../hooks/user/content-manager/useUpdateStageContent";
 import { useUpdateStageProgress } from "../../hooks/user/useUpdateStageProgress";
+import { useGetStudent } from "../../hooks/user/useGetStudent";
 
 function ManageQuiz({ stage }) {
   const { register, handleSubmit, reset } = useForm();
@@ -329,10 +330,12 @@ function ManageQuiz({ stage }) {
   );
 }
 
-function QuizContent({ stage }) {
-  const { questions, questionsCount = questions.length } = stage ?? {};
+function QuizContent({ stage, roadmapId }) {
+  const { questions, questionsCount = questions.length, number } = stage ?? {};
   console.log(stage);
+  const navigate = useNavigate();
   const { updateStageProgress, isLoading } = useUpdateStageProgress();
+  const { studentData, isLoading: isGettingStudent } = useGetStudent();
   const [quizState, setQuizState] = useState({
     selectedQuestion: null,
     score: 0,
@@ -388,7 +391,16 @@ function QuizContent({ stage }) {
   };
 
   const handleNextStage = () => {
-    updateStageProgress();
+    if (
+      studentData?.roadmaps?.find(
+        (roadmap) => roadmap.roadmap._id === roadmapId,
+      )?.completedStages ===
+      number - 1
+    ) {
+      updateStageProgress();
+    } else {
+      navigate(`/roadmaps/${roadmapId}/stage/${number + 1}`);
+    }
   };
 
   const startQuiz = () => {
@@ -594,7 +606,9 @@ const Quiz = () => {
           <ManageQuiz user={user} stage={stage} />
         )}
 
-        {user.role === "student" && <QuizContent stage={stage} />}
+        {user.role === "student" && (
+          <QuizContent stage={stage} roadmapId={roadmapId} />
+        )}
       </div>
     </div>
   );

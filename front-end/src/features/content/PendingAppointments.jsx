@@ -9,7 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 const PendingAppointments = () => {
   const { pendingAppointments, isLoading } = useGetPendingAppointment();
   const { appointments, locations } = pendingAppointments || {};
-
+  console.log(pendingAppointments);
   const [startDate, setStartDate] = useState(() => {
     const date = new Date();
     date.setHours(0);
@@ -32,7 +32,7 @@ const PendingAppointments = () => {
   const handleLocationClick = (location) => setSelectedLocation(location);
 
   const handleReject = (appointmentId) => {
-    updateAppointment({ appointmentId, date: { status: "rejected" } });
+    updateAppointment({ appointmentId, data: { status: "rejected" } });
   };
 
   const handleAccept = (appointmentId) => {

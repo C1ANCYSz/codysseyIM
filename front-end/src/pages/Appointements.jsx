@@ -1,17 +1,31 @@
 import { format } from "date-fns";
-import {
-  FaMapMarkerAlt,
-  FaCalendarAlt,
-  FaTrophy,
-  FaTrash,
-} from "react-icons/fa";
+import { FaMapMarkerAlt, FaCalendarAlt, FaTrophy } from "react-icons/fa";
 import Loader from "../ui/Loader";
 import { useGetAppointments } from "../hooks/user/useGetAppointments";
 import { useDeleteAppointment } from "../hooks/user/useDeleteAppointment";
-import { MdCancel, MdOutlineCancel } from "react-icons/md";
+import { MdCancel } from "react-icons/md";
+import { useState } from "react";
+
 function Appointments() {
   const { appointments, isLoading } = useGetAppointments();
   const { deleteAppointment, isLoading: isDeleting } = useDeleteAppointment();
+  const [selectedAppointments, setSelectedAppointments] = useState("all");
+  console.log(appointments);
+  const filteredAppointments =
+    selectedAppointments === "all"
+      ? appointments
+      : appointments.filter((currAppointment) =>
+          selectedAppointments === "completed"
+            ? currAppointment.status === "completed"
+            : selectedAppointments === "accepted"
+              ? currAppointment.status === "accepted"
+              : selectedAppointments === "pending"
+                ? currAppointment.status === "pending"
+                : selectedAppointments === "rejected"
+                  ? currAppointment.status === "rejected"
+                  : null,
+        );
+
   const getStatusColor = (status) => {
     const colors = {
       accepted: "bg-emerald-500/80",
@@ -26,23 +40,60 @@ function Appointments() {
 
   return (
     <div className="min-h-screen p-8">
-      <h1 className="mb-12 bg-gradient-to-r from-white to-gray-400 bg-clip-text text-center text-4xl font-bold tracking-tight text-transparent">
-        My Appointments
-      </h1>
+      <div className="mb-12 flex items-center justify-between">
+        <h1 className="bg-gradient-to-r from-white to-gray-400 bg-clip-text text-4xl font-bold tracking-tight text-transparent">
+          My Appointments
+        </h1>
+        <div className="flex gap-4 text-white">
+          <button
+            className={`cursor-pointer rounded-full px-4 py-2 text-sm font-medium text-white capitalize transition-all duration-300 ${selectedAppointments === "all" ? "bg-primary-600/50" : "bg-white/10"}`}
+            onClick={() => setSelectedAppointments("all")}
+          >
+            All
+          </button>
+          <button
+            className={`cursor-pointer rounded-full px-4 py-2 text-sm font-medium text-white capitalize transition-all duration-300 ${selectedAppointments === "completed" ? "bg-primary-600/50" : "bg-white/10"}`}
+            onClick={() => setSelectedAppointments("completed")}
+          >
+            completed
+          </button>
+          <button
+            className={`cursor-pointer rounded-full px-4 py-2 text-sm font-medium text-white capitalize transition-all duration-300 ${selectedAppointments === "accepted" ? "bg-primary-600/50" : "bg-white/10"}`}
+            onClick={() => setSelectedAppointments("accepted")}
+          >
+            accepted
+          </button>
+          <button
+            className={`cursor-pointer rounded-full px-4 py-2 text-sm font-medium text-white capitalize transition-all duration-300 ${selectedAppointments === "pending" ? "bg-primary-600/50" : "bg-white/10"}`}
+            onClick={() => setSelectedAppointments("pending")}
+          >
+            pending
+          </button>
+          <button
+            className={`cursor-pointer rounded-full px-4 py-2 text-sm font-medium text-white capitalize transition-all duration-300 ${selectedAppointments === "rejected" ? "bg-primary-600/50" : "bg-white/10"}`}
+            onClick={() => setSelectedAppointments("rejected")}
+          >
+            rejected
+          </button>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {appointments.map((appointment) => (
+        {filteredAppointments.map((appointment) => (
           <div
             key={appointment._id}
             className="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all duration-300 hover:border-white/20 hover:bg-white/10"
           >
-            <button
-              onClick={() => deleteAppointment(appointment._id)}
-              disabled={isDeleting}
-              className="absolute top-2 right-2 animate-pulse cursor-pointer rounded-full text-2xl text-red-500 transition-all duration-1000"
-            >
-              <MdCancel />
-            </button>
+            {(appointment.status === "rejected" ||
+              appointment.status === "pending") && (
+              <button
+                onClick={() => deleteAppointment(appointment._id)}
+                disabled={isDeleting}
+                className="absolute top-2 right-2 animate-pulse cursor-pointer rounded-full text-2xl text-red-500 transition-all duration-1000"
+              >
+                <MdCancel />
+              </button>
+            )}
             {/* Roadmap Header */}
             <div className="mb-6 flex items-center gap-4">
               <img
@@ -93,9 +144,11 @@ function Appointments() {
               )}
 
               {appointment.score && (
-                <div className="flex items-center gap-3 text-gray-300">
-                  <FaTrophy className="text-amber-500" />
-                  <span className="text-sm">Score: {appointment.score}%</span>
+                <div className="mx-auto flex w-fit items-center gap-3 rounded-full bg-orange-500 px-4 py-2 text-white">
+                  <FaTrophy className="text-lg" />
+                  <span className="text-lg font-bold">
+                    Score: {appointment.score}%
+                  </span>
                 </div>
               )}
             </div>

@@ -7,7 +7,6 @@ const AuthContext = createContext();
 export function AuthProvider({ children }) {
   const [isLoggedIn, setIsLoggedIn] = useState(null); // null = loading
   const [user, setUser] = useState(null);
-  console.log(user);
   const location = useLocation();
   const navigate = useNavigate();
   const { data, isLoading } = useQuery({
