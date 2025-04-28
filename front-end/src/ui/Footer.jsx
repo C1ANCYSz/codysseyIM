@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 
 function Footer() {
   const { isLoggedIn } = useAuth();
+
   if (isLoggedIn) return null;
 
   const socialLinks = [
@@ -18,12 +19,7 @@ function Footer() {
     { icon: FaLinkedin, href: "#" },
   ];
 
-  const categories = [
-    "Front-end",
-    "Back-end",
-    "Full-Stack Development",
-    "DevOps",
-  ];
+  const categories = ["Frontend", "Backend", "Fullstack", "Database"];
 
   const quickLinks = [
     { text: "About", to: "/about" },
@@ -88,7 +84,7 @@ function Footer() {
             {categories.map((category, index) => (
               <li key={index}>
                 <Link
-                  to={`/category/${category.toLowerCase()}`}
+                  to={`/roadmaps/?category=${category}`}
                   className="group inline-flex items-center text-gray-300 transition-colors hover:text-white"
                 >
                   <span className="bg-primary-500 h-[2px] w-0 transition-all group-hover:mr-2 group-hover:w-4"></span>
