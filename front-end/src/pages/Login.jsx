@@ -96,7 +96,7 @@ const Login = () => {
 
         <div className="from-primary-600 relative hidden w-1/2 items-center justify-center bg-gradient-to-br to-slate-950 p-8 md:flex">
           <div className="absolute inset-0 mt-10 mb-30 rounded-3xl bg-[url('/src/assets/images/login.png')] bg-contain bg-center bg-no-repeat opacity-90"></div>
-          <blockquote className="relative z-10 mt-auto mb-8 px-4 text-center text-xl font-semibold text-white">
+          <blockquote className="relative z-10 mt-auto px-4 text-center text-xl font-semibold text-white">
             “Imagination is more important than knowledge”
             <br />
             <span className="text-sm font-normal">– Albert Einstein</span>

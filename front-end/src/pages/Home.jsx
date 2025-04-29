@@ -212,8 +212,10 @@ const Home = () => {
                   key={index}
                   initial={{ y: 50, opacity: 0 }}
                   animate={featuresInView ? { y: 0, opacity: 1 } : {}}
-                  transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
-                  whileHover={{ y: -8, transition: { duration: 0.3 } }}
+                  transition={{ duration: 0.1, ease: "easeOut" }}
+                  whileHover={{
+                    y: -8,
+                  }}
                   className="group flex flex-col items-center gap-6 rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-sm transition-all select-none hover:bg-white/10"
                 >
                   <motion.div
@@ -223,7 +225,6 @@ const Home = () => {
                       type: "spring",
                       stiffness: 200,
                       damping: 12,
-                      delay: 0.6 + index * 0.1,
                     }}
                     className="rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white shadow-lg shadow-indigo-500/20"
                   >
@@ -286,7 +287,7 @@ const Home = () => {
                   key={index}
                   initial={{ y: 50, opacity: 0 }}
                   animate={tracksInView ? { y: 0, opacity: 1 } : {}}
-                  transition={{ duration: 0.6, delay: 0.4 + index * 0.1 }}
+                  transition={{ duration: 0.1 }}
                   whileHover={{ y: -8, scale: 1.02 }}
                   className="group relative cursor-pointer overflow-hidden rounded-xl border border-white/10 bg-gradient-to-br from-slate-800/80 to-slate-900/80 p-8 transition-all hover:border-indigo-500/30"
                 >
