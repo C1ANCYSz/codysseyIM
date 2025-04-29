@@ -2,6 +2,7 @@ import { FaArrowLeft, FaEdit } from "react-icons/fa";
 import { useGetStage } from "../../hooks/courses/useGetStage";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import {
   PiCheckBold,
   PiCheckCircleFill,
@@ -334,6 +335,7 @@ function QuizContent({ stage, roadmapId }) {
   const { questions, questionsCount = questions.length, number } = stage ?? {};
   console.log(stage);
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { updateStageProgress, isLoading } = useUpdateStageProgress();
   const { studentData, isLoading: isGettingStudent } = useGetStudent();
   const [quizState, setQuizState] = useState({
@@ -560,7 +562,10 @@ function QuizContent({ stage, roadmapId }) {
 const Quiz = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-
+  const { register, handleSubmit } = useForm();
+  const [isEditing, setIsEditing] = useState(false);
+  const { updateStageContent, isLoading: isUpdatingContent } =
+    useUpdateStageContent();
   const { stage: { stage } = {}, isLoading } = useGetStage();
 
   const {
@@ -568,8 +573,33 @@ const Quiz = () => {
     title,
     roadmap: roadmapId,
     questionsCount,
+    number,
     type,
+    _id: stageId,
   } = stage ?? {};
+  console.log(stage);
+  function handleEditQuizInfo(data) {
+    const { title, description } = data;
+
+    updateStageContent(
+      {
+        stageId,
+        data: {
+          ...stage,
+          title,
+          description,
+          number: Number(data.number), // Convert to number since form data is string
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+          // Use data.number to ensure we use the updated number
+          navigate(`/roadmaps/${roadmapId}/stage/${Number(data.number)}`);
+        },
+      },
+    );
+  }
 
   if (isLoading) {
     return (
@@ -597,9 +627,96 @@ const Quiz = () => {
             <span className="from-primary-600 to-primary-500 rounded-full bg-gradient-to-r px-4 py-2 text-sm font-medium text-white">
               {type}
             </span>
-            <h1 className="pr-4 text-2xl font-bold text-white">{title}</h1>
+            {isEditing ? (
+              <input
+                type="text"
+                defaultValue={title}
+                placeholder="Enter title..."
+                className="w-full rounded-xl border-0 p-4 text-white placeholder-white/40 transition-all outline-none"
+                {...register("title", {
+                  required: { value: true, message: "Title is required" },
+                })}
+              />
+            ) : (
+              <h1 className="pr-4 text-2xl font-bold text-white">{title}</h1>
+            )}
+            <button
+              className="cursor-pointer rounded-full bg-emerald-600 px-5 py-3 text-white transition-all duration-200 hover:bg-emerald-700"
+              onClick={() => {
+                if (!isEditing) setIsEditing(true);
+                if (isEditing) {
+                  handleSubmit(handleEditQuizInfo)();
+                }
+              }}
+            >
+              {isEditing ? "Done" : "Edit"}
+            </button>
           </div>
-          <p className="mt-6 text-lg text-white/60">{stage?.description}</p>
+          {isEditing ? (
+            <motion.div
+              exit={{ opacity: 0, y: -20 }}
+              className="mt-4 flex flex-col items-center gap-3"
+            >
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.5 }}
+                className="flex items-center gap-4"
+              >
+                <label htmlFor="stage" className="w-33 text-start text-white">
+                  Quiz Description:
+                </label>
+                <textarea
+                  rows={2}
+                  defaultValue={description}
+                  className="bg-footer-800/50 rounded-lg border border-gray-400 px-4 py-2 text-white outline-none"
+                  {...register("description", {
+                    required: {
+                      value: true,
+                      message: "Description is required",
+                    },
+                  })}
+                />
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 20 }}
+                transition={{ duration: 0.5 }}
+                className="-ml-35 flex items-center gap-4"
+              >
+                <label htmlFor="stage" className="w-32 text-start text-white">
+                  Stage Number:
+                </label>
+                <input
+                  type="number"
+                  defaultValue={number}
+                  className="bg-footer-800/50 w-16 rounded-lg border border-gray-400 px-2 py-2 text-center text-white outline-none"
+                  {...register("number", {
+                    required: {
+                      value: true,
+                      message: "Stage number is required",
+                    },
+                    min: {
+                      value: 1,
+                      message: "Stage number must be at least 1",
+                    },
+                  })}
+                />
+              </motion.div>
+            </motion.div>
+          ) : (
+            <motion.p
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.5 }}
+              className="mt-6 text-lg text-white/60"
+            >
+              {stage?.description}
+            </motion.p>
+          )}
         </header>
 
         {user.role === "content manager" && (

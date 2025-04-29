@@ -3,7 +3,6 @@ import {
   FaPlay,
   FaQuestionCircle,
   FaCertificate,
-  FaRocket,
   FaCheck,
   FaPlus,
   FaTrash,

@@ -221,10 +221,11 @@ function AddDocsForm({ stage, updateStageContent, docsArray, setDocsArray }) {
 
 function VideoContent() {
   const navigate = useNavigate();
+  const { register, handleSubmit } = useForm();
+
   const { updateStageProgress } = useUpdateStageProgress();
-
   const [docsArray, setDocsArray] = useState([]);
-
+  const [isEditing, setIsEditing] = useState(false);
   const [editingVideoId, setEditingVideoId] = useState(null);
   const [editingDocId, setEditingDocId] = useState(null);
   const [editFormData, setEditFormData] = useState({
@@ -248,6 +249,7 @@ function VideoContent() {
     videos,
     roadmap: roadmapId,
     _id: stageId,
+    description,
   } = stage || {};
 
   const {
@@ -280,6 +282,28 @@ function VideoContent() {
       setIsNextStageDisabled(false);
     }
   }, [number, stagesCount, selectedVideo]);
+
+  function handleSubmitStageInfo(data) {
+    console.log(data);
+    console.log(stage);
+    updateStageContent(
+      {
+        stageId,
+        data: {
+          ...stage,
+          title: data.title,
+          description: data.description,
+          number: data.number,
+        },
+      },
+      {
+        onSuccess: () => {
+          setIsEditing(false);
+          navigate(`/roadmaps/${roadmapId}/stage/${data.number}`);
+        },
+      },
+    );
+  }
 
   function handleDeleteVideo(video) {
     const newVideos = videos.filter((v) => v.url !== video.url);
@@ -421,9 +445,77 @@ function VideoContent() {
             <span className="bg-primary-700 rounded-full px-4 py-2 text-sm font-bold text-white capitalize select-none">
               {type}
             </span>
-            <h2 className="text-3xl font-semibold capitalize">{title}</h2>
+            {isEditing ? (
+              <input
+                type="text"
+                defaultValue={title}
+                {...register("title")}
+                className="bg-footer-800 ring-primary-500 rounded-lg px-4 py-2 text-white outline-none focus:ring-2"
+              />
+            ) : (
+              <h2 className="text-3xl font-semibold capitalize">{title}</h2>
+            )}
+            {user?.role === "content manager" && (
+              <button
+                className="cursor-pointer rounded-full bg-emerald-600 px-4 py-1 transition-all duration-200 hover:bg-emerald-700"
+                onClick={() => {
+                  if (!isEditing) setIsEditing(true);
+                  if (isEditing) {
+                    handleSubmit(handleSubmitStageInfo)();
+                  }
+                }}
+              >
+                {isEditing ? "Done" : "Edit"}
+              </button>
+            )}
           </div>
-          <p className="text-lg text-gray-400/80">{stage?.description}</p>
+          {isEditing && (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-3"
+            >
+              <label className="text-lg font-semibold">Stage Number: </label>
+              <input
+                type="number"
+                defaultValue={number}
+                className="bg-footer-800/50 w-16 rounded-lg border border-gray-400 px-2 py-2 text-center text-white outline-none"
+                {...register("number", {
+                  valueAsNumber: true,
+                  required: {
+                    value: true,
+                    message: "Stage number is required",
+                  },
+                  min: 1,
+                })}
+              />
+            </motion.div>
+          )}
+          {isEditing ? (
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-3"
+            >
+              <label className="text-lg font-semibold">
+                Stage Description:{" "}
+              </label>
+
+              <textarea
+                rows={3}
+                defaultValue={description}
+                className="bg-footer-800/50 w-64 rounded-lg border border-gray-400 px-4 py-2 text-white outline-none"
+                {...register("description", {
+                  required: {
+                    value: true,
+                    message: "Description is required",
+                  },
+                })}
+              />
+            </motion.div>
+          ) : (
+            <p className="text-lg text-gray-400/80">{description}</p>
+          )}
         </motion.div>
 
         <div>
