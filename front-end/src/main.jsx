@@ -7,10 +7,10 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      refetchOnWindowFocus: true,
+      refetchOnWindowFocus: false,
       refetchOnMount: true,
       refetchOnReconnect: true,
-      staleTime: 0,
+      staleTime: 5 * 60 * 1000,
     },
   },
 });
