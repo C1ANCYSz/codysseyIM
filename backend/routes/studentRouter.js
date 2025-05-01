@@ -15,6 +15,7 @@ const {
   getAppointments,
   getQuestionnare,
   getRecommendedRoadmaps,
+  skipQuestionnare,
 } = require('../controllers/studentController');
 router.post(
   '/enroll/:id',
@@ -92,5 +93,12 @@ router.get(
   protectRoute,
   restrictTo('student'),
   getRecommendedRoadmaps
+);
+
+router.put(
+  '/skip-questionnare',
+  protectRoute,
+  restrictTo('student'),
+  skipQuestionnare
 );
 module.exports = router;

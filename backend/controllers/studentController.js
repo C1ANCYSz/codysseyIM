@@ -484,6 +484,21 @@ exports.answerQuestionnare = async (req, res, next) => {
   }
 };
 
+exports.skipQuestionnare = async (req, res, next) => {
+  const user = await User.findById(req.user._id);
+  if (!user) {
+    return next(new AppError('User not found', 404));
+  }
+
+  user.tookQuestionnaire = true;
+  await user.save({ validateBeforeSave: false });
+
+  res.status(200).json({
+    success: true,
+    message: 'Questionnaire skipped successfully',
+  });
+};
+
 exports.getRecommendedRoadmaps = async (req, res, next) => {
   const recommendedRoadmaps = await RecommendedRoadmap.find({
     user: req.user._id,
