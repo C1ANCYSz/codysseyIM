@@ -371,57 +371,116 @@ exports.deleteAppointment = async (req, res, next) => {
   }
 };
 
-exports.answerQuestionnare = async (req, res) => {
+exports.answerQuestionnare = async (req, res, next) => {
   try {
     const { selectedAnswers } = req.body;
 
     if (!Array.isArray(selectedAnswers) || selectedAnswers.length === 0) {
-      return res.status(400).json({ error: 'Invalid answers submitted' });
+      return next(new AppError('No answers provided', 400));
     }
 
     const questions = await Question.find({});
     const roadmaps = await Roadmap.find({}, 'title category image');
 
+    if (!questions.length) {
+      return next(new AppError('No questions found', 404));
+    }
+    if (!roadmaps.length) {
+      return next(new AppError('No roadmaps found', 404));
+    }
+
     const roadmapMap = new Map();
-    roadmaps.forEach((r) => roadmapMap.set(r.title, { ...r._doc, score: 0 }));
+    roadmaps.forEach((r) =>
+      roadmapMap.set(r.title.toLowerCase(), { ...r._doc, score: 0 })
+    );
+
+    let impactedRoadmapsCount = 0;
 
     for (const answerText of selectedAnswers) {
-      for (const question of questions) {
-        const answer = question.answers.find((a) => a.text === answerText);
-        if (!answer) continue;
+      if (!answerText) continue;
 
-        for (const impact of answer.impacts) {
-          for (const [title, roadmap] of roadmapMap.entries()) {
-            if (title.toLowerCase().includes(impact.roadmap.toLowerCase())) {
-              roadmap.score += impact.score;
-              break; // assuming only one match needed
+      const answer = questions
+        .flatMap((q) => q.answers)
+        .find((a) => a.text === answerText);
+
+      if (answer && Array.isArray(answer.impacts)) {
+        answer.impacts.forEach((impact) => {
+          if (impact.roadmap && typeof impact.score === 'number') {
+            const roadmapTitle = impact.roadmap.toLowerCase();
+            if (roadmapMap.has(roadmapTitle)) {
+              impactedRoadmapsCount++;
+              roadmapMap.get(roadmapTitle).score += impact.score;
             }
           }
-        }
+        });
       }
+    }
+
+    if (impactedRoadmapsCount === 0) {
+      return next(
+        new AppError(
+          'Not enough valid answers to generate recommendations',
+          404
+        )
+      );
     }
 
     const sortedRoadmaps = [...roadmapMap.values()]
       .filter((r) => r.score > 0)
       .sort((a, b) => b.score - a.score);
 
-    if (sortedRoadmaps.length === 0) {
-      return res.json({ recommended: { title: 'General Roadmap', id: null } });
+    const [firstTop, secondTop, thirdTop] =
+      sortedRoadmaps.length >= 3
+        ? sortedRoadmaps
+        : [
+            sortedRoadmaps[0],
+            sortedRoadmaps[1] || null,
+            sortedRoadmaps[2] || null,
+          ];
+
+    let existingRecommendation = await RecommendedRoadmap.findOne({
+      user: req.user._id,
+    });
+
+    const validRoadmaps = [firstTop?._id, secondTop?._id, thirdTop?._id].filter(
+      Boolean
+    );
+
+    if (existingRecommendation) {
+      existingRecommendation.roadmaps = validRoadmaps;
+      await existingRecommendation.save();
+    } else {
+      await RecommendedRoadmap.create({
+        user: req.user._id,
+        roadmaps: validRoadmaps,
+      });
     }
 
-    const [firstTop, secondTop, thirdTop] = sortedRoadmaps;
-    await RecommendedRoadmap.create({
-      user: req.user._id,
-      roadmaps: [firstTop._id, secondTop._id, thirdTop._id],
-    });
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return next(new AppError('User not found', 404));
+    }
+
+    user.tookQuestionnaire = true;
+    await user.save({ validateBeforeSave: false });
 
     return res.json({
       success: true,
-      roadmaps: [firstTop, secondTop, thirdTop],
+      roadmaps: validRoadmaps.map((roadmapId) => {
+        const roadmap = roadmaps.find(
+          (r) => r._id.toString() === roadmapId.toString()
+        );
+        return {
+          id: roadmap?._id,
+          title: roadmap?.title,
+          category: roadmap?.category,
+          image: roadmap?.image,
+        };
+      }),
     });
   } catch (error) {
     console.error('Error submitting answers:', error);
-    res.status(500).json({ error: 'Server error while submitting answers' });
+    return next(new AppError('Server error while submitting answers', 500));
   }
 };
 
@@ -445,5 +504,18 @@ exports.getRecommendedRoadmaps = async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: { roadmaps: recommendedRoadmaps },
+  });
+};
+
+exports.getQuestionnare = async (req, res, next) => {
+  const Questions = await Question.find({}).select('question answers.text'); // Selecting only 'question' and 'answers.text'
+
+  if (!Questions) {
+    return next(new AppError('No Questions found', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    Questions,
   });
 };

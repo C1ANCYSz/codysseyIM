@@ -13,10 +13,9 @@ const {
   bookAppointment,
   getBookAppointments,
   getAppointments,
-
+  getQuestionnare,
   getRecommendedRoadmaps,
 } = require('../controllers/studentController');
-
 router.post(
   '/enroll/:id',
   protectRoute,
@@ -82,6 +81,12 @@ router.post(
   answerQuestionnare
 );
 
+router.get(
+  '/questionnare',
+  protectRoute,
+  restrictTo('student'),
+  getQuestionnare
+);
 router.get(
   '/roadmaps/recommended',
   protectRoute,
