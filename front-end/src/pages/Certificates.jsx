@@ -3,18 +3,13 @@ import { GiCancel } from "react-icons/gi";
 import { FiDownload } from "react-icons/fi";
 import { Link } from "react-router-dom";
 import { MdOutlineScheduleSend } from "react-icons/md";
+import Loader from "../ui/Loader";
 
 function Certificates() {
   const { certificates, isLoading, error } = useGetCertificates();
 
   console.log(certificates);
-  if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="border-primary-500 h-8 w-8 animate-spin rounded-full border-4 border-t-transparent"></div>
-      </div>
-    );
-  }
+  if (isLoading) return <Loader />;
 
   if (error) {
     return (

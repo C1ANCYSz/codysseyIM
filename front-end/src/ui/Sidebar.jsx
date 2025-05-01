@@ -24,27 +24,64 @@ import { useForm } from "react-hook-form";
 import { RiCalendarScheduleLine } from "react-icons/ri";
 import { AiOutlineSchedule } from "react-icons/ai";
 import { GrScheduleNew } from "react-icons/gr";
-
+import { MdOutlineRecommend } from "react-icons/md";
 const navItemsStudent = [
-  { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
-  { to: "/roadmaps", icon: <FiBookOpen />, label: "Roadmaps" },
-  { to: "/certificates", icon: <TbFileCertificate />, label: "Certificates" },
-  { to: "/appointments", icon: <GrScheduleNew />, label: "Appointments" },
+  {
+    to: "/dashboard",
+    icon: <FiHome className="text-xl" />,
+    label: "Dashboard",
+  },
+  {
+    to: "/roadmaps",
+    icon: <FiBookOpen className="text-xl" />,
+    label: "Roadmaps",
+  },
+  {
+    to: "/certificates",
+    icon: <TbFileCertificate className="text-xl" />,
+    label: "Certificates",
+  },
+  {
+    to: "/appointments",
+    icon: <GrScheduleNew className="text-xl" />,
+    label: "Appointments",
+  },
+  {
+    to: "/recommendations",
+    icon: <MdOutlineRecommend className="text-xl" />,
+    label: "Recommendations",
+  },
 ];
 
 const navItemsContentManager = [
-  { to: "/roadmaps", icon: <FiBookOpen />, label: "Roadmaps" },
-  { to: "/add-roadmap", icon: <FiBookOpen />, label: "Add Roadmap" },
+  {
+    to: "/roadmaps",
+    icon: <FiBookOpen className="text-xl" />,
+    label: "Roadmaps",
+  },
+  {
+    to: "/add-roadmap",
+    icon: <FiBookOpen className="text-xl" />,
+    label: "Add Roadmap",
+  },
 ];
 
 const navItemsAdmin = [
-  { to: "/dashboard", icon: <FiHome />, label: "Dashboard" },
+  {
+    to: "/dashboard",
+    icon: <FiHome className="text-xl" />,
+    label: "Dashboard",
+  },
   {
     to: "/admin/content-managers",
-    icon: <FaUsers />,
+    icon: <FaUsers className="text-xl" />,
     label: "Content Managers",
   },
-  { to: "/admin/academies", icon: <FaUsers />, label: "Academies" },
+  {
+    to: "/admin/academies",
+    icon: <FaUsers className="text-xl" />,
+    label: "Academies",
+  },
   {
     label: "Notifications",
     icon: <FiBell className="text-xl" />,

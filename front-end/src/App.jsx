@@ -24,6 +24,7 @@ import BookAppointment from "./features/content/BookAppointment";
 import PendingAppointments from "./features/content/PendingAppointments";
 import AcceptedAppointments from "./features/content/AcceptedAppointments";
 import CompletedAppointments from "./features/content/CompletedAppointments";
+import Recommendations from "./pages/Recommendations";
 function App() {
   return (
     <Router>
@@ -80,6 +81,14 @@ function App() {
                 element={
                   <PrivateRoute>
                     <Appointements />
+                  </PrivateRoute>
+                }
+              />
+              <Route
+                path="recommendations"
+                element={
+                  <PrivateRoute>
+                    <Recommendations />
                   </PrivateRoute>
                 }
               />

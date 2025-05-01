@@ -284,8 +284,6 @@ function VideoContent() {
   }, [number, stagesCount, selectedVideo]);
 
   function handleSubmitStageInfo(data) {
-    console.log(data);
-    console.log(stage);
     updateStageContent(
       {
         stageId,
