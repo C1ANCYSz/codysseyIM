@@ -2,7 +2,6 @@ const router = require('express').Router();
 
 const { restrictTo } = require('../middlewares/restrictTo');
 const { protectRoute } = require('../middlewares/protectRoute');
-
 const {
   enrollInRoadmap,
   getDashboard,
@@ -14,6 +13,8 @@ const {
   bookAppointment,
   getBookAppointments,
   getAppointments,
+
+  getRecommendedRoadmaps,
 } = require('../controllers/studentController');
 
 router.post(
@@ -79,5 +80,12 @@ router.post(
   protectRoute,
   restrictTo('student'),
   answerQuestionnare
+);
+
+router.get(
+  '/roadmaps/recommended',
+  protectRoute,
+  restrictTo('student'),
+  getRecommendedRoadmaps
 );
 module.exports = router;

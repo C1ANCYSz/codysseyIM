@@ -4,7 +4,7 @@ const UserRoadmap = require('../models/UserRoadmap');
 const Certificate = require('../models/Certificate');
 const Appointment = require('../models/Appointment');
 const Question = require('../models/Question');
-
+const RecommendedRoadmap = require('../models/RecommenedRoadmap');
 const AppError = require('../utils/AppError');
 
 const path = require('path');
@@ -375,56 +375,75 @@ exports.answerQuestionnare = async (req, res) => {
   try {
     const { selectedAnswers } = req.body;
 
-    if (!selectedAnswers || !Array.isArray(selectedAnswers)) {
+    if (!Array.isArray(selectedAnswers) || selectedAnswers.length === 0) {
       return res.status(400).json({ error: 'Invalid answers submitted' });
     }
 
     const questions = await Question.find({});
-    const roadmaps = await Roadmap.find({}, 'title');
+    const roadmaps = await Roadmap.find({}, 'title category image');
 
-    const roadmapScores = roadmaps.reduce((acc, roadmap) => {
-      acc[roadmap.title] = 0;
-      return acc;
-    }, {});
+    const roadmapMap = new Map();
+    roadmaps.forEach((r) => roadmapMap.set(r.title, { ...r._doc, score: 0 }));
 
-    selectedAnswers.forEach((answerText) => {
-      questions.forEach((question) => {
+    for (const answerText of selectedAnswers) {
+      for (const question of questions) {
         const answer = question.answers.find((a) => a.text === answerText);
-        if (answer) {
-          answer.impacts.forEach((impact) => {
-            const matchingRoadmap = roadmaps.find((r) =>
-              r.title.toLowerCase().includes(impact.roadmap.toLowerCase())
-            );
-            if (matchingRoadmap) {
-              roadmapScores[matchingRoadmap.title] += impact.score;
+        if (!answer) continue;
+
+        for (const impact of answer.impacts) {
+          for (const [title, roadmap] of roadmapMap.entries()) {
+            if (title.toLowerCase().includes(impact.roadmap.toLowerCase())) {
+              roadmap.score += impact.score;
+              break; // assuming only one match needed
             }
-          });
+          }
         }
-      });
-    });
-
-    const sortedRoadmaps = Object.entries(roadmapScores)
-      .sort((a, b) => b[1] - a[1])
-      .map(([roadmap, score]) => ({ title: roadmap, score }));
-
-    if (sortedRoadmaps.length === 0 || sortedRoadmaps[0].score === 0) {
-      return res.json({
-        recommended: { title: 'General Roadmap', id: null },
-      });
+      }
     }
 
-    const topRoadmap = sortedRoadmaps[0];
+    const sortedRoadmaps = [...roadmapMap.values()]
+      .filter((r) => r.score > 0)
+      .sort((a, b) => b.score - a.score);
 
-    const selectedRoadmap = roadmaps.find((r) => r.title === topRoadmap.title);
+    if (sortedRoadmaps.length === 0) {
+      return res.json({ recommended: { title: 'General Roadmap', id: null } });
+    }
+
+    const [firstTop, secondTop, thirdTop] = sortedRoadmaps;
+    await RecommendedRoadmap.create({
+      user: req.user._id,
+      roadmaps: [firstTop._id, secondTop._id, thirdTop._id],
+    });
 
     return res.json({
-      recommended: {
-        title: selectedRoadmap.title,
-        id: selectedRoadmap._id,
-      },
+      success: true,
+      roadmaps: [firstTop, secondTop, thirdTop],
     });
   } catch (error) {
     console.error('Error submitting answers:', error);
     res.status(500).json({ error: 'Server error while submitting answers' });
   }
+};
+
+exports.getRecommendedRoadmaps = async (req, res, next) => {
+  const recommendedRoadmaps = await RecommendedRoadmap.find({
+    user: req.user._id,
+  })
+    .select('roadmaps')
+    .populate({
+      path: 'roadmaps',
+      select: 'title image _id category',
+    });
+
+  if (!recommendedRoadmaps.length) {
+    return res.json({
+      success: true,
+      message: "You haven't taken the questionnaire yet.",
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    data: { roadmaps: recommendedRoadmaps },
+  });
 };

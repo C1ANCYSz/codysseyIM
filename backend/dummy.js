@@ -121,22 +121,25 @@ const questions = [
     answers: [
       {
         text: 'Absolute Beginner',
-        impacts: [{ roadmap: 'HTML & CSS', score: 5 }],
+        impacts: [
+          { roadmap: 'HTML & CSS', score: 5 },
+          { roadmap: 'Javascript', score: 3 },
+        ],
       },
       {
         text: 'Some Experience',
         impacts: [
           { roadmap: 'Vue.js', score: 4 },
           { roadmap: 'React JS', score: 4 },
-          { roadmap: 'Express.js', score: 4 },
+          { roadmap: 'Python', score: 4 },
         ],
       },
       {
         text: 'Confident Coder',
         impacts: [
           { roadmap: 'MERN Stack', score: 5 },
-          { roadmap: 'Django', score: 5 },
-          { roadmap: 'MongoDB', score: 5 },
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Data structures & Algorithms', score: 5 },
         ],
       },
     ],
@@ -148,38 +151,44 @@ const questions = [
         text: 'Build my first website',
         impacts: [
           { roadmap: 'HTML & CSS', score: 5 },
-          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'Javascript', score: 4 },
+          { roadmap: 'Tailwind CSS', score: 4 },
         ],
       },
       {
-        text: 'Create full web apps',
+        text: 'Create full web applications',
         impacts: [
           { roadmap: 'MERN Stack', score: 5 },
           { roadmap: 'Next.js', score: 5 },
+          { roadmap: 'React JS', score: 4 },
         ],
       },
       {
-        text: 'Learn backend systems',
+        text: 'Develop mobile apps',
         impacts: [
-          { roadmap: 'Node.js', score: 5 },
-          { roadmap: 'Express.js', score: 5 },
-          { roadmap: 'Django', score: 5 },
+          { roadmap: 'React Native', score: 5 },
+          { roadmap: 'Flutter', score: 5 },
         ],
       },
       {
-        text: 'Explore databases',
-        impacts: [{ roadmap: 'MongoDB', score: 5 }],
+        text: 'Work with data and databases',
+        impacts: [
+          { roadmap: 'MongoDB', score: 5 },
+          { roadmap: 'PostgreSQL', score: 5 },
+          { roadmap: 'Data Analysis', score: 4 },
+        ],
       },
     ],
   },
   {
-    question: "What's your learning vibe?",
+    question: "What's your learning style?",
     answers: [
       {
         text: 'Visual and interactive',
         impacts: [
           { roadmap: 'Vue.js', score: 5 },
           { roadmap: 'React JS', score: 5 },
+          { roadmap: 'HTML & CSS', score: 4 },
         ],
       },
       {
@@ -187,51 +196,63 @@ const questions = [
         impacts: [
           { roadmap: 'Node.js', score: 5 },
           { roadmap: 'Express.js', score: 5 },
+          { roadmap: 'Data structures & Algorithms', score: 5 },
         ],
       },
       {
-        text: 'Curious about how computers work',
-        impacts: [{ roadmap: 'assembly', score: 5 }],
-      },
-      {
-        text: 'Love seeing fast results',
+        text: 'Practical and hands-on',
         impacts: [
-          { roadmap: 'HTML & CSS', score: 5 },
-          { roadmap: 'Next.js', score: 5 },
+          { roadmap: 'Git & GitHub', score: 5 },
+          { roadmap: 'Python', score: 5 },
         ],
       },
     ],
   },
   {
-    question: 'How do you prefer learning?',
+    question: 'Which of these excites you most?',
     answers: [
       {
-        text: 'Quick wins first, then deeper',
+        text: 'Building beautiful user interfaces',
         impacts: [
-          { roadmap: 'HTML & CSS', score: 5 },
-          { roadmap: 'Vue.js', score: 4 },
+          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'Vue.js', score: 5 },
+          { roadmap: 'Tailwind CSS', score: 5 },
         ],
       },
       {
-        text: 'Deep dive from Day 1',
+        text: 'Creating powerful backend systems',
         impacts: [
           { roadmap: 'Node.js', score: 5 },
-          { roadmap: 'Django', score: 5 },
-          { roadmap: 'MongoDB', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+          { roadmap: 'PostgreSQL', score: 4 },
+        ],
+      },
+      {
+        text: 'Developing mobile applications',
+        impacts: [
+          { roadmap: 'React Native', score: 5 },
+          { roadmap: 'Flutter', score: 5 },
+        ],
+      },
+      {
+        text: 'Working with data and AI',
+        impacts: [
+          { roadmap: 'Machine Learning Basics', score: 5 },
+          { roadmap: 'Data Analysis', score: 5 },
         ],
       },
     ],
   },
   {
-    question: 'Which of these sounds like your dream job?',
+    question: 'Which tech role interests you most?',
     answers: [
       {
         text: 'Frontend Developer',
         impacts: [
           { roadmap: 'React JS', score: 5 },
           { roadmap: 'Vue.js', score: 5 },
-          { roadmap: 'TypeScript', score: 5 },
-          { roadmap: 'Next.js', score: 5 },
+          { roadmap: 'Next.js', score: 4 },
+          { roadmap: 'Tailwind CSS', score: 4 },
         ],
       },
       {
@@ -239,7 +260,7 @@ const questions = [
         impacts: [
           { roadmap: 'Node.js', score: 5 },
           { roadmap: 'Express.js', score: 5 },
-          { roadmap: 'Django', score: 5 },
+          { roadmap: 'PostgreSQL', score: 4 },
         ],
       },
       {
@@ -250,164 +271,175 @@ const questions = [
         ],
       },
       {
-        text: 'Database Administrator',
-        impacts: [{ roadmap: 'MongoDB', score: 5 }],
+        text: 'Mobile Developer',
+        impacts: [
+          { roadmap: 'React Native', score: 5 },
+          { roadmap: 'Flutter', score: 5 },
+        ],
+      },
+      {
+        text: 'Data Specialist',
+        impacts: [
+          { roadmap: 'Data Analysis', score: 5 },
+          { roadmap: 'Machine Learning Basics', score: 5 },
+        ],
       },
     ],
   },
   {
-    question: 'What type of projects would you love to build first?',
+    question: 'What type of projects excite you?',
     answers: [
       {
-        text: 'Beautiful websites and apps',
+        text: 'Websites and web apps',
         impacts: [
           { roadmap: 'React JS', score: 5 },
           { roadmap: 'Vue.js', score: 5 },
+          { roadmap: 'Next.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Mobile applications',
+        impacts: [
+          { roadmap: 'React Native', score: 5 },
+          { roadmap: 'Flutter', score: 5 },
+        ],
+      },
+      {
+        text: 'APIs and backend services',
+        impacts: [
+          { roadmap: 'Node.js', score: 5 },
+          { roadmap: 'Express.js', score: 5 },
+        ],
+      },
+      {
+        text: 'Data analysis and visualization',
+        impacts: [
+          { roadmap: 'Data Analysis', score: 5 },
+          { roadmap: 'Python', score: 4 },
+        ],
+      },
+    ],
+  },
+  {
+    question: 'How do you prefer to learn?',
+    answers: [
+      {
+        text: 'Quick wins and visible results',
+        impacts: [
           { roadmap: 'HTML & CSS', score: 5 },
-          { roadmap: 'Next.js', score: 4 },
+          { roadmap: 'Javascript', score: 4 },
+          { roadmap: 'Tailwind CSS', score: 4 },
         ],
       },
       {
-        text: 'Backend systems and APIs',
+        text: 'Structured, step-by-step',
         impacts: [
-          { roadmap: 'Node.js', score: 5 },
-          { roadmap: 'Express.js', score: 5 },
-          { roadmap: 'Django', score: 5 },
+          { roadmap: 'Data structures & Algorithms', score: 5 },
+          { roadmap: 'Git & GitHub', score: 5 },
         ],
       },
       {
-        text: 'Full applications from scratch',
+        text: 'Building real projects',
         impacts: [
           { roadmap: 'MERN Stack', score: 5 },
-          { roadmap: 'Next.js', score: 5 },
+          { roadmap: 'React Native', score: 5 },
         ],
-      },
-      {
-        text: 'Powerful databases',
-        impacts: [{ roadmap: 'MongoDB', score: 5 }],
-      },
-      {
-        text: 'Low-level software',
-        impacts: [{ roadmap: 'assembly', score: 5 }],
       },
     ],
   },
   {
-    question: 'Which topic do you find more exciting?',
+    question: 'Which of these sounds most appealing?',
     answers: [
       {
-        text: 'UI/UX and animations',
+        text: 'Creating responsive UIs',
         impacts: [
           { roadmap: 'React JS', score: 5 },
           { roadmap: 'Vue.js', score: 5 },
+          { roadmap: 'Tailwind CSS', score: 5 },
         ],
       },
       {
-        text: 'Data handling and APIs',
+        text: 'Building scalable backends',
         impacts: [
           { roadmap: 'Node.js', score: 5 },
           { roadmap: 'Express.js', score: 5 },
+          { roadmap: 'PostgreSQL', score: 4 },
+        ],
+      },
+      {
+        text: 'Developing cross-platform apps',
+        impacts: [
+          { roadmap: 'React Native', score: 5 },
+          { roadmap: 'Flutter', score: 5 },
+        ],
+      },
+      {
+        text: 'Working with data and patterns',
+        impacts: [
+          { roadmap: 'Data Analysis', score: 5 },
+          { roadmap: 'Machine Learning Basics', score: 5 },
+        ],
+      },
+    ],
+  },
+  {
+    question: 'Pick your preferred tech stack:',
+    answers: [
+      {
+        text: 'JavaScript/TypeScript ecosystem',
+        impacts: [
+          { roadmap: 'React JS', score: 5 },
+          { roadmap: 'Node.js', score: 4 },
+          { roadmap: 'MERN Stack', score: 4 },
+        ],
+      },
+      {
+        text: 'Python ecosystem',
+        impacts: [
+          { roadmap: 'Python', score: 5 },
+          { roadmap: 'Data Analysis', score: 4 },
+          { roadmap: 'Machine Learning Basics', score: 4 },
+        ],
+      },
+      {
+        text: 'Mobile development',
+        impacts: [
+          { roadmap: 'React Native', score: 5 },
+          { roadmap: 'Flutter', score: 5 },
+        ],
+      },
+      {
+        text: 'Databases and data',
+        impacts: [
           { roadmap: 'MongoDB', score: 5 },
-        ],
-      },
-      {
-        text: 'Security, auth, scaling',
-        impacts: [
-          { roadmap: 'Django', score: 5 },
-          { roadmap: 'MERN Stack', score: 5 },
+          { roadmap: 'PostgreSQL', score: 5 },
         ],
       },
     ],
   },
   {
-    question: "What's more important for you?",
+    question: 'Which fundamental skill do you want to strengthen?',
     answers: [
       {
-        text: 'Frontend looks and feels',
+        text: 'Programming concepts',
         impacts: [
-          { roadmap: 'Vue.js', score: 5 },
-          { roadmap: 'React JS', score: 5 },
-          { roadmap: 'TypeScript', score: 4 },
+          { roadmap: 'Javascript', score: 5 },
+          { roadmap: 'Python', score: 5 },
         ],
       },
       {
-        text: 'Backend logic and power',
-        impacts: [
-          { roadmap: 'Node.js', score: 5 },
-          { roadmap: 'Express.js', score: 5 },
-          { roadmap: 'Django', score: 5 },
-        ],
+        text: 'Algorithms and problem solving',
+        impacts: [{ roadmap: 'Data structures & Algorithms', score: 5 }],
       },
       {
-        text: 'Full package, both frontend and backend',
-        impacts: [
-          { roadmap: 'MERN Stack', score: 5 },
-          { roadmap: 'Next.js', score: 5 },
-        ],
-      },
-    ],
-  },
-  {
-    question: 'Which tech would you LOVE to master first?',
-    answers: [
-      {
-        text: 'React.js',
-        impacts: [
-          { roadmap: 'React JS', score: 5 },
-          { roadmap: 'MERN Stack', score: 3 },
-          { roadmap: 'Next.js', score: 4 },
-        ],
+        text: 'Version control and collaboration',
+        impacts: [{ roadmap: 'Git & GitHub', score: 5 }],
       },
       {
-        text: 'Node.js',
+        text: 'Web fundamentals',
         impacts: [
-          { roadmap: 'Node.js', score: 5 },
-          { roadmap: 'Express.js', score: 5 },
-        ],
-      },
-      {
-        text: 'TypeScript',
-        impacts: [
-          { roadmap: 'TypeScript', score: 5 },
-          { roadmap: 'Next.js', score: 4 },
-        ],
-      },
-      { text: 'Vue.js', impacts: [{ roadmap: 'Vue.js', score: 5 }] },
-      { text: 'Django', impacts: [{ roadmap: 'django', score: 5 }] },
-    ],
-  },
-  {
-    question: 'Pick your future tech stack:',
-    answers: [
-      {
-        text: 'MERN (MongoDB, Express, React, Node)',
-        impacts: [
-          { roadmap: 'MERN Stack', score: 5 },
-          { roadmap: 'MongoDB', score: 4 },
-          { roadmap: 'Node.js', score: 4 },
-          { roadmap: 'React JS', score: 4 },
-        ],
-      },
-      {
-        text: 'React + Next.js',
-        impacts: [
-          { roadmap: 'React JS', score: 5 },
-          { roadmap: 'Next.js', score: 5 },
-        ],
-      },
-      {
-        text: 'Vue.js + Node.js',
-        impacts: [
-          { roadmap: 'Vue.js', score: 5 },
-          { roadmap: 'Node.js', score: 4 },
-          { roadmap: 'Express.js', score: 4 },
-        ],
-      },
-      {
-        text: 'Django + Database',
-        impacts: [
-          { roadmap: 'django', score: 5 },
-          { roadmap: 'MongoDB', score: 4 },
+          { roadmap: 'HTML & CSS', score: 5 },
+          { roadmap: 'Javascript', score: 4 },
         ],
       },
     ],
