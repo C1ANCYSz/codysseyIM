@@ -14,6 +14,7 @@ import { useAuth } from "../../context/AuthProvider";
 import { useUpdateStageContent } from "../../hooks/user/content-manager/useUpdateStageContent";
 import { useUpdateStageProgress } from "../../hooks/user/useUpdateStageProgress";
 import { useGetStudent } from "../../hooks/user/useGetStudent";
+import { toast } from "react-hot-toast";
 
 function ManageQuiz({ stage }) {
   const { register, handleSubmit, reset } = useForm();
@@ -560,19 +561,19 @@ function QuizContent({ stage, roadmapId }) {
 }
 
 const Quiz = () => {
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { register, handleSubmit } = useForm();
   const [isEditing, setIsEditing] = useState(false);
   const { updateStageContent, isLoading: isUpdatingContent } =
     useUpdateStageContent();
   const { stage: { stage } = {}, isLoading } = useGetStage();
+  const navigate = useNavigate();
 
   const {
     description,
     title,
     roadmap: roadmapId,
-    questionsCount,
+
     number,
     type,
     _id: stageId,
@@ -580,6 +581,7 @@ const Quiz = () => {
   console.log(stage);
   function handleEditQuizInfo(data) {
     const { title, description } = data;
+    const newNumber = Number(data.number);
 
     updateStageContent(
       {
@@ -588,14 +590,19 @@ const Quiz = () => {
           ...stage,
           title,
           description,
-          number: Number(data.number), // Convert to number since form data is string
+          number: newNumber,
         },
       },
       {
         onSuccess: () => {
           setIsEditing(false);
-          // Use data.number to ensure we use the updated number
-          navigate(`/roadmaps/${roadmapId}/stage/${Number(data.number)}`);
+          navigate(`/roadmaps/${roadmapId}/stage/${newNumber}`, {
+            replace: true,
+          });
+        },
+        onError: (error) => {
+          console.error("Error updating stage:", error);
+          toast.error("Failed to update stage information");
         },
       },
     );
