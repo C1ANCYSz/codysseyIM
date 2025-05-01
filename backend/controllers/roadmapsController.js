@@ -5,7 +5,9 @@ const AppError = require('../utils/AppError');
 const mongoose = require('mongoose');
 require('express-async-errors');
 const UserRoadmap = require('../models/UserRoadmap');
-
+const Certificate = require('../models/Certificate');
+const RecommendedRoadmap = require('../models/RecommenedRoadmap');
+const Appointment = require('../models/Appointment');
 exports.getRoadmaps = async (req, res, next) => {
   const categories = await Roadmap.distinct('category').lean();
 
@@ -345,10 +347,6 @@ exports.deleteRoadmap = async (req, res, next) => {
   try {
     const roadmapId = req.params.id;
 
-    // Delete all UserRoadmap entries associated with the roadmap
-    await UserRoadmap.deleteMany({ roadmap: roadmapId }, { session });
-
-    // Delete the roadmap itself
     const roadmap = await Roadmap.findByIdAndDelete(roadmapId, { session });
 
     if (!roadmap) {
@@ -356,6 +354,13 @@ exports.deleteRoadmap = async (req, res, next) => {
       session.endSession();
       return next(new AppError('No roadmap found with that ID.', 404));
     }
+
+    await Promise.all([
+      UserRoadmap.deleteMany({ roadmap: roadmapId }, { session }),
+      Certificate.deleteMany({ roadmap: roadmapId }, { session }),
+      RecommendedRoadmap.deleteMany({ roadmaps: roadmapId }, { session }),
+      Appointment.deleteMany({ roadmap: roadmapId }, { session }),
+    ]);
 
     await session.commitTransaction();
     session.endSession();
