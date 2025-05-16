@@ -191,9 +191,10 @@ The frontend is directly integrated with the API, providing a seamless and fast 
 ---
 
 Codyssey is designed for flexibility, performance, and clarity—providing learners, academies, and admins with a cohesive and powerful educational experience.
-"""
 
 
 ## 📄 Additional Resources
 
 - [View Full Project Documentation](https://docs.google.com/document/d/1TST3C8EyvG7oocJ8vWQJm1UulqQXnyk0-VoXDkiChJw)
+
+"""
