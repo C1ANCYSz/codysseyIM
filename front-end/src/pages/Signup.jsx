@@ -2,71 +2,22 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useSignup } from "../hooks/auth/useSignup";
 import { FaCode, FaEye, FaEyeSlash } from "react-icons/fa";
+import { useForm } from "react-hook-form";
 
 function Signup() {
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    getValues,
+  } = useForm();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    password: "",
-    confirmPassword: "",
-  });
-  const [errors, setErrors] = useState({});
+
   const { signup, isLoading, error } = useSignup();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-
-    // Clear error when user starts typing
-    if (errors[name]) {
-      setErrors((prev) => ({
-        ...prev,
-        [name]: null,
-      }));
-    }
-  };
-
-  const validateForm = () => {
-    const newErrors = {};
-
-    // Name validation
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
-
-    // Email validation
-    if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "Please enter a valid email";
-    }
-
-    // Password validation
-    if (!formData.password) {
-      newErrors.password = "Password is required";
-    } else if (formData.password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
-    }
-
-    // Confirm password validation
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    if (validateForm()) {
-      signup(formData);
-    }
+  const onSubmit = (data) => {
+    signup(data);
   };
 
   return (
@@ -100,13 +51,7 @@ function Signup() {
               </p>
             </div>
 
-            {error && (
-              <div className="mb-6 rounded-lg bg-red-50 p-4 text-sm text-red-600">
-                {error}
-              </div>
-            )}
-
-            <form className="space-y-6" onSubmit={handleSubmit}>
+            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
               {/* Name field */}
               <div>
                 <label
@@ -119,15 +64,22 @@ function Signup() {
                   id="name"
                   name="name"
                   type="text"
-                  value={formData.name}
-                  onChange={handleChange}
                   placeholder="Enter your name"
                   className={`w-full rounded-lg border ${
                     errors.name ? "border-red-400" : "border-gray-300"
                   } px-4 py-3 transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:outline-none`}
+                  {...register("name", {
+                    required: "Name is required",
+                    minLength: {
+                      value: 3,
+                      message: "Name must be at least 3 characters long",
+                    },
+                  })}
                 />
-                {errors.name && (
-                  <p className="mt-1 text-sm text-red-600">{errors.name}</p>
+                {errors.name?.message && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.name?.message}
+                  </p>
                 )}
               </div>
 
@@ -143,15 +95,18 @@ function Signup() {
                   id="email"
                   name="email"
                   type="email"
-                  value={formData.email}
-                  onChange={handleChange}
                   placeholder="name@example.com"
                   className={`w-full rounded-lg border ${
                     errors.email ? "border-red-400" : "border-gray-300"
                   } px-4 py-3 transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:outline-none`}
+                  {...register("email", {
+                    required: "Email is required",
+                  })}
                 />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email}</p>
+                {errors.email?.message && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.email?.message}
+                  </p>
                 )}
               </div>
 
@@ -168,12 +123,17 @@ function Signup() {
                     id="password"
                     name="password"
                     type={showPassword ? "text" : "password"}
-                    value={formData.password}
-                    onChange={handleChange}
                     placeholder="At least 8 characters"
                     className={`w-full rounded-lg border ${
                       errors.password ? "border-red-400" : "border-gray-300"
                     } px-4 py-3 pr-12 transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:outline-none`}
+                    {...register("password", {
+                      required: "Password is required",
+                      minLength: {
+                        value: 8,
+                        message: "Password must be at least 8 characters long",
+                      },
+                    })}
                   />
                   <button
                     type="button"
@@ -190,8 +150,10 @@ function Signup() {
                     )}
                   </button>
                 </div>
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+                {errors.password?.message && (
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.password?.message}
+                  </p>
                 )}
               </div>
 
@@ -208,14 +170,18 @@ function Signup() {
                     id="confirmPassword"
                     name="confirmPassword"
                     type={showConfirm ? "text" : "password"}
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
                     placeholder="Confirm your password"
                     className={`w-full rounded-lg border ${
                       errors.confirmPassword
                         ? "border-red-400"
                         : "border-gray-300"
                     } px-4 py-3 pr-12 transition-colors focus:border-violet-500 focus:ring-2 focus:ring-violet-200 focus:outline-none`}
+                    {...register("confirmPassword", {
+                      required: "Please confirm your password",
+                      validate: (value) =>
+                        value === getValues("password") ||
+                        "Passwords do not match",
+                    })}
                   />
                   <button
                     type="button"
@@ -230,9 +196,9 @@ function Signup() {
                     )}
                   </button>
                 </div>
-                {errors.confirmPassword && (
+                {errors.confirmPassword?.message && (
                   <p className="mt-1 text-sm text-red-600">
-                    {errors.confirmPassword}
+                    {errors.confirmPassword?.message}
                   </p>
                 )}
               </div>
