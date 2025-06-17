@@ -3,3 +3,4 @@ node_modules
 roadmapSeeding.js
 playlist_data.json
 meta.json
+.prettierrc
