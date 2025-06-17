@@ -7,10 +7,10 @@
     "backend": "cd backend && nodemon server.js",
     "frontend": "cd front-end && npm run dev",
     "all": "concurrently \"npm run backend\" \"npm run frontend\"",
-    "install": "cd front-end && npm install && cd ../backend && npm install ",
+    "install": "cd front-end && npm install && npm run build && cd ../backend && npm install",
     "git": "git pull origin main",
     "start": "npm run install && npm run all",
-   "startPro": "npm run install && concurrently \"cd backend && node server.js\" \"cd front-end && npm run dev\""
+    "startPro": "npm run install && concurrently \"cd backend && node server.js\" \"cd front-end && npm run dev\""
 
   },
   "keywords": [],
