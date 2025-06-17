@@ -8,17 +8,14 @@ export function useMakeAppointment() {
   const { mutate: makeAppointment, isLoading } = useMutation({
     mutationFn: async (data) => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/student/book-appointment`,
-          {
-            method: "POST",
-            body: JSON.stringify(data),
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
+        const response = await fetch(`/api/student/book-appointment`, {
+          method: "POST",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          credentials: "include",
+        });
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message);

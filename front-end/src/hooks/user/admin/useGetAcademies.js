@@ -5,7 +5,7 @@ export function useGetAcademies() {
     queryKey: ["academies"],
     queryFn: async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/admin/academies", {
+        const res = await fetch("/api/admin/academies", {
           headers: {
             "Content-Type": "application/json",
           },

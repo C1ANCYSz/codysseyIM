@@ -12,13 +12,10 @@ export function useEnroll() {
   } = useMutation({
     mutationFn: async (roadmapId) => {
       try {
-        const res = await fetch(
-          `http://localhost:3000/api/student/enroll/${roadmapId}`,
-          {
-            method: "POST",
-            credentials: "include",
-          },
-        );
+        const res = await fetch(`/api/student/enroll/${roadmapId}`, {
+          method: "POST",
+          credentials: "include",
+        });
         if (!res.ok) {
           throw new Error("Failed to enroll in roadmap");
         }

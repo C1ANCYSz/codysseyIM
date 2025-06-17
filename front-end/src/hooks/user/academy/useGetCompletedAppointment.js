@@ -5,16 +5,13 @@ export function useGetCompletedAppointment() {
     queryKey: ["academy-completed-appointments"],
     queryFn: async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/academy/appointments/completed`,
-          {
-            method: "GET",
-            headers: {
-              "Content-type": "application/json",
-            },
-            credentials: "include",
+        const response = await fetch(`/api/academy/appointments/completed`, {
+          method: "GET",
+          headers: {
+            "Content-type": "application/json",
           },
-        );
+          credentials: "include",
+        });
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message);

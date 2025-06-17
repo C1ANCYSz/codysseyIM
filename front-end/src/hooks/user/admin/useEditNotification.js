@@ -4,17 +4,14 @@ export function useEditNotification() {
   const queryClient = useQueryClient();
   const { mutate: editNotification, isLoading: isEditing } = useMutation({
     mutationFn: async ({ text }) => {
-      const response = await fetch(
-        `http://localhost:3000/api/admin/notification`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ text }),
-          credentials: "include",
+      const response = await fetch(`/api/admin/notification`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({ text }),
+        credentials: "include",
+      });
       if (!response.ok) {
         throw new Error("Failed to edit notification");
       }

@@ -7,7 +7,7 @@ export function useAddContentManager() {
     mutationFn: async function (email) {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/admin/content-managers`,
+          `/api/admin/content-managers`,
           {
             method: "POST",
             headers: {

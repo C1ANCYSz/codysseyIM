@@ -15,7 +15,7 @@ export function AuthProvider({ children }) {
       // Store the current location before checking login status
       localStorage.setItem("lastLocation", location.pathname);
       try {
-        const res = await fetch("http://localhost:3000/api/auth/check", {
+        const res = await fetch("/api/auth/check", {
           method: "GET",
           credentials: "include", // Sends cookie
         });

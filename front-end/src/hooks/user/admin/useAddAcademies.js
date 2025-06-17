@@ -6,17 +6,14 @@ export function useAddAcademy() {
   const { mutate: addAcademy, isLoading } = useMutation({
     mutationFn: async function (academy) {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/admin/academies`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(academy),
-            credentials: "include",
+        const response = await fetch(`/api/admin/academies`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify(academy),
+          credentials: "include",
+        });
         if (!response.ok) {
           throw new Error("Failed to add academy");
         }

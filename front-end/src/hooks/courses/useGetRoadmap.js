@@ -10,12 +10,9 @@ export const useGetRoadmap = () => {
   } = useQuery({
     queryKey: ["roadmap", roadmapId],
     queryFn: async () => {
-      const response = await fetch(
-        `http://localhost:3000/api/roadmaps/${roadmapId}`,
-        {
-          credentials: "include",
-        },
-      );
+      const response = await fetch(`/api/roadmaps/${roadmapId}`, {
+        credentials: "include",
+      });
       const {
         data: { roadmap },
       } = await response.json();

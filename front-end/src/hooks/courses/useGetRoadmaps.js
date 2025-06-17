@@ -9,7 +9,7 @@ export const useGetRoadmaps = () => {
     queryKey: ["roadmaps"],
     queryFn: async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/roadmaps");
+        const res = await fetch("/api/roadmaps");
         const { data } = await res.json();
         console.log(data);
         return data;

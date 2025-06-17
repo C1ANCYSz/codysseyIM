@@ -5,15 +5,12 @@ export function useGetContentManagers() {
     queryKey: ["content-managers"],
     queryFn: async () => {
       try {
-        const res = await fetch(
-          "http://localhost:3000/api/admin/content-managers",
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
+        const res = await fetch("/api/admin/content-managers", {
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          credentials: "include",
+        });
         const { data } = await res.json();
         return data;
       } catch (error) {

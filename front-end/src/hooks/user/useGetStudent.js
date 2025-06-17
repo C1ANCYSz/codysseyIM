@@ -9,7 +9,7 @@ export function useGetStudent() {
     queryKey: ["student"],
     queryFn: async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/student/dashboard", {
+        const res = await fetch("/api/student/dashboard", {
           credentials: "include",
         });
         const data = await res.json();

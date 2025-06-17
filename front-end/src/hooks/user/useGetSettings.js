@@ -9,12 +9,9 @@ export function useGetSettings() {
     queryKey: ["settings"],
     queryFn: async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/user/settings`,
-          {
-            credentials: "include",
-          },
-        );
+        const response = await fetch(`/api/user/settings`, {
+          credentials: "include",
+        });
         const { data } = await response.json();
         return data.user;
       } catch (error) {

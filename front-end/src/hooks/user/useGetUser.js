@@ -8,7 +8,7 @@ export function useGetUser() {
   } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3000/api/auth/check", {
+      const res = await fetch("/api/auth/check", {
         method: "GET",
         credentials: "include", // Sends cookie
       });

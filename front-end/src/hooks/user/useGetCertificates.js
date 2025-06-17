@@ -9,12 +9,9 @@ export function useGetCertificates() {
     queryKey: ["certificates"],
     queryFn: async () => {
       try {
-        const res = await fetch(
-          "http://localhost:3000/api/student/certificates",
-          {
-            credentials: "include",
-          },
-        );
+        const res = await fetch("/api/student/certificates", {
+          credentials: "include",
+        });
         const { data } = await res.json();
         return data.certificates;
       } catch (error) {

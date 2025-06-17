@@ -6,7 +6,7 @@ export function useDeleteAppointment() {
   const { mutate: deleteAppointment, isLoading } = useMutation({
     mutationFn: async (appointmentId) => {
       const response = await fetch(
-        `http://localhost:3000/api/student/appointments/${appointmentId}`,
+        `/api/student/appointments/${appointmentId}`,
         {
           method: "DELETE",
           headers: {

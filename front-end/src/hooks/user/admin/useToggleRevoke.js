@@ -5,7 +5,7 @@ export const useToggleRevoke = () => {
   const { mutate: toggleRevoke, isLoading } = useMutation({
     mutationFn: async (email) => {
       const response = await fetch(
-        `http://localhost:3000/api/admin/toggle-revoke`,
+        `/api/admin/toggle-revoke`,
         {
           method: "PUT",
           body: JSON.stringify({ email }),

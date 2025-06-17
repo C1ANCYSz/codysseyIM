@@ -7,17 +7,14 @@ export const useSubmitQuestionnaire = () => {
   const { mutate: submitAnswers, isLoading } = useMutation({
     mutationFn: async (answers) => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/student/answer-questionnare",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-            body: JSON.stringify({ selectedAnswers: answers }),
+        const response = await fetch("/api/student/answer-questionnare", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          credentials: "include",
+          body: JSON.stringify({ selectedAnswers: answers }),
+        });
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data.message);

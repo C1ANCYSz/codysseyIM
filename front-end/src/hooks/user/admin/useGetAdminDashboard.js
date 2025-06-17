@@ -9,15 +9,12 @@ export const useGetAdminDashboard = () => {
     queryKey: ["admin-dashboard"],
     queryFn: async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/admin/dashboard`,
-          {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
+        const response = await fetch(`/api/admin/dashboard`, {
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          credentials: "include",
+        });
         const data = await response.json();
         return data;
       } catch (error) {

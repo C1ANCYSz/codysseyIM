@@ -9,16 +9,13 @@ export function useGetRecommendations() {
     queryKey: ["recommendations"],
     queryFn: async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/student/roadmaps/recommended",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
+        const response = await fetch("/api/student/roadmaps/recommended", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          credentials: "include",
+        });
         const data = await response.json();
         if (!response.ok) throw new Error(data.message);
         return data.roadmaps || [];

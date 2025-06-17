@@ -10,17 +10,14 @@ export function useVerifyEmail() {
     mutationFn: async (code) => {
       const token = { verificationToken: code };
       console.log(token);
-      const response = await fetch(
-        `http://localhost:3000/api/auth/verify-email`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(token),
-          credentials: "include",
+      const response = await fetch(`/api/auth/verify-email`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify(token),
+        credentials: "include",
+      });
       return response.json();
     },
     onSuccess: (data) => {

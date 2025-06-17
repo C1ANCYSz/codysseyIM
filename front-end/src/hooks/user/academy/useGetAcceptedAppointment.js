@@ -6,7 +6,7 @@ export function useGetAcceptedAppointment() {
     queryFn: async () => {
       try {
         const response = await fetch(
-          `http://localhost:3000/api/academy/appointments/accepted`,
+          `/api/academy/appointments/accepted`,
           {
             method: "GET",
             headers: {

@@ -5,16 +5,13 @@ export const useUpdateQuestionnaire = () => {
   const { mutate: updateQuestionnaire, isLoading } = useMutation({
     mutationFn: async () => {
       try {
-        const response = await fetch(
-          "http://localhost:3000/api/student/skip-questionnare",
-          {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
+        const response = await fetch("/api/student/skip-questionnare", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          credentials: "include",
+        });
         const data = await response.json();
         if (!response.ok) {
           throw new Error(data.message);

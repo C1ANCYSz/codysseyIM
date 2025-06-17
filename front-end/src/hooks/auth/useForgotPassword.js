@@ -11,16 +11,13 @@ export function useForgotPassword() {
   } = useMutation({
     mutationFn: async ({ email, setStep }) => {
       try {
-        const res = await fetch(
-          "http://localhost:3000/api/auth/forgot-password",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ email }),
+        const res = await fetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify({ email }),
+        });
         const data = await res.json();
         if (data.success) {
           setStep(2);
@@ -50,7 +47,7 @@ export function useVerifyEmail() {
   } = useMutation({
     mutationFn: async ({ email, code, setStep }) => {
       try {
-        const res = await fetch("http://localhost:3000/api/auth/verify-email", {
+        const res = await fetch("/api/auth/verify-email", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -96,16 +93,13 @@ export function useResetPassword() {
   } = useMutation({
     mutationFn: async ({ password, confirmPassword }) => {
       try {
-        const res = await fetch(
-          `http://localhost:3000/api/auth/reset-password/${token}`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ password, confirmPassword }),
+        const res = await fetch(`/api/auth/reset-password/${token}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          body: JSON.stringify({ password, confirmPassword }),
+        });
 
         const data = await res.json();
 

@@ -6,17 +6,14 @@ export function useUpdateAppointment() {
   const { mutate: updateAppointment, isLoading } = useMutation({
     mutationFn: async function ({ appointmentId, data }) {
       try {
-        const res = await fetch(
-          `http://localhost:3000/api/academy/appointments/${appointmentId}`,
-          {
-            method: "PUT",
-            body: JSON.stringify(data),
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
+        const res = await fetch(`/api/academy/appointments/${appointmentId}`, {
+          method: "PUT",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
           },
-        );
+          credentials: "include",
+        });
         if (!res.ok) {
           const errorData = await res.json();
           throw new Error(errorData.message);
