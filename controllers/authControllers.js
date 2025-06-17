@@ -16,7 +16,7 @@ const {
   sendPasswordResetSuccess,
 } = require('../mailing/emails');
 
-const { defaultRoadmap } = require('../controllers/studentController');
+const { defaultRoadmap } = require('./studentController');
 /* 
 
 

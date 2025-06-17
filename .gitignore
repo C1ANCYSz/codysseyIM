@@ -1,10 +1,5 @@
 node_modules
-backend/node_modules
-backend/.env
-frontend/node_modules
-frontend/.env
-backend/.prettierrc
-backend/meta.json
-backend/roadmapSeeding.js
-backend/playlist_data.json
-backend/dummy.js
+.env
+roadmapSeeding.js
+playlist_data.json
+meta.json
