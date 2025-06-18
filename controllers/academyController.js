@@ -150,28 +150,38 @@ exports.getDashboard = async (req, res, next) => {
 };
 
 exports.getPendingAppointments = async (req, res, next) => {
-  const appointments = await Appointment.find({
-    academy: req.user.id,
-    status: 'pending',
-  })
-    .populate({
-      path: 'roadmap',
-      select: 'title image',
+  try {
+    const appointments = await Appointment.find({
+      academy: req.user.id,
+      status: 'pending',
     })
-    .populate({
-      path: 'user',
-      select: 'name email',
-    })
-    .select('-academy')
-    .sort('-createdAt');
+      .populate({
+        path: 'roadmap',
+        select: 'title image',
+      })
+      .populate({
+        path: 'user',
+        select: 'name email',
+      })
+      .select('-academy')
+      .sort('-createdAt');
 
-  const user = await User.findById(req.user.id);
+    const user = await User.findById(req.user.id);
 
-  if (!appointments) {
-    return res.json({ success: true, data: {} });
+    if (!user) {
+      return res
+        .status(404)
+        .json({ success: false, message: 'User not found' });
+    }
+
+    res.json({
+      success: true,
+      appointments,
+      locations: user.locations,
+    });
+  } catch (error) {
+    next(error);
   }
-
-  res.json({ success: true, appointments, locations: user.locations });
 };
 
 exports.getAcceptedAppointments = async (req, res, next) => {
