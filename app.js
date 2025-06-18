@@ -14,6 +14,11 @@ const userRouter = require('./routes/userRouter');
 const academyRouter = require('./routes/academyRouter');
 const app = express();
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://codyssey-eta.vercel.app',
+];
+
 app.use(
   cors({
     //
