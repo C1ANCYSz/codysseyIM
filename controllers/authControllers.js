@@ -5,10 +5,10 @@ const User = require('./../models/User');
 const mongoose = require('mongoose');
 const AppError = require('../utils/AppError');
 const UserRoadmap = require('../models/UserRoadmap');
+require('dotenv').config();
 const {
   generateVerificationToken,
 } = require('../utils/generateVerificationToken');
-
 const {
   sendVerificationEmail,
   sendWelcomeEmail,
@@ -157,10 +157,15 @@ exports.signUp = async (req, res, next) => {
 };
 
 exports.logout = async (req, res) => {
-  res.clearCookie('token');
+  res.clearCookie('token', {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+  });
+
   res.status(200).json({
     success: true,
-    message: 'logged out successfully',
+    message: 'Logged out successfully',
   });
 };
 
